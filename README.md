@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🏢 BR7 ARRENDAMIENTOS
+# 🏢 BR7 RENT
 
 ### Plataforma Integral para la Gestión de Arrendamientos
 
@@ -17,7 +17,7 @@ Digitalización, centralización y optimización de los procesos administrativos
 
 # 📖 Descripción General
 
-**BR7 ARRENDAMIENTOS** es una plataforma diseñada para modernizar y optimizar la administración de inmuebles arrendados mediante la centralización de la información, la automatización de procesos y la mejora de la comunicación entre administradores, propietarios y arrendatarios.
+**BR7 RENT** es una plataforma diseñada para modernizar y optimizar la administración de inmuebles arrendados mediante la centralización de la información, la automatización de procesos y la mejora de la comunicación entre administradores, propietarios y arrendatarios.
 
 El sistema busca eliminar procesos manuales y repetitivos, proporcionando herramientas que faciliten la gestión de propiedades, contratos, estados de cuenta, comunicaciones y solicitudes de los usuarios desde una única plataforma.
 
