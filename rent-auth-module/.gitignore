@@ -34,3 +34,7 @@ build/
 
 ###target
 target/
+
+###keys
+src/main/resources/keys/public.pem
+src/main/resources/keys/private.pem

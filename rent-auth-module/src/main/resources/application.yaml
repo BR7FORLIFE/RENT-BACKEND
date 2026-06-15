@@ -1,3 +1,7 @@
 spring:
   application:
     name: rent-auth-module
+
+jwt: 
+  accessToken:
+    expired: 900 # 900 segundos de expiracion del access token o 15 min 
