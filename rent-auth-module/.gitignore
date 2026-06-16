@@ -38,3 +38,7 @@ target/
 ###keys
 src/main/resources/keys/public.pem
 src/main/resources/keys/private.pem
+
+## envorments variables
+.env.local
+.env

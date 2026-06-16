@@ -2,6 +2,22 @@ spring:
   application:
     name: rent-auth-module
 
+  webflux:
+    base-path: /api
+
+  mongodb:
+    username: ${MONGO_USERNAME}
+    password: ${MONGO_PASSWORD}
+    representation:
+      uuid: standard
+    uri: ${MONGO_URI}
+
+resend:
+  api-key: ${RESEND_API_KEY}
+
 jwt: 
   accessToken:
     expired: 900 # 900 segundos de expiracion del access token o 15 min 
+
+server:
+  port: 8080
