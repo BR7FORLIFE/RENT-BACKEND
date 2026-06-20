@@ -21,6 +21,39 @@ public class UserModel {
     private Set<RolEnum> rols;
     private boolean isEnabled;
 
+    public static UserModel changeStatus(UserModel model, boolean isEnabled) {
+        return new UserModel(
+                model.getId(),
+                model.getUsername(),
+                model.getPassword(),
+                model.getEmail(),
+                model.getCellphone(),
+                model.getFullname(),
+                model.getIdentificationType(),
+                model.getIdentificationNumber(),
+                model.getCreateAt(),
+                model.getUpdateAt(),
+                model.getRols(),
+                isEnabled);
+    }
+
+    private UserModel(UUID id, String username, String password, String email, String cellphone, String fullname,
+            IdentificationEnum identificationType, String identificationNumber, Instant createAt, Instant updateAt,
+            Set<RolEnum> rols, boolean isEnabled) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.cellphone = cellphone;
+        this.fullname = fullname;
+        this.identificationType = identificationType;
+        this.identificationNumber = identificationNumber;
+        this.createAt = createAt;
+        this.updateAt = updateAt;
+        this.rols = rols;
+        this.isEnabled = isEnabled;
+    }
+
     private UserModel(UserBuilder builder) {
         this.id = builder.id;
         this.username = builder.username;

@@ -47,13 +47,14 @@ public class AuthUseCaseImp implements AuthUseCase {
                             .identificationType(cmd.identificationType())
                             .build();
 
-                    // mandamos la verificacion de email
-                    
-
-                    // retornamos la respuesta
+                    // retornamos la respuesta y enviamos el email de verificacion
                     return authRepositoryPort.save(user)
-                            .map(saved -> new RegisterUserCommandResult(saved.getId(),
-                                    "user created sucessfull! please verified your email for activate the user!"));
+                            .flatMap(saved -> emailVerificationUseCase
+                                    .sendEmailVerificationToken(saved.getId(), saved.getEmail())
+                                    .thenReturn(saved))
+                            .map(saved -> new RegisterUserCommandResult(
+                                    saved.getId(),
+                                    "user created successfully! please verify your email!"));
                 });
     }
 }
