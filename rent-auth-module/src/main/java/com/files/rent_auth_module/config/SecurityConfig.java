@@ -22,7 +22,7 @@ import com.files.rent_auth_module.shared.jwt.JwtService;
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_PATHS = { "/auth/**" };
+    private final String[] PUBLIC_PATHS = { "/auth/**", "/email/**" };
 
     private final JwtService jwtService;
 
@@ -41,7 +41,7 @@ public class SecurityConfig {
                     configuration.addAllowedHeader("*");
                     configuration.addAllowedHeader("*");
                     configuration.addAllowedMethod("*");
-                    configuration.addAllowedOrigin("");
+                    configuration.addAllowedOrigin("http://localhost:8081");
 
                     return configuration;
                 })) // configurar el cors cuando tengamos enlace al frontend
