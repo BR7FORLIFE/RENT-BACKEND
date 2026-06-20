@@ -14,6 +14,10 @@ spring:
 
 resend:
   api-key: ${RESEND_API_KEY}
+  issuer: ${ISSUER_EMAIL}
+  path-verification: ${PATH_VERIFICATION_URL}
+  expiration-time: 1800
+  expiration-forward-time: 60
 
 jwt: 
   accessToken:
