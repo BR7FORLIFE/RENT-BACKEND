@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -21,8 +22,8 @@ import com.files.rent_auth_module.shared.jwt.JwtService;
 @Configuration
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
-
-    private final String[] PUBLIC_PATHS = { "/auth/**", "/email/**" };
+    /* por el callback de google */
+    private final String[] PUBLIC_PATHS = { "/auth/**", "/email/**", "/oauth2/**", "/login/**" };
 
     private final JwtService jwtService;
 
@@ -45,6 +46,7 @@ public class SecurityConfig {
 
                     return configuration;
                 })) // configurar el cors cuando tengamos enlace al frontend
+                .oauth2Login(Customizer.withDefaults())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((exchange, ex) -> {
                             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
