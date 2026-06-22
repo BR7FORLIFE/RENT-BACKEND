@@ -12,6 +12,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.files.rent_auth_module.application.global.JwtServicePort;
+import com.files.rent_auth_module.domain.auth.UserModel;
 import com.files.rent_auth_module.infra.security.CustomUserDetails;
 import com.files.rent_auth_module.infra.zGlobalAdviceException.exceptions.JwtExceptions;
 import com.nimbusds.jose.JOSEObjectType;
@@ -27,7 +29,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Service
-public class JwtService {
+public class JwtService implements JwtServicePort {
 
     @Value("${jwt.accessToken.expired}")
     private Integer accessTokenExpiredTime;
@@ -44,7 +46,13 @@ public class JwtService {
         this.rsaPublicKey = rsaPublicKey;
     }
 
-    public Mono<String> generateAccessToken(UserDetails userDetails) {
+    @Override
+    public Mono<String> obtainAccessToken(UserModel data) {
+        CustomUserDetails details = new CustomUserDetails(data);
+        return this.generateAccessToken(details);
+    }
+
+    private Mono<String> generateAccessToken(UserDetails userDetails) {
         // fecha de emision del token y fecha de expiracion
         Instant now = Instant.now();
         Instant expirationTime = now.plusSeconds(this.accessTokenExpiredTime);
