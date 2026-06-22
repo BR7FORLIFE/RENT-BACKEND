@@ -12,6 +12,23 @@ spring:
       uuid: standard
     uri: ${MONGO_URI}
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google: 
+            client-id: ${OAUTH2_CLIENT_ID}
+            client-secret: ${OAUTH2_CLIENT_SECRET}
+            client-name: ${OAUTH2_CLIENT_NAME}
+            scope:
+            - openid
+            - profile
+            - email    
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
 resend:
   api-key: ${RESEND_API_KEY}
   issuer: ${ISSUER_EMAIL}
@@ -22,6 +39,9 @@ resend:
 jwt: 
   accessToken:
     expired: 900 # 900 segundos de expiracion del access token o 15 min 
+
+refreshToken:
+  expired: 15 # expiracion de 15 dias
 
 server:
   port: 8080
