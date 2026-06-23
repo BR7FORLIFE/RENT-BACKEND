@@ -11,4 +11,6 @@ public interface AuthUseCase {
     Mono<RegisterUserCommandResult> register(RegisterUserCommand cmd);
 
     Mono<LoginUserCommandResult> login(LoginUserUserCommand cmd);
+
+    Mono<String> logout();
 }

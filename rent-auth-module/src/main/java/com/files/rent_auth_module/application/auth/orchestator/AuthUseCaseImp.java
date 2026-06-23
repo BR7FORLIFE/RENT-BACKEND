@@ -1,6 +1,5 @@
 package com.files.rent_auth_module.application.auth.orchestator;
 
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,9 @@ import com.files.rent_auth_module.application.auth.command.response.RegisterUser
 import com.files.rent_auth_module.application.auth.exceptions.AuthExceptions;
 import com.files.rent_auth_module.application.auth.ports.AuthRepositoryPort;
 import com.files.rent_auth_module.application.auth.usecases.AuthUseCase;
+import com.files.rent_auth_module.application.emailVerification.ports.EmailVerificationPort;
 import com.files.rent_auth_module.application.emailVerification.usecases.EmailVerificationUseCase;
+import com.files.rent_auth_module.application.refreshToken.ports.RefreshTokenRepositoryPort;
 import com.files.rent_auth_module.application.refreshToken.usecases.RefreshTokenUseCase;
 import com.files.rent_auth_module.domain.auth.UserModel;
 
@@ -22,17 +23,23 @@ public class AuthUseCaseImp implements AuthUseCase {
 
     private final AuthRepositoryPort authRepositoryPort;
     private final EmailVerificationUseCase emailVerificationUseCase;
+    private final EmailVerificationPort emailVerificationPort;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenUseCase refreshTokenUseCase;
+    private final RefreshTokenRepositoryPort refreshTokenRepositoryPort;
 
     public AuthUseCaseImp(AuthRepositoryPort authRepositoryPort,
             EmailVerificationUseCase emailVerificationUseCase,
+            EmailVerificationPort emailVerificationPort,
             PasswordEncoder passwordEncoder,
-            RefreshTokenUseCase refreshTokenUseCase) {
+            RefreshTokenUseCase refreshTokenUseCase,
+            RefreshTokenRepositoryPort refreshTokenRepositoryPort) {
         this.authRepositoryPort = authRepositoryPort;
         this.passwordEncoder = passwordEncoder;
         this.emailVerificationUseCase = emailVerificationUseCase;
+        this.emailVerificationPort = emailVerificationPort;
         this.refreshTokenUseCase = refreshTokenUseCase;
+        this.refreshTokenRepositoryPort = refreshTokenRepositoryPort;
     }
 
     @Override
@@ -58,10 +65,15 @@ public class AuthUseCaseImp implements AuthUseCase {
                     return authRepositoryPort.save(user)
                             .flatMap(saved -> emailVerificationUseCase
                                     .sendEmailVerificationToken(saved.getId(), saved.getEmail())
-                                    .thenReturn(saved))
-                            .map(saved -> new RegisterUserCommandResult(
-                                    saved.getId(),
-                                    "usuario creado satisfactoriamente, por favor verifica tu email para continuar!"));
+                                    .thenReturn(
+                                            new RegisterUserCommandResult(
+                                                    saved.getId(),
+                                                    "usuario creado satisfactoriamente, por favor verifica tu email para continuar!"))
+                                    .onErrorResume(error -> Mono.when(
+                                            authRepositoryPort.deleteByUserId(saved.getId()),
+                                            refreshTokenRepositoryPort.deleteRefreshTokenByUserId(saved.getId()),
+                                            emailVerificationPort.deleteEmailVerificationByUserId(saved.getId()))
+                                            .then(Mono.error(error))));
                 });
     }
 
@@ -78,5 +90,10 @@ public class AuthUseCaseImp implements AuthUseCase {
                     return refreshTokenUseCase.generateRefreshTokenAndAccessToken(user)
                             .map(res -> new LoginUserCommandResult(res.refreshToken(), res.accessToken()));
                 });
+    }
+
+    @Override
+    public Mono<String> logout() {
+        return refreshTokenUseCase.revokedAllRefresh().thenReturn("se cerró la session correctamente!");
     }
 }

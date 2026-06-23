@@ -79,4 +79,9 @@ public class AuthController {
         return refreshTokenUseCase.revokedAllAndObtainRefreshToken(dto.userId(), dto.refreshToken())
                 .map(res -> ResponseEntity.ok().body(new LoginUserResponseDto(res.refreshToken(), res.accessToken())));
     }
+
+    @PostMapping("/logout")
+    public Mono<ResponseEntity<Map<String, String>>> logout() {
+        return authUseCase.logout().map(msg -> ResponseEntity.ok().body(Map.of("message", msg)));
+    }
 }
