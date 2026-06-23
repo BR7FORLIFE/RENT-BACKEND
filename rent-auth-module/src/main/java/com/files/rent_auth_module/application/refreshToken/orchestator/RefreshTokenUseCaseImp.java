@@ -45,22 +45,9 @@ public class RefreshTokenUseCaseImp implements RefreshTokenUseCase {
 
     @Override
     public Mono<GenerateRefreshTokenCommandResult> generateRefreshTokenAndAccessToken(UserModel model) {
-        Instant now = Instant.now();
-        Instant expiredAt = now.plus(refreshTokenDaysExpired, ChronoUnit.DAYS);
-
-        // generamos el token con alta entropia
-        String token = generateCodeService.randomBase64(32);
-        String tokenHash = generateCodeService.sha256(token);
-
-        RefreshTokenModel refresh = new RefreshTokenModel.RefreshTokenBuilderDraft()
-                .userId(model.getId())
-                .token(tokenHash)
-                .expiredAt(expiredAt)
-                .build();
-
-        return refreshTokenPort.save(refresh)
-                .flatMap(user -> jwtServicePort.obtainAccessToken(model)
-                        .map(accessToken -> new GenerateRefreshTokenCommandResult(token, accessToken)));
+        // revocamos todos los refresh token para no tener refresh activos y creamos el
+        // pair nuevo
+        return revokedAllRefresh().then(createRefreshAndAccessToken(model));
     }
 
     @Override
@@ -96,5 +83,29 @@ public class RefreshTokenUseCaseImp implements RefreshTokenUseCase {
                 .map(RefreshTokenModel::getUserId)
                 .flatMap(authRepositoryPort::findById)
                 .flatMap(this::generateRefreshTokenAndAccessToken);
+    }
+
+    @Override
+    public Mono<Void> revokedAllRefresh() {
+        return refreshTokenPort.revokedAllRefresh();
+    }
+
+    private Mono<GenerateRefreshTokenCommandResult> createRefreshAndAccessToken(UserModel model) {
+        Instant now = Instant.now();
+        Instant expiredAt = now.plus(refreshTokenDaysExpired, ChronoUnit.DAYS);
+
+        // generamos el token con alta entropia
+        String token = generateCodeService.randomBase64(32);
+        String tokenHash = generateCodeService.sha256(token);
+
+        RefreshTokenModel refresh = new RefreshTokenModel.RefreshTokenBuilderDraft()
+                .userId(model.getId())
+                .token(tokenHash)
+                .expiredAt(expiredAt)
+                .build();
+
+        return refreshTokenPort.save(refresh)
+                .flatMap(user -> jwtServicePort.obtainAccessToken(model)
+                        .map(accessToken -> new GenerateRefreshTokenCommandResult(token, accessToken)));
     }
 }

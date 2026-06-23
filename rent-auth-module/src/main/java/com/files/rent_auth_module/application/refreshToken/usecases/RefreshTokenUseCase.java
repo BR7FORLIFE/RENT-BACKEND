@@ -13,4 +13,6 @@ public interface RefreshTokenUseCase {
     Mono<String> obtainAccessToken(UUID userId, String refreshToken);
 
     Mono<GenerateRefreshTokenCommandResult> revokedAllAndObtainRefreshToken(UUID userId, String refresh);
+
+    Mono<Void> revokedAllRefresh();
 }
