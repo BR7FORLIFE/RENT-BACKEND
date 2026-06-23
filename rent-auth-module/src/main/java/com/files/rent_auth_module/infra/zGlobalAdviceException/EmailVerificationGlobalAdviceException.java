@@ -11,6 +11,8 @@ import com.files.rent_auth_module.application.emailVerification.exceptions.Email
 import com.files.rent_auth_module.application.emailVerification.exceptions.EmailVerificationIsExpiredException;
 import com.files.rent_auth_module.application.emailVerification.exceptions.EmailVerificationRevockedException;
 import com.files.rent_auth_module.application.emailVerification.exceptions.NotEmailVerificationException;
+import com.files.rent_auth_module.infra.emailVerification.exceptions.DomainEmailNotExists;
+import com.files.rent_auth_module.infra.emailVerification.exceptions.EmailProviderException;
 import com.files.rent_auth_module.shared.ApiError;
 import com.files.rent_auth_module.shared.StaticError;
 
@@ -48,6 +50,20 @@ public class EmailVerificationGlobalAdviceException {
     @ExceptionHandler(EmailVerificationCooldownException.class)
     public ResponseEntity<ApiError> handleCooldownEmailVerification(
             EmailVerificationCooldownException ex,
+            ServerWebExchange exchange) {
+        return StaticError.send(HttpStatus.NOT_ACCEPTABLE, exchange, ex.getMessage());
+    }
+
+    @ExceptionHandler(EmailProviderException.class)
+    public ResponseEntity<ApiError> handleErrorProviderException(
+            EmailProviderException ex,
+            ServerWebExchange exchange) {
+        return StaticError.send(HttpStatus.SERVICE_UNAVAILABLE, exchange, ex.getMessage());
+    }
+
+    @ExceptionHandler(DomainEmailNotExists.class)
+    public ResponseEntity<ApiError> handleDomainEmailNotExists(
+            DomainEmailNotExists ex,
             ServerWebExchange exchange) {
         return StaticError.send(HttpStatus.NOT_ACCEPTABLE, exchange, ex.getMessage());
     }
