@@ -10,4 +10,6 @@ import reactor.core.publisher.Mono;
 
 public interface UserRepository extends ReactiveMongoRepository<UserDocument, UUID> {
     Mono<UserDocument> findByEmail(String email);
+
+    Mono<Void> deleteById(UUID Id);
 }

@@ -37,4 +37,9 @@ public class UserRepositoryAdapter implements AuthRepositoryPort {
         return userRepository.findById(id)
                 .map(UserMapper::toDomain);
     }
+
+    @Override
+    public Mono<Void> deleteByUserId(UUID userId) {
+        return userRepository.deleteById(userId);
+    }
 }

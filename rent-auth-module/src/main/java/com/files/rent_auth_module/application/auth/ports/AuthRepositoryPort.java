@@ -13,4 +13,6 @@ public interface AuthRepositoryPort {
     Mono<UserModel> findByEmail(String email);
 
     Mono<UserModel> save(UserModel userModel);
+
+    Mono<Void> deleteByUserId(UUID userId);
 }

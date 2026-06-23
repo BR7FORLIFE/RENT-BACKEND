@@ -10,4 +10,6 @@ import reactor.core.publisher.Mono;
 
 public interface IMongoRefreshTokenRepository extends ReactiveMongoRepository<RefreshTokenDocument, UUID> {
     Mono<RefreshTokenDocument> findByUserIdAndToken(UUID UserId, String Token);
+
+    Mono<Void> deleteByUserId(UUID UserId);
 }

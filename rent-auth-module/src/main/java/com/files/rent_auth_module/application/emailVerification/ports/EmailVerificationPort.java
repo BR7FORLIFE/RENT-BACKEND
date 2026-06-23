@@ -14,4 +14,6 @@ public interface EmailVerificationPort {
     Mono<EmailVerificationModel> findFirstByUserIdOrderByCreatedAtDesc(UUID userId);
 
     Mono<Void> revockedAllEmailVerification(UUID userId);
+
+    Mono<Void> deleteEmailVerificationByUserId(UUID userId);
 }

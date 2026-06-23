@@ -56,4 +56,9 @@ public class EmailRepositoryAdapter implements EmailVerificationPort {
         return repository.save(EmailVerificationMapper.toEntity(model))
                 .map(EmailVerificationMapper::toDomain);
     }
+
+    @Override
+    public Mono<Void> deleteEmailVerificationByUserId(UUID userId) {
+        return repository.deleteByUserId(userId);
+    }
 }

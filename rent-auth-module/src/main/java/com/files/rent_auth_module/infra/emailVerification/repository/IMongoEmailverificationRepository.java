@@ -12,4 +12,6 @@ public interface IMongoEmailverificationRepository extends ReactiveMongoReposito
     Mono<EmailVerificationDocument> findByToken(String Token);
 
     Mono<EmailVerificationDocument> findFirstByUserIdOrderByCreateAtDesc(UUID userId);
+
+    Mono<Void> deleteByUserId(UUID UserId);
 }

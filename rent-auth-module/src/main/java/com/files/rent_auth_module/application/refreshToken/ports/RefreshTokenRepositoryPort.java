@@ -10,4 +10,8 @@ public interface RefreshTokenRepositoryPort {
     Mono<RefreshTokenModel> save(RefreshTokenModel model);
 
     Mono<RefreshTokenModel> findByUserIdAndToken(UUID userId, String token);
+
+    Mono<Void> revokedAllRefresh();
+
+    Mono<Void> deleteRefreshTokenByUserId(UUID userId);
 }

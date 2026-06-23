@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.files.rent_auth_module.application.emailVerification.ports.ResendPort;
+import com.files.rent_auth_module.infra.emailVerification.exceptions.DomainEmailNotExists;
+import com.files.rent_auth_module.infra.emailVerification.exceptions.EmailProviderException;
 import com.resend.Resend;
+import com.resend.core.exception.ResendException;
 import com.resend.services.emails.model.CreateEmailOptions;
 
 import reactor.core.publisher.Mono;
@@ -27,14 +30,21 @@ public class ResendServiceAdapter implements ResendPort {
 
     public Mono<Void> sendEmail(String to, String code) {
         return Mono.fromCallable(() -> {
-            CreateEmailOptions options = new CreateEmailOptions.Builder()
-                    .from(emailIssuer)
-                    .to(to)
-                    .subject("RENT - VERIFY YOUR EMAIL")
-                    .html(createHtml(code))
-                    .build();
+            try {
+                CreateEmailOptions options = new CreateEmailOptions.Builder()
+                        .from(emailIssuer)
+                        .to(to)
+                        .subject("RENT - VERIFY YOUR EMAIL")
+                        .html(createHtml(code))
+                        .build();
 
-            return resend.emails().send(options);
+                return resend.emails().send(options);
+            } catch (ResendException e) {
+                if (e.getErrorName().equals("invalid_recipient")) {
+                    throw new DomainEmailNotExists();
+                }
+                throw new EmailProviderException();
+            }
         }).subscribeOn(Schedulers.boundedElastic()).then();
     }
 
