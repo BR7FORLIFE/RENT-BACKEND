@@ -9,11 +9,11 @@ public class AuthExceptions extends ExceptionHandler {
     }
 
     public static AuthExceptions userNotFound() {
-        return new AuthExceptions("user not found!");
+        return new AuthExceptions("Usuario no encontrado");
     }
 
     public static AuthExceptions userAlreadyExistsException() {
-        return new AuthExceptions("User already exists!");
+        return new AuthExceptions("El usuario existe");
     }
 
     public static AuthExceptions disabledUser(String message) {

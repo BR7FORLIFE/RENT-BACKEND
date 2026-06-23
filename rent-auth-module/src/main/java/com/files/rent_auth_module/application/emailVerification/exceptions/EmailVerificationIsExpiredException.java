@@ -4,6 +4,6 @@ import com.files.rent_auth_module.shared.exceptions.ExceptionHandler;
 
 public class EmailVerificationIsExpiredException extends ExceptionHandler {
     public EmailVerificationIsExpiredException() {
-        super("email verification is expired!");
+        super("El codigo de expiración se encuentra expirado");
     }
 }

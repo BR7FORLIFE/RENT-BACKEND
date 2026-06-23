@@ -9,14 +9,14 @@ public class RefreshTokenExceptions extends ExceptionHandler {
     }
 
     public static RefreshTokenExceptions refreshExpiredException() {
-        return new RefreshTokenExceptions("the refresh token is expired!");
+        return new RefreshTokenExceptions("El refresh token esta expirado!");
     }
 
     public static RefreshTokenExceptions refreshRevokedException() {
-        return new RefreshTokenExceptions("the refresh token is revoked!");
+        return new RefreshTokenExceptions("El refresh token ha sido invalidado");
     }
 
     public static RefreshTokenExceptions refreshTokenNotFound() {
-        return new RefreshTokenExceptions("the refresh token not found!");
+        return new RefreshTokenExceptions("No se ha encontrado refresh token");
     }
 }
