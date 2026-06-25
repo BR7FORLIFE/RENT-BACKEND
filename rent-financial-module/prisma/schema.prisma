@@ -1,0 +1,207 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum StatusContract{
+  DRAFT // borrador (fase de creación de contrato) 
+  PENDING // pendiente (el documento esta a la espera de firma)
+  EXECUTION // ejecucion (el contrato sigue vigente y activo)
+  DEFEATED // vencido (el contrato llega a su finalizacion)
+}
+
+enum TypeStreet{
+  STREET // calle
+  CAREER // carrera
+  AVENUE // avenida
+  DIAGONAL // diagonal
+  CROSS // transversal
+}
+
+// tipos de precios o pagos de servicio por medio de acuerdos
+enum PriceTypeAgreement{
+  CUSTOM_QUOTE // precio de servicio personalizado
+  FIXED // precio fijo de servicio
+  NEGOTIABLE // precio de servicio negociable
+  PERCENTAGE // precio de servicio acordado por partes, cuotas, etc..
+}
+
+enum Currency{
+  COP
+  USD
+}
+
+//estados de pago de dicho servicio (modelo ya que el encargado de esta logica es el modulo de pagos)
+enum PaymentStatus{
+  PENDING // pendiente
+  COMPLETE // completo
+  FAILED // fallido
+  OPEN // orden creado por el cliente pero no se ha completado la transaccion
+  AUTHORIZE // pago autorizado por el banco pero aun no se ha destinado al negocio o al receptor
+  PAID // servicio pagado y depositado a la cuenta del receptor
+  EXPIRED // el tiempo limite para el pago ha expirado
+  REIMBURSED // pago reembolsado por cualquier problema o por parte del banco
+}
+
+model TypeProperty{
+  id String @id @default(uuid())
+  name String
+  description String?
+
+  properties Property[]
+}
+
+model PropertyOccupationType{
+  id String @id @default(uuid())
+  name String
+  description String?
+
+  properties Property[]
+}
+
+model PropertyActorRole{
+  id String @id @default(uuid())
+  name String
+  description String?
+
+  propertyMemberRoles PropertyMemberRole[]
+  services Service[]
+}
+
+model PublicServiceType{
+  id String @id @default(uuid())
+  name String
+  description String?
+
+  publicServices PublicService[]
+}
+
+model Direction{
+  id String @id @default(uuid())
+  latitute Decimal
+  longitud Decimal
+  department String
+  city String
+  neighborhood String
+  type_street TypeStreet
+  number_street Int
+  complement String @ignore
+
+  property Property?
+}
+
+model Property{
+  id String @id @default(uuid())
+  user_id String
+  register_by_userId String
+  property_type_id String 
+  property_occupation_type_id String
+  direction_id String @unique
+  fmi String
+  predial_number String
+  is_published Boolean
+  create_at DateTime @default(now())
+  update_at DateTime
+
+  publicServices PublicService[]
+  propertyMembers PropertyMember[]
+  contracts Contract[]
+  propertyServiceAssignments PropertyServiceAssignment[]
+  direction Direction @relation(fields: [direction_id], references: [id])
+  typeProperty TypeProperty @relation(fields: [property_type_id], references: [id])
+  propertyOccupationType PropertyOccupationType @relation(fields: [property_occupation_type_id], references: [id])
+
+}
+
+model Contract{
+  id String @id @default(uuid())
+  property_id String
+  landlord_member_id String
+  tenant_member_id String
+  monthly_rent Decimal
+  deposit_amount Decimal
+  start_date DateTime
+  end_date DateTime
+  status StatusContract
+  create_by_user_id String
+  create_at DateTime @default(now())
+
+  landlord PropertyMember @relation("LandlordContract", fields:[landlord_member_id],references:[id])
+  tenant PropertyMember @relation("TenantContract", fields:[tenant_member_id], references:[id])
+  property Property @relation(fields:[property_id], references:[id])
+}
+
+model PropertyMember{
+  id String @id @default(uuid())
+  user_id String
+  property_id String
+  assigned_by String
+  assigned_at DateTime @default(now())
+
+  @@unique([user_id, property_id])
+
+  property Property @relation(fields: [property_id], references: [id])
+  propertyMemberRole PropertyMemberRole[]
+  propertyServiceAssignment PropertyServiceAssignment[]
+  landlordContracts Contract[] @relation("LandlordContract")
+  tenantContracts Contract[] @relation("TenantContract")
+}
+
+model PropertyMemberRole{
+  id String @id @default(uuid())
+  property_member_id String
+  property_actor_role_id String
+
+  @@unique([property_actor_role_id, property_member_id])
+
+  propertyMember PropertyMember @relation(fields: [property_member_id], references: [id])
+  propertyActorRole PropertyActorRole @relation(fields: [property_actor_role_id], references: [id])
+}
+
+model Service{
+  id String @id @default(uuid())
+  property_actor_role_id String
+  name String 
+  description String
+
+  propertyServiceAssignments PropertyServiceAssignment[]
+  propertyActorRole PropertyActorRole @relation(fields: [property_actor_role_id], references: [id])
+}
+
+model PropertyServiceAssignment{
+  id String @id @default(uuid())
+  property_id String
+  property_member_id String
+  service_id String
+  price_type_agreement PriceTypeAgreement
+  base_price Decimal
+  currency Currency
+  expiration_date DateTime
+  create_at DateTime @default(now())
+  payment_status PaymentStatus
+
+  propertyMember PropertyMember @relation(fields: [property_member_id], references: [id])
+  property Property @relation(fields: [property_id], references: [id])
+  service Service @relation(fields: [service_id], references: [id])
+}
+
+model PublicService{
+  id String @id @default(uuid())
+  property_id String
+  public_service_type_id String
+  account_number String
+  register_date DateTime @default(now())
+
+  publicServiceType PublicServiceType @relation(fields:[public_service_type_id], references:[id])
+  property Property @relation(fields:[property_id], references:[id])
+  @@unique([property_id, public_service_type_id])
+}
