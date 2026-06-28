@@ -92,64 +92,68 @@ model Direction{
   department String
   city String
   neighborhood String
-  type_street TypeStreet
-  number_street Int
-  complement String @ignore
+  typeStreet TypeStreet @map("type_street")
+  numberStreet Int @map("number_street")
+  complement String?
+  createAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
 
   property Property?
 }
 
 model Property{
   id String @id @default(uuid())
-  user_id String
-  register_by_userId String
-  property_type_id String 
-  property_occupation_type_id String
-  direction_id String @unique
+  userId String @map("user_id")
+  registerByUserId String @map("register_by_userId")
+  propertyTypeId String @map("property_type_id")
+  propertyOccupationTypeId String @map("property_occupation_type_id")
+  directionId String @unique @map("direction_id")
   fmi String
-  predial_number String
-  is_published Boolean
-  create_at DateTime @default(now())
-  update_at DateTime
+  predialNumber String @map("predial_number")
+  isPublished Boolean @map("is_published")
+  createAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
 
   publicServices PublicService[]
   propertyMembers PropertyMember[]
   contracts Contract[]
   propertyServiceAssignments PropertyServiceAssignment[]
-  direction Direction @relation(fields: [direction_id], references: [id])
-  typeProperty TypeProperty @relation(fields: [property_type_id], references: [id])
-  propertyOccupationType PropertyOccupationType @relation(fields: [property_occupation_type_id], references: [id])
+  direction Direction @relation(fields: [directionId], references: [id])
+  typeProperty TypeProperty @relation(fields: [propertyTypeId], references: [id])
+  propertyOccupationType PropertyOccupationType @relation(fields: [propertyOccupationTypeId], references: [id])
 
 }
 
 model Contract{
   id String @id @default(uuid())
-  property_id String
-  landlord_member_id String
-  tenant_member_id String
-  monthly_rent Decimal
-  deposit_amount Decimal
-  start_date DateTime
-  end_date DateTime
+  propertyId String @map("property_id")
+  landlordMemberId String @map("landlord_member_id")
+  tenantMemberId String @map("tenant_member_id")
+  monthlyRent Decimal @map("monthly_rent")
+  depositAmount Decimal @map("deposit_amount")
+  startDate DateTime @map("start_date")
+  endDate DateTime @map("end_date")
   status StatusContract
-  create_by_user_id String
-  create_at DateTime @default(now())
+  createByUserId String @map("create_by_user_id")
+  createAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
 
-  landlord PropertyMember @relation("LandlordContract", fields:[landlord_member_id],references:[id])
-  tenant PropertyMember @relation("TenantContract", fields:[tenant_member_id], references:[id])
-  property Property @relation(fields:[property_id], references:[id])
+  landlord PropertyMember @relation("LandlordContract", fields:[landlordMemberId],references:[id])
+  tenant PropertyMember @relation("TenantContract", fields:[tenantMemberId], references:[id])
+  property Property @relation(fields:[propertyId], references:[id])
 }
 
 model PropertyMember{
   id String @id @default(uuid())
-  user_id String
-  property_id String
-  assigned_by String
-  assigned_at DateTime @default(now())
+  userId String @map("user_id")
+  propertyId String @map("property_id")
+  assignedBy String @map("assigned_by")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+  updateAt DateTime @updatedAt @map("update_at")
 
-  @@unique([user_id, property_id])
+  @@unique([userId, propertyId])
 
-  property Property @relation(fields: [property_id], references: [id])
+  property Property @relation(fields: [propertyId], references: [id])
   propertyMemberRole PropertyMemberRole[]
   propertyServiceAssignment PropertyServiceAssignment[]
   landlordContracts Contract[] @relation("LandlordContract")
@@ -158,50 +162,52 @@ model PropertyMember{
 
 model PropertyMemberRole{
   id String @id @default(uuid())
-  property_member_id String
-  property_actor_role_id String
+  propertyMemberId String @map("property_member_id")
+  propertyActorRoleId String @map("property_actor_role_id")
 
-  @@unique([property_actor_role_id, property_member_id])
+  @@unique([propertyActorRoleId, propertyMemberId])
 
-  propertyMember PropertyMember @relation(fields: [property_member_id], references: [id])
-  propertyActorRole PropertyActorRole @relation(fields: [property_actor_role_id], references: [id])
+  propertyMember PropertyMember @relation(fields: [propertyMemberId], references: [id])
+  propertyActorRole PropertyActorRole @relation(fields: [propertyActorRoleId], references: [id])
 }
 
 model Service{
   id String @id @default(uuid())
-  property_actor_role_id String
+  propertyActorRoleId String @map("property_actor_role_id")
   name String 
   description String
 
   propertyServiceAssignments PropertyServiceAssignment[]
-  propertyActorRole PropertyActorRole @relation(fields: [property_actor_role_id], references: [id])
+  propertyActorRole PropertyActorRole @relation(fields: [propertyActorRoleId], references: [id])
 }
 
 model PropertyServiceAssignment{
   id String @id @default(uuid())
-  property_id String
-  property_member_id String
-  service_id String
-  price_type_agreement PriceTypeAgreement
-  base_price Decimal
+  propertyId String @map("property_id")
+  propertyMemberId String @map("property_member_id")
+  serviceId String @map("service_id")
+  priceTypeAgreement PriceTypeAgreement @map("price_type_agreement")
+  basePrice Decimal @map("base_price")
   currency Currency
-  expiration_date DateTime
-  create_at DateTime @default(now())
-  payment_status PaymentStatus
+  expirationDate DateTime @map("expiration_date")
+  createAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+  paymentStatus PaymentStatus @map("payment_status")
 
-  propertyMember PropertyMember @relation(fields: [property_member_id], references: [id])
-  property Property @relation(fields: [property_id], references: [id])
-  service Service @relation(fields: [service_id], references: [id])
+  propertyMember PropertyMember @relation(fields: [propertyMemberId], references: [id])
+  property Property @relation(fields: [propertyId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
 }
 
 model PublicService{
   id String @id @default(uuid())
-  property_id String
-  public_service_type_id String
-  account_number String
-  register_date DateTime @default(now())
+  propertyId String @map("property_id")
+  publicServiceTypeId String @map("public_service_type_id")
+  accountNumber String @map("account_number")
+  registerDate DateTime @default(now()) @map("register_date")
+  updateAt DateTime @updatedAt @map("update_at")
 
-  publicServiceType PublicServiceType @relation(fields:[public_service_type_id], references:[id])
-  property Property @relation(fields:[property_id], references:[id])
-  @@unique([property_id, public_service_type_id])
+  publicServiceType PublicServiceType @relation(fields:[publicServiceTypeId], references:[id])
+  property Property @relation(fields:[propertyId], references:[id])
+  @@unique([propertyId, publicServiceTypeId])
 }
