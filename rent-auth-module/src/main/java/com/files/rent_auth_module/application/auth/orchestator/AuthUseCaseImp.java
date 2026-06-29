@@ -82,9 +82,13 @@ public class AuthUseCaseImp implements AuthUseCase {
         return authRepositoryPort.findByEmail(cmd.email())
                 .switchIfEmpty(Mono.error(AuthExceptions.userNotFound()))
                 .flatMap(user -> {
+                    // verificamos la contraseña del usuario
+                    if (!passwordEncoder.matches(cmd.password(), user.getPassword())) {
+                        return Mono.error(AuthExceptions.passwordIsNotCorrect());
+                    }
+
                     if (!user.isEnabled()) {
-                        return Mono.error(AuthExceptions
-                                .disabledUser("Por favor verifica tu email para poder loguearte a la aplicación!"));
+                        return Mono.error(AuthExceptions.disabledUser());
                     }
 
                     return refreshTokenUseCase.generateRefreshTokenAndAccessToken(user)

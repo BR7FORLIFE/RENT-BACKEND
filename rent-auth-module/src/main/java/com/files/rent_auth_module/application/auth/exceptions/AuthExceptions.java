@@ -16,7 +16,11 @@ public class AuthExceptions extends ExceptionHandler {
         return new AuthExceptions("El usuario existe");
     }
 
-    public static AuthExceptions disabledUser(String message) {
-        return new AuthExceptions(message);
+    public static AuthExceptions disabledUser() {
+        return new AuthExceptions("Por favor verifica tu email para poder loguearte a la aplicación!");
+    }
+
+    public static AuthExceptions passwordIsNotCorrect() {
+        return new AuthExceptions("La contraseña no es correcta!");
     }
 }
