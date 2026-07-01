@@ -1,8 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
+  Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -60,8 +63,21 @@ export class PropertyRegistrationController {
     return response;
   }
 
-  async consultPropertyByFmi() {}
+  @Get(':id')
+  async consultPropertyById(@Req() req: AuthRequest, @Param('id') id: string) {
+    const data = await this.propertyService.consultPropertyById(
+      req.user.userId,
+      id,
+    );
 
+    return {
+      property: data,
+    };
+  }
+
+  @Patch()
   async modifyProperty() {}
+
+  @Delete()
   async deleteProperty() {}
 }
