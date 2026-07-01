@@ -10,6 +10,12 @@ export class PropertyAlreadyRegisterException extends AppException {
   }
 }
 
+export class PropertyNotFoundException extends AppException {
+  constructor() {
+    super('No se ha encontrado propiedad (s)', 404, 'NOT_FOUND');
+  }
+}
+
 export class PropertyOccupationTypeNotFoundException extends AppException {
   constructor() {
     super(
@@ -24,6 +30,16 @@ export class TypePropertyNotFoundException extends AppException {
   constructor() {
     super(
       'El tipo de propiedad del inmueble no se encuentra registrado!',
+      404,
+      'NOT_FOUND',
+    );
+  }
+}
+
+export class PropertyActorRoleNotFoundException extends AppException {
+  constructor() {
+    super(
+      'El tipo de rol de la persona no se encuentra registrado!',
       404,
       'NOT_FOUND',
     );
