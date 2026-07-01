@@ -85,6 +85,20 @@ model PublicServiceType{
   publicServices PublicService[]
 }
 
+model ResourceImages{
+  id String @id @default(uuid())
+  assetId String? @map("asset_id")
+  width Int? 
+  height Int?
+  format String?
+  url String
+  secureUrl String? @map("secure_url")
+  createAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+  property Property?
+}
+
 model Direction{
   id String @id @default(uuid())
   latitute Decimal
@@ -108,9 +122,15 @@ model Property{
   propertyTypeId String @map("property_type_id")
   propertyOccupationTypeId String @map("property_occupation_type_id")
   directionId String @unique @map("direction_id")
+  resourceImageId String @unique @map("resource_image_id")
+  propertyName String @map("property_name")
+  propertyDescription String @map("property_description")
   fmi String
   predialNumber String @map("predial_number")
   isPublished Boolean @map("is_published")
+  
+   // esto permite que los administradores validen la autenticidad del inmueble
+  isActive Boolean @map("is_active") @default(false)
   createAt DateTime @default(now()) @map("create_at")
   updateAt DateTime @updatedAt @map("update_at")
 
@@ -121,7 +141,7 @@ model Property{
   direction Direction @relation(fields: [directionId], references: [id])
   typeProperty TypeProperty @relation(fields: [propertyTypeId], references: [id])
   propertyOccupationType PropertyOccupationType @relation(fields: [propertyOccupationTypeId], references: [id])
-
+  resourceImage ResourceImages @relation(fields: [resourceImageId], references: [id])
 }
 
 model Contract{

@@ -64,6 +64,30 @@ async function main() {
     ],
     skipDuplicates: true,
   });
+
+  await prisma.propertyActorRole.createMany({
+    data: [
+      {
+        name: 'LANDLORD',
+        description: 'Propietario o arrendador del inmueble.',
+      },
+      {
+        name: 'TENANT',
+        description: 'Arrendatario que ocupa el inmueble mediante contrato.',
+      },
+      {
+        name: 'PROPERTY_ADMINISTRATOR',
+        description:
+          'Persona encargada de administrar el inmueble por cuenta del propietario.',
+      },
+      {
+        name: 'OPERATION_SUPPORT',
+        description:
+          'Encargado de inspecciones, entregas, mantenimientos y apoyo operativo.',
+      },
+    ],
+    skipDuplicates: true,
+  });
 }
 
 await main().finally(() => prisma.$disconnect());
