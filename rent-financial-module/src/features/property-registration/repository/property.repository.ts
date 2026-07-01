@@ -2,7 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import type {
   DirectionType,
+  PropertyActorRoleType,
+  PropertyMemberRoleType,
+  PropertyMemberType,
+  PropertyOccupationType,
   PropertyType,
+  ResourceImageType,
+  TypePropertyType,
 } from '../schemas/property-registration.schema.js';
 import type {
   PaginationResponse,
@@ -32,6 +38,8 @@ export class PropertyRepository {
           predialNumber: true,
           isPublished: true,
           createAt: true,
+          propertyDescription: true,
+          propertyName: true,
 
           typeProperty: {
             select: {
@@ -46,6 +54,7 @@ export class PropertyRepository {
           },
 
           direction: true,
+          resourceImage: true,
         },
       }),
       this.prisma.property.count({
@@ -66,15 +75,38 @@ export class PropertyRepository {
     };
   }
 
-  async findByFMIOrPredialNumber(fmi: string, predialNumber: string) {
+  async findByFMIOrPredialNumber(
+    userId: string,
+    fmi: string | null,
+    predialNumber: string | null,
+  ) {
+    if (fmi) {
+      return await this.prisma.property.findFirst({
+        where: {
+          userId,
+          fmi,
+        },
+      });
+    }
+    if (predialNumber) {
+      return await this.prisma.property.findFirst({
+        where: {
+          userId,
+          predialNumber,
+        },
+      });
+    }
+
+    return null;
+  }
+
+  async findPropertyById(userId: string, id: string) {
     return await this.prisma.property.findFirst({
-      where: {
-        OR: [{ fmi }, { predialNumber: predialNumber }],
-      },
+      where: { userId, id },
     });
   }
 
-  async findPropertyOccupationTypeByName(name: string) {
+  async findPropertyOccupationTypeByName(name: PropertyOccupationType) {
     return await this.prisma.propertyOccupationType.findFirst({
       where: {
         name,
@@ -82,7 +114,7 @@ export class PropertyRepository {
     });
   }
 
-  async findTypePropertyByName(name: string) {
+  async findTypePropertyByName(name: TypePropertyType) {
     return await this.prisma.typeProperty.findFirst({
       where: {
         name,
@@ -90,6 +122,13 @@ export class PropertyRepository {
     });
   }
 
+  async findPropertyActorRoleByName(name: PropertyActorRoleType) {
+    return await this.prisma.propertyActorRole.findFirst({
+      where: {
+        name,
+      },
+    });
+  }
   async saveProperty(property: PropertyType) {
     return await this.prisma.property.create({
       data: property,
@@ -98,5 +137,19 @@ export class PropertyRepository {
 
   async saveDirection(direction: DirectionType) {
     return await this.prisma.direction.create({ data: direction });
+  }
+
+  async saveAssetResource(resourceimage: ResourceImageType) {
+    return await this.prisma.resourceImages.create({ data: resourceimage });
+  }
+
+  async savePropertyMember(propertyMember: PropertyMemberType) {
+    return await this.prisma.propertyMember.create({ data: propertyMember });
+  }
+
+  async savePropertyMemberRole(properyMemberRole: PropertyMemberRoleType) {
+    return await this.prisma.propertyMemberRole.create({
+      data: properyMemberRole,
+    });
   }
 }
