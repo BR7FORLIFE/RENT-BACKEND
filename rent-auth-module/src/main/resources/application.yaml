@@ -3,7 +3,7 @@ spring:
     name: rent-auth-module
 
   webflux:
-    base-path: /api
+    base-path: /rent-auth
 
   mongodb:
     username: ${MONGO_USERNAME}
@@ -44,4 +44,4 @@ refreshToken:
   expired: 15 # expiracion de 15 dias
 
 server:
-  port: 8080
+  port: 3001

@@ -142,7 +142,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"be2f3e85-69a9-4d78-b9e4-0643e98de703\",\n    \"refreshToken\": \"xJjadCam8diQFie2Us571npKw5Abu8Tvl1aiEuutv2s\"\n}",
+							"raw": "{\n    \"userId\": \"be2f3e85-69a9-4d78-b9e4-0643e98de703\",\n    \"refreshToken\": \"zBFnUroOisNc0gVG9eKWMOs5BmsgvQU_QfcSwCKkr5Q\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -224,7 +224,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJicjdmb3JsaWZlIiwicm9scyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiQlI3Rk9STElGRSIsImV4cCI6MTc4MjYwMzA5MiwiaWF0IjoxNzgyNjAyMTkyLCJ1c2VySWQiOiJiZTJmM2U4NS02OWE5LTRkNzgtYjllNC0wNjQzZTk4ZGU3MDMiLCJqdGkiOiIzNWJjMDRkNy01N2ZjLTQwNTgtYmZmNy01ZDg2ZDI0NDZjOGUifQ.oQ5LGof67WuQbQ0U5_wwhXhQD3TxlQx4l2vfpmrCf19Y2Di_M3l4JDgqCMbRVRJ89BHxWXkU5De1jzg9jTOghUDLTMIcqvJK3AzF1xHCfzCw2GhVMlZNPnlR3KOaIh6nk_yRio5UlzDh6VQ2u9-T2HhFhOtlsdAbDvixuKf-yV9--6j0VoSF-G44JI9NGJOT2Q8V3IxH8bA25djfwTt4jOKjs5zriOTWT2Vync8MgWXUBIJzhxa-AlJ_xJ_tYZ8eEXZiv91fp5Tt9JdNtL1E2YazftTRCynOFl32HmmDFAPj5xs0INuH384H1BErfPLisEzj2wiyPdfPwSAAflhskA",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJicjdmb3JsaWZlIiwicm9scyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiQlI3Rk9STElGRSIsImV4cCI6MTc4MzY5Nzk0MCwiaWF0IjoxNzgyNzU5MjEwLCJ1c2VySWQiOiJiZTJmM2U4NS02OWE5LTRkNzgtYjllNC0wNjQzZTk4ZGU3MDMiLCJqdGkiOiI5M2E4ZGI3Mi1jZmU5LTQ3YjgtYjVlNy0xMmY2ZTc3NjZmYWQifQ.fItfVI27Tf9WgKZw85n2VB1QLddAKEhNEi392Qmr1Z3yHISUL72cakB0n36eEI766HbL2b2JyP4kLLKwlZSwT_IJ3IFW1ETYaoBYZc9BeGm3DNdiJe_vd_MaCDnvJFlxt4RD9L5Rp6jc1pn1l6-0D13UNAV7oC_-L2WOBYxpeV9GPwG2aoCtqEjovNLim6WO9X0qgFJYPiWQG0D86xkR9PtXMk3jBnNuj1a9WhqeMJb4pmFQCTM-GdLwzMk-CZrysvaaPUaZH-c5vV_h3oeLQX1uW_qOIDSYdZw59XFDx-axgvDOfoRuVqfhJK3eIc5XRpPx6Bz0AQ8XFBF9z64HDw",
 											"type": "string"
 										}
 									]
@@ -233,7 +233,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "  {\n    \"propertyType\": \"RESIDENTIAL\",\n    \"propertyOccupationType\": \"VACANT\",\n    \"direction\": {\n      \"latitute\": 10.4365,\n      \"longitud\": -75.5123,\n      \"department\": \"Bolivar\",\n      \"city\": \"Cartagena\",\n      \"neighborhood\": \"La Boquilla\",\n      \"typeStreet\": \"STREET\",\n      \"numberStreet\": 5,\n      \"complement\": \"\"\n    },\n    \"fmi\": \"060-1234571\",\n    \"predialNumber\": \"130010101000000123456000000005\"\n  }",
+									"raw": "  {\n    \"propertyType\": \"RESIDENTIAL\",\n    \"propertyOccupationType\": \"VACANT\",\n    \"direction\": {\n      \"latitute\": 10.4365,\n      \"longitud\": -75.5123,\n      \"department\": \"Bolivar\",\n      \"city\": \"Cartagena\",\n      \"neighborhood\": \"La Boquilla\",\n      \"typeStreet\": \"STREET\",\n      \"numberStreet\": 5,\n      \"complement\": \"Al lado del mar\"\n    },\n    \"resourceImage\": {\n        \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n        \"width\": 70,\n        \"height\": 35,\n        \"format\": \"png\",\n        \"url\": \"http\",\n        \"secureUrl\": \"https\"\n    },\n    \"fmi\": \"060-1234571\",\n    \"predialNumber\": \"130010101000000123456000000005\",\n    \"propertyName\": \"Propiedad en los caracoles\",\n    \"propertyDescription\": \"Este es una propiedad ubicada en los caracoles con 2 cuartos, 1 baño, etc...\"\n  }",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -241,13 +241,14 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:3000/property",
+									"raw": "http://localhost:3000/rent-financial/property",
 									"protocol": "http",
 									"host": [
 										"localhost"
 									],
 									"port": "3000",
 									"path": [
+										"rent-financial",
 										"property"
 									]
 								}
@@ -262,7 +263,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJicjdmb3JsaWZlIiwicm9scyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiQlI3Rk9STElGRSIsImV4cCI6MTc4MjYwNTc1OSwiaWF0IjoxNzgyNjA0ODU5LCJ1c2VySWQiOiJiZTJmM2U4NS02OWE5LTRkNzgtYjllNC0wNjQzZTk4ZGU3MDMiLCJqdGkiOiI0MzU5ZDZhNi02YzQzLTRhYzktYjEyMy05ZjI4NjUxOWM5NWEifQ.YQqlzOZHrSyice2LFGc2zoqhgHIWNmNT7MDWuRXffdZgt8gmJnX7qZZoD4zz0SF6EaD5awJxFGod-NXNNLdZjajNiBEU_9oAsiCrVAEiXgnvWE8tYZD-VFEQoTQQjGzbVRKUHD11vOPPF7Myf1HiUBwGUfphEJFZnt_9Hc0uLgyTNHA3K-x6ls5dx7DmERk9Y_zc4v-owLyYWcdV-cu29ZG4H_P5vlvJ6x0Vs7qlK_kJc_t4a-a5a34i6IuWK9F-UgZuiba-Pkt6wtdKeZQI9xOJrIsgxMzUi1uiQatswR6kC4ESSsP0LmQExSmVzkSUR9ehwy4ZDygbQSGt_zwFVw",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJicjdmb3JsaWZlIiwicm9scyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiQlI3Rk9STElGRSIsImV4cCI6MTc4MzY5Nzk0MCwiaWF0IjoxNzgyNzU5MjEwLCJ1c2VySWQiOiJiZTJmM2U4NS02OWE5LTRkNzgtYjllNC0wNjQzZTk4ZGU3MDMiLCJqdGkiOiI5M2E4ZGI3Mi1jZmU5LTQ3YjgtYjVlNy0xMmY2ZTc3NjZmYWQifQ.fItfVI27Tf9WgKZw85n2VB1QLddAKEhNEi392Qmr1Z3yHISUL72cakB0n36eEI766HbL2b2JyP4kLLKwlZSwT_IJ3IFW1ETYaoBYZc9BeGm3DNdiJe_vd_MaCDnvJFlxt4RD9L5Rp6jc1pn1l6-0D13UNAV7oC_-L2WOBYxpeV9GPwG2aoCtqEjovNLim6WO9X0qgFJYPiWQG0D86xkR9PtXMk3jBnNuj1a9WhqeMJb4pmFQCTM-GdLwzMk-CZrysvaaPUaZH-c5vV_h3oeLQX1uW_qOIDSYdZw59XFDx-axgvDOfoRuVqfhJK3eIc5XRpPx6Bz0AQ8XFBF9z64HDw",
 											"type": "string"
 										}
 									]
@@ -270,14 +271,46 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:3000/property",
+									"raw": "http://localhost:3000/rent-financial/property",
 									"protocol": "http",
 									"host": [
 										"localhost"
 									],
 									"port": "3000",
 									"path": [
+										"rent-financial",
 										"property"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Property By FMI",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJicjdmb3JsaWZlIiwicm9scyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiQlI3Rk9STElGRSIsImV4cCI6MTc4MzY5Nzk0MCwiaWF0IjoxNzgyNzU5MjEwLCJ1c2VySWQiOiJiZTJmM2U4NS02OWE5LTRkNzgtYjllNC0wNjQzZTk4ZGU3MDMiLCJqdGkiOiI5M2E4ZGI3Mi1jZmU5LTQ3YjgtYjVlNy0xMmY2ZTc3NjZmYWQifQ.fItfVI27Tf9WgKZw85n2VB1QLddAKEhNEi392Qmr1Z3yHISUL72cakB0n36eEI766HbL2b2JyP4kLLKwlZSwT_IJ3IFW1ETYaoBYZc9BeGm3DNdiJe_vd_MaCDnvJFlxt4RD9L5Rp6jc1pn1l6-0D13UNAV7oC_-L2WOBYxpeV9GPwG2aoCtqEjovNLim6WO9X0qgFJYPiWQG0D86xkR9PtXMk3jBnNuj1a9WhqeMJb4pmFQCTM-GdLwzMk-CZrysvaaPUaZH-c5vV_h3oeLQX1uW_qOIDSYdZw59XFDx-axgvDOfoRuVqfhJK3eIc5XRpPx6Bz0AQ8XFBF9z64HDw",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:3000/rent-financial/property/079b4467-5947-437c-a0f0-7194c003200c",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"rent-financial",
+										"property",
+										"079b4467-5947-437c-a0f0-7194c003200c"
 									]
 								}
 							},
@@ -286,6 +319,36 @@
 					]
 				}
 			]
+		},
+		{
+			"name": "Gateway Test",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"br7forlife\",\n    \"password\": \"123456\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"cellphone\": \"3003311999\",\n    \"fullname\": \"brayan andres diaz pacheco\",\n    \"identificationType\": \"CC\",\n    \"identificationNumber\": \"199945478063\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/rent-auth/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"rent-auth",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
