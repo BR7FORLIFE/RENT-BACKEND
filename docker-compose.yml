@@ -1,0 +1,64 @@
+services: 
+  ## base de datos del microservicio de authentication usuarios
+  auth-database:
+    image: mongo:noble
+    container_name: auth-database
+    ports:
+      - 27017:27017    
+    volumes: 
+      - mongo_data:/data/db
+    env_file:
+      - ./enviroments/auth-rent.env
+
+  ## base de datos de registro e informacion de las propiedades
+  financial-database: 
+    image: postgres:17
+    container_name: financial-database-module
+    ports: 
+      - 5432:5432
+    volumes: 
+      - pg_data:/var/lib/postgresql/data
+    env_file:
+      - ./enviroments/financial-rent.env 
+
+  ## servicio de authentication - FRAMEWORK: SPRING
+  auth:   
+    build:
+      context: ./rent-auth-module
+      dockerfile: Dockerfile
+    container_name: rent-auth
+    ports: 
+      - "3001:3001"
+    depends_on:
+      - auth-database
+    env_file:
+      - ./enviroments/auth-rent.env
+
+  ## servicio de registro e informacion de propiedades - FRAMEWORK: NESTJS
+  financial:
+    build:
+      context: ./rent-financial-module
+      dockerfile: Dockerfile
+    container_name: rent-financial
+    ports: 
+      - "3002:3002"
+    depends_on:
+      - financial-database
+    env_file:
+      - ./enviroments/financial-rent.env
+  
+  ##gateway para reversed proxy
+  nginx: 
+    image: nginx:trixie
+    container_name: gateway
+    ports:
+      - "3000:3000"
+    volumes: 
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - auth
+      - financial
+
+volumes: 
+  mongo_data: 
+  pg_data:
