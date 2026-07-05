@@ -6,6 +6,7 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "packageManager": "pnpm@10.26.1",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -82,5 +83,13 @@
   },
   "prisma": {
     "seed": "tsx prisma/seeds/seed.ts"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+    "prisma",
+    "@prisma/engines",
+    "esbuild",
+    "unrs-resolver"
+    ]
   }
 }

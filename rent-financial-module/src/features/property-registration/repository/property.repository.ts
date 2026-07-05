@@ -103,6 +103,30 @@ export class PropertyRepository {
   async findPropertyById(userId: string, id: string) {
     return await this.prisma.property.findFirst({
       where: { userId, id },
+      select: {
+        id: true,
+        fmi: true,
+        predialNumber: true,
+        isPublished: true,
+        createAt: true,
+        propertyDescription: true,
+        propertyName: true,
+
+        typeProperty: {
+          select: {
+            name: true,
+          },
+        },
+
+        propertyOccupationType: {
+          select: {
+            name: true,
+          },
+        },
+
+        direction: true,
+        resourceImage: true,
+      },
     });
   }
 

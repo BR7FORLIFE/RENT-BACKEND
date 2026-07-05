@@ -7,6 +7,8 @@ async function bootstrap() {
 
   app.useGlobalFilters(new GlobalExceptionFilter());
 
-  await app.listen(process.env.PORT ?? 3000);
+  app.setGlobalPrefix('rent-financial');
+
+  await app.listen(process.env.PORT ?? 3002);
 }
 bootstrap();
