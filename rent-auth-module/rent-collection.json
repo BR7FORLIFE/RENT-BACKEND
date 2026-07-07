@@ -93,13 +93,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/oauth2/authorization/google",
+							"raw": "http://localhost:3001/rent-auth/oauth2/authorization/google",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "3001",
 							"path": [
+								"rent-auth",
 								"oauth2",
 								"authorization",
 								"google"
@@ -207,6 +208,34 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Oauth2 Get Credentials",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sessionID\": \"Kzo7QX5bEA1UNiszvbDTCpSbIm82u3B61h-wrgUx73Q\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{DEFAULT_PATH}}/auth/oauth2/exchange",
+							"host": [
+								"{{DEFAULT_PATH}}"
+							],
+							"path": [
+								"auth",
+								"oauth2",
+								"exchange"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -224,7 +253,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJicjdmb3JsaWZlIiwicm9scyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiQlI3Rk9STElGRSIsImV4cCI6MTc4MzY5Nzk0MCwiaWF0IjoxNzgyNzU5MjEwLCJ1c2VySWQiOiJiZTJmM2U4NS02OWE5LTRkNzgtYjllNC0wNjQzZTk4ZGU3MDMiLCJqdGkiOiI5M2E4ZGI3Mi1jZmU5LTQ3YjgtYjVlNy0xMmY2ZTc3NjZmYWQifQ.fItfVI27Tf9WgKZw85n2VB1QLddAKEhNEi392Qmr1Z3yHISUL72cakB0n36eEI766HbL2b2JyP4kLLKwlZSwT_IJ3IFW1ETYaoBYZc9BeGm3DNdiJe_vd_MaCDnvJFlxt4RD9L5Rp6jc1pn1l6-0D13UNAV7oC_-L2WOBYxpeV9GPwG2aoCtqEjovNLim6WO9X0qgFJYPiWQG0D86xkR9PtXMk3jBnNuj1a9WhqeMJb4pmFQCTM-GdLwzMk-CZrysvaaPUaZH-c5vV_h3oeLQX1uW_qOIDSYdZw59XFDx-axgvDOfoRuVqfhJK3eIc5XRpPx6Bz0AQ8XFBF9z64HDw",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJicjdmb3JsaWZlIiwicm9scyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiQlI3Rk9STElGRSIsImV4cCI6MTc4MzY5Nzk0MCwiaWF0IjoxNzgyNzU5MjEwLCJ1c2VySWQiOiI3NGQxN2M4OS00NmRkLTQ1OGMtOTcxMy1lNjY3OWM4YmE3ODYiLCJqdGkiOiI5M2E4ZGI3Mi1jZmU5LTQ3YjgtYjVlNy0xMmY2ZTc3NjZmYWQifQ.R937w5xsgJ_-gLvnZGuK06cdaem1svvwZPzjXT9RIYYU35YTKcr-h616fTNXMhQwZCtvjFBHt8OcSmxfplxYHWe37bSo8BFr4be3vi500cXGrwM9ww_tiFsyMbgyy8L51QKsF-qnsvwAeigYwF-WPdrL8a7kKSpvq0lu6XIcp0pOynylnvPGYz6dIae1gvui9y3PLiqMDB4GHrdNMqf4y6wiK9uhGFFbRkSczL7453Y1_WQsjDyoScFGOfd6VoMsmkgyJ-Cvh0z95npOZJx5k7a8ZtqH8abv6MqaaMK1wzEPnTj_JuYqFBPIBAoAPeYouZ0mNSQq0M_sP0-tFpGA-A",
 											"type": "string"
 										}
 									]
@@ -263,7 +292,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJicjdmb3JsaWZlIiwicm9scyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiQlI3Rk9STElGRSIsImV4cCI6MTc4MzY5Nzk0MCwiaWF0IjoxNzgyNzU5MjEwLCJ1c2VySWQiOiJiZTJmM2U4NS02OWE5LTRkNzgtYjllNC0wNjQzZTk4ZGU3MDMiLCJqdGkiOiI5M2E4ZGI3Mi1jZmU5LTQ3YjgtYjVlNy0xMmY2ZTc3NjZmYWQifQ.fItfVI27Tf9WgKZw85n2VB1QLddAKEhNEi392Qmr1Z3yHISUL72cakB0n36eEI766HbL2b2JyP4kLLKwlZSwT_IJ3IFW1ETYaoBYZc9BeGm3DNdiJe_vd_MaCDnvJFlxt4RD9L5Rp6jc1pn1l6-0D13UNAV7oC_-L2WOBYxpeV9GPwG2aoCtqEjovNLim6WO9X0qgFJYPiWQG0D86xkR9PtXMk3jBnNuj1a9WhqeMJb4pmFQCTM-GdLwzMk-CZrysvaaPUaZH-c5vV_h3oeLQX1uW_qOIDSYdZw59XFDx-axgvDOfoRuVqfhJK3eIc5XRpPx6Bz0AQ8XFBF9z64HDw",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJicjdmb3JsaWZlIiwicm9scyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiQlI3Rk9STElGRSIsImV4cCI6MTc4MzY5Nzk0MCwiaWF0IjoxNzgyNzU5MjEwLCJ1c2VySWQiOiI3NGQxN2M4OS00NmRkLTQ1OGMtOTcxMy1lNjY3OWM4YmE3ODYiLCJqdGkiOiI5M2E4ZGI3Mi1jZmU5LTQ3YjgtYjVlNy0xMmY2ZTc3NjZmYWQifQ.R937w5xsgJ_-gLvnZGuK06cdaem1svvwZPzjXT9RIYYU35YTKcr-h616fTNXMhQwZCtvjFBHt8OcSmxfplxYHWe37bSo8BFr4be3vi500cXGrwM9ww_tiFsyMbgyy8L51QKsF-qnsvwAeigYwF-WPdrL8a7kKSpvq0lu6XIcp0pOynylnvPGYz6dIae1gvui9y3PLiqMDB4GHrdNMqf4y6wiK9uhGFFbRkSczL7453Y1_WQsjDyoScFGOfd6VoMsmkgyJ-Cvh0z95npOZJx5k7a8ZtqH8abv6MqaaMK1wzEPnTj_JuYqFBPIBAoAPeYouZ0mNSQq0M_sP0-tFpGA-A",
 											"type": "string"
 										}
 									]
@@ -286,14 +315,14 @@
 							"response": []
 						},
 						{
-							"name": "Get Property By FMI",
+							"name": "Get Property By ID",
 							"request": {
 								"auth": {
 									"type": "bearer",
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJicjdmb3JsaWZlIiwicm9scyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiQlI3Rk9STElGRSIsImV4cCI6MTc4MzY5Nzk0MCwiaWF0IjoxNzgyNzU5MjEwLCJ1c2VySWQiOiJiZTJmM2U4NS02OWE5LTRkNzgtYjllNC0wNjQzZTk4ZGU3MDMiLCJqdGkiOiI5M2E4ZGI3Mi1jZmU5LTQ3YjgtYjVlNy0xMmY2ZTc3NjZmYWQifQ.fItfVI27Tf9WgKZw85n2VB1QLddAKEhNEi392Qmr1Z3yHISUL72cakB0n36eEI766HbL2b2JyP4kLLKwlZSwT_IJ3IFW1ETYaoBYZc9BeGm3DNdiJe_vd_MaCDnvJFlxt4RD9L5Rp6jc1pn1l6-0D13UNAV7oC_-L2WOBYxpeV9GPwG2aoCtqEjovNLim6WO9X0qgFJYPiWQG0D86xkR9PtXMk3jBnNuj1a9WhqeMJb4pmFQCTM-GdLwzMk-CZrysvaaPUaZH-c5vV_h3oeLQX1uW_qOIDSYdZw59XFDx-axgvDOfoRuVqfhJK3eIc5XRpPx6Bz0AQ8XFBF9z64HDw",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJicjdmb3JsaWZlIiwicm9scyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiQlI3Rk9STElGRSIsImV4cCI6MTc4MzY5Nzk0MCwiaWF0IjoxNzgyNzU5MjEwLCJ1c2VySWQiOiI3NGQxN2M4OS00NmRkLTQ1OGMtOTcxMy1lNjY3OWM4YmE3ODYiLCJqdGkiOiI5M2E4ZGI3Mi1jZmU5LTQ3YjgtYjVlNy0xMmY2ZTc3NjZmYWQifQ.R937w5xsgJ_-gLvnZGuK06cdaem1svvwZPzjXT9RIYYU35YTKcr-h616fTNXMhQwZCtvjFBHt8OcSmxfplxYHWe37bSo8BFr4be3vi500cXGrwM9ww_tiFsyMbgyy8L51QKsF-qnsvwAeigYwF-WPdrL8a7kKSpvq0lu6XIcp0pOynylnvPGYz6dIae1gvui9y3PLiqMDB4GHrdNMqf4y6wiK9uhGFFbRkSczL7453Y1_WQsjDyoScFGOfd6VoMsmkgyJ-Cvh0z95npOZJx5k7a8ZtqH8abv6MqaaMK1wzEPnTj_JuYqFBPIBAoAPeYouZ0mNSQq0M_sP0-tFpGA-A",
 											"type": "string"
 										}
 									]
@@ -301,7 +330,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:3000/rent-financial/property/079b4467-5947-437c-a0f0-7194c003200c",
+									"raw": "http://localhost:3000/rent-financial/property/d4c8011d-40bd-4d8c-abe8-674cd5cc5f48",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -310,7 +339,7 @@
 									"path": [
 										"rent-financial",
 										"property",
-										"079b4467-5947-437c-a0f0-7194c003200c"
+										"d4c8011d-40bd-4d8c-abe8-674cd5cc5f48"
 									]
 								}
 							},
