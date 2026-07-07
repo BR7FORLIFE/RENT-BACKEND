@@ -23,4 +23,8 @@ public class AuthExceptions extends ExceptionHandler {
     public static AuthExceptions passwordIsNotCorrect() {
         return new AuthExceptions("La contraseña no es correcta!");
     }
+
+    public static AuthExceptions oauthSessionIDNotFound() {
+        return new AuthExceptions("Error al obtener las credenciales de acceso!");
+    }
 }
