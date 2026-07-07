@@ -11,6 +11,10 @@ spring:
     representation:
       uuid: standard
     uri: ${MONGO_URI}
+  
+  data:
+    redis:
+      url: redis://auth-cache:6379 # en entornos de docker usar el nombre del servicio
 
   security:
     oauth2:
@@ -24,6 +28,7 @@ spring:
             - openid
             - profile
             - email    
+            
 
 logging:
   level:
