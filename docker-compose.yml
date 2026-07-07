@@ -21,6 +21,14 @@ services:
     env_file:
       - ./enviroments/financial-rent.env 
 
+  cache: 
+    image: redis:8
+    container_name: auth-cache
+    ports: 
+      - 6379:6379
+    volumes: 
+      - redis-data:/data
+  
   ## servicio de authentication - FRAMEWORK: SPRING
   auth:   
     build:
@@ -31,6 +39,7 @@ services:
       - "3001:3001"
     depends_on:
       - auth-database
+      - cache
     env_file:
       - ./enviroments/auth-rent.env
 
@@ -62,3 +71,4 @@ services:
 volumes: 
   mongo_data: 
   pg_data:
+  redis-data:
