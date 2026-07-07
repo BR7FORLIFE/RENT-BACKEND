@@ -4,17 +4,17 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.bind.annotation.RestController;
 import com.files.rent_auth_module.application.auth.command.actions.LoginUserUserCommand;
 import com.files.rent_auth_module.application.auth.command.actions.RegisterUserCommand;
 import com.files.rent_auth_module.application.auth.dtos.request.LoginUserRequestDto;
+import com.files.rent_auth_module.application.auth.dtos.request.Oauth2SessionID;
 import com.files.rent_auth_module.application.auth.dtos.request.RegisterUserRequestDto;
 import com.files.rent_auth_module.application.auth.dtos.response.LoginUserResponseDto;
 import com.files.rent_auth_module.application.auth.dtos.response.RegisterUserResponseDto;
@@ -55,8 +55,8 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public Mono<Map<String, Object>> oauth2Me(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        return Mono.just(oAuth2User.getAttributes());
+    public Mono<?> Me() {
+        return null;
     }
 
     @PostMapping("/login")
@@ -77,6 +77,12 @@ public class AuthController {
     @PostMapping("/refresh/rotate")
     public Mono<ResponseEntity<LoginUserResponseDto>> rotateRefreshToken(@RequestBody RefreshRevokedRequestDto dto) {
         return refreshTokenUseCase.revokedAllAndObtainRefreshToken(dto.userId(), dto.refreshToken())
+                .map(res -> ResponseEntity.ok().body(new LoginUserResponseDto(res.refreshToken(), res.accessToken())));
+    }
+
+    @PostMapping("/oauth2/exchange")
+    public Mono<ResponseEntity<LoginUserResponseDto>> oauthGetCredentials(@RequestBody Oauth2SessionID oauth2Login) {
+        return authUseCase.oauth2GetCredentials(oauth2Login.sessionID())
                 .map(res -> ResponseEntity.ok().body(new LoginUserResponseDto(res.refreshToken(), res.accessToken())));
     }
 
