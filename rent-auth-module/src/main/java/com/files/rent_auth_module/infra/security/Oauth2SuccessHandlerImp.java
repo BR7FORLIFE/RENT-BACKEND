@@ -43,7 +43,8 @@ public class Oauth2SuccessHandlerImp implements ServerAuthenticationSuccessHandl
                     exchange.getResponse().setStatusCode(HttpStatus.FOUND);
 
                     // debemos crear la screen de redirecciones en el frontend
-                    exchange.getResponse().getHeaders().setLocation(URI.create(""));
+                    exchange.getResponse().getHeaders()
+                            .setLocation(URI.create("rentfrontend://login/oauth2/callback?sessionID=" + oauthSesionID));
 
                     return exchange.getResponse().setComplete();
                 });
