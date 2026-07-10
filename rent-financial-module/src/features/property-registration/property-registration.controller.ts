@@ -14,16 +14,18 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../core/auth/auth.guard.js';
 import { ZodValidation } from '../../core/pipes/zod-validation.pipe.js';
-import {
-  createPropertySchema,
-  type CreatePropertyType,
-} from './schemas/property-registration.schema.js';
 import { PropertyService } from './services/property.service.js';
 import type { AuthRequest } from '../../types/auth-request.js';
 import {
   paginationSchema,
   type PaginationType,
 } from '../../shared/pagination/pagination-schemas.js';
+import {
+  createPropertyDtoRequest,
+  EditingPropertyDtoRequest,
+  type CreatePropertyType,
+  type EditingPropertyType,
+} from './dtos/request-dto.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller({
@@ -32,7 +34,7 @@ import {
 export class PropertyRegistrationController {
   constructor(private readonly propertyService: PropertyService) {}
 
-  @UsePipes(new ZodValidation(createPropertySchema))
+  @UsePipes(new ZodValidation(createPropertyDtoRequest))
   @HttpCode(201)
   @Post()
   async registerProperty(
@@ -75,8 +77,23 @@ export class PropertyRegistrationController {
     };
   }
 
+  @UsePipes(new ZodValidation(EditingPropertyDtoRequest))
+  @HttpCode(201)
   @Patch()
-  async modifyProperty() {}
+  async modifyProperty(
+    @Req() req: AuthRequest,
+    @Body() editingProperty: EditingPropertyType,
+  ) {
+    const { id, message } = await this.propertyService.editingProperty(
+      req.user.userId,
+      editingProperty,
+    );
+
+    return {
+      id,
+      message,
+    };
+  }
 
   @Delete()
   async deleteProperty() {}
