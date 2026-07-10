@@ -50,3 +50,4 @@ refreshToken:
 
 server:
   port: 3001
+  forward-headers-strategy: native
