@@ -2,24 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import type {
   DirectionType,
-  PropertyActorRoleType,
   PropertyMemberRoleType,
   PropertyMemberType,
-  PropertyOccupationType,
   PropertyType,
   ResourceImageType,
-  TypePropertyType,
 } from '../schemas/property-registration.schema.js';
 import type {
   PaginationResponse,
   PaginationType,
 } from '../../../shared/pagination/pagination-schemas.js';
-import type { PropertyInfoResponse } from '../dtos/response/response-dto.js';
+import type { PropertyInfoResponse } from '../dtos/response-dto.js';
+import type { Prisma } from '../../../../generated/prisma/client.js';
+import type {
+  PropertyActorRoleType,
+  PropertyOccupationType,
+  TypePropertyType,
+} from '../types.js';
 
 @Injectable()
 export class PropertyRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  //find properties
   async findAll(
     userId: string,
     paginationDto: PaginationType,
@@ -74,7 +78,6 @@ export class PropertyRepository {
       },
     };
   }
-
   async findByFMIOrPredialNumber(
     userId: string,
     fmi: string | null,
@@ -153,6 +156,8 @@ export class PropertyRepository {
       },
     });
   }
+
+  //save functions
   async saveProperty(property: PropertyType) {
     return await this.prisma.property.create({
       data: property,
@@ -174,6 +179,21 @@ export class PropertyRepository {
   async savePropertyMemberRole(properyMemberRole: PropertyMemberRoleType) {
     return await this.prisma.propertyMemberRole.create({
       data: properyMemberRole,
+    });
+  }
+
+  //update functions
+  async updateProperty(
+    id: string,
+    userId: string,
+    data: Prisma.PropertyUpdateInput,
+  ) {
+    return await this.prisma.property.update({
+      where: {
+        id,
+        userId,
+      },
+      data,
     });
   }
 }
