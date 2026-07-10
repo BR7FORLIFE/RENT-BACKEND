@@ -3,9 +3,15 @@ import { PropertyRegistrationController } from './property-registration.controll
 import { PropertyService } from './services/property.service.js';
 import { PropertyRepository } from './repository/property.repository.js';
 import { PrismaService } from '../../core/database/prisma.service.js';
+import { PropertyHelper } from './services/helpers.service.js';
 
 @Module({
   controllers: [PropertyRegistrationController],
-  providers: [PropertyService, PropertyRepository, PrismaService],
+  providers: [
+    PropertyService,
+    PropertyRepository,
+    PrismaService,
+    PropertyHelper,
+  ],
 })
 export class PropertyRegistrationModule {}
