@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import type {
-  CreatePropertyType,
   PropertyMemberRoleType,
   PropertyMemberType,
   PropertyType,
@@ -17,11 +16,21 @@ import type {
   PaginationResponse,
   PaginationType,
 } from '../../../shared/pagination/pagination-schemas.js';
-import type { PropertyInfoResponse } from '../dtos/response/response-dto.js';
+import type { PropertyInfoResponse } from '../dtos/response-dto.js';
+import { PropertyHelper } from './helpers.service.js';
+import type {
+  CreatePropertyType,
+  EditingPropertyType,
+} from '../dtos/request-dto.js';
+import type { Prisma } from '../../../../generated/prisma/client.js';
+import type { PropertyOccupationType, TypePropertyType } from '../types.js';
 
 @Injectable()
 export class PropertyService {
-  constructor(private readonly repository: PropertyRepository) {}
+  constructor(
+    private readonly helper: PropertyHelper,
+    private readonly repository: PropertyRepository,
+  ) {}
 
   async registerProperty(
     userId: string,
@@ -131,5 +140,77 @@ export class PropertyService {
     }
 
     return data;
+  }
+
+  async editingProperty(
+    userId: string,
+    partialProperty: EditingPropertyType,
+  ): Promise<{ id: string; message: string }> {
+    //verificamos que exista dicha propiedad
+    const property = await this.repository.findPropertyById(
+      userId,
+      partialProperty.id,
+    );
+
+    if (!property) {
+      throw new PropertyNotFoundException();
+    }
+
+    const cleanProperty = this.helper.cleanUndefined(partialProperty);
+
+    const data: Prisma.PropertyUpdateInput = {};
+
+    for (const [key, value] of Object.entries(cleanProperty)) {
+      switch (key) {
+        case 'propertyType': {
+          const propertyName = await this.repository.findTypePropertyByName(
+            value as TypePropertyType,
+          );
+
+          if (!propertyName) {
+            break;
+          }
+
+          const { id } = propertyName;
+
+          data.typeProperty = {
+            connect: {
+              id,
+            },
+          };
+          break;
+        }
+
+        case 'propertyOccupationType': {
+          const propertyOccupation =
+            await this.repository.findPropertyOccupationTypeByName(
+              value as PropertyOccupationType,
+            );
+
+          if (!propertyOccupation) {
+            break;
+          }
+
+          const { id } = propertyOccupation;
+
+          data.propertyOccupationType = {
+            connect: {
+              id,
+            },
+          };
+          break;
+        }
+        default:
+          data[key] = value;
+      }
+    }
+
+    const result = await this.repository.updateProperty(
+      partialProperty.id,
+      userId,
+      data,
+    );
+
+    return { id: result.id, message: 'propiedad actualizada exitosamente!' };
   }
 }
