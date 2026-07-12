@@ -54,7 +54,7 @@ enum PaymentStatus{
 
 model TypeProperty{
   id String @id @default(uuid())
-  name String
+  name String @unique
   description String?
 
   properties Property[]
@@ -62,7 +62,7 @@ model TypeProperty{
 
 model PropertyOccupationType{
   id String @id @default(uuid())
-  name String
+  name String @unique
   description String?
 
   properties Property[]
@@ -70,7 +70,7 @@ model PropertyOccupationType{
 
 model PropertyActorRole{
   id String @id @default(uuid())
-  name String
+  name String @unique
   description String?
 
   propertyMemberRoles PropertyMemberRole[]
@@ -79,7 +79,7 @@ model PropertyActorRole{
 
 model PublicServiceType{
   id String @id @default(uuid())
-  name String
+  name String @unique
   description String?
 
   publicServices PublicService[]
@@ -97,6 +97,7 @@ model ResourceImages{
   updateAt DateTime @updatedAt @map("update_at")
 
   property Property?
+  contract Contract[]
 }
 
 model Direction{
@@ -157,10 +158,12 @@ model Contract{
   createByUserId String @map("create_by_user_id")
   createAt DateTime @default(now()) @map("create_at")
   updateAt DateTime @updatedAt @map("update_at")
+  resourceImageId String? @map("resource_image_id")
 
   landlord PropertyMember @relation("LandlordContract", fields:[landlordMemberId],references:[id])
   tenant PropertyMember @relation("TenantContract", fields:[tenantMemberId], references:[id])
   property Property @relation(fields:[propertyId], references:[id])
+  resourceImage ResourceImages? @relation(fields: [resourceImageId], references: [id])
 }
 
 model PropertyMember{
