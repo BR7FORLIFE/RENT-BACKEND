@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import type {
-  DirectionType,
   PropertyMemberRoleType,
   PropertyMemberType,
   PropertyType,
-  ResourceImageType,
 } from '../schemas/property-registration.schema.js';
 import type {
   PaginationResponse,
@@ -133,6 +131,18 @@ export class PropertyRepository {
     });
   }
 
+  async findPropertyMemberByUserIdAndPropertyId(
+    userId: string,
+    propertyId: string,
+  ) {
+    return await this.prisma.propertyMember.findFirst({
+      where: {
+        userId,
+        propertyId,
+      },
+    });
+  }
+
   async findPropertyOccupationTypeByName(name: PropertyOccupationType) {
     return await this.prisma.propertyOccupationType.findFirst({
       where: {
@@ -162,14 +172,6 @@ export class PropertyRepository {
     return await this.prisma.property.create({
       data: property,
     });
-  }
-
-  async saveDirection(direction: DirectionType) {
-    return await this.prisma.direction.create({ data: direction });
-  }
-
-  async saveAssetResource(resourceimage: ResourceImageType) {
-    return await this.prisma.resourceImages.create({ data: resourceimage });
   }
 
   async savePropertyMember(propertyMember: PropertyMemberType) {

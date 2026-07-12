@@ -16,6 +16,16 @@ export class PropertyNotFoundException extends AppException {
   }
 }
 
+export class PropertyMemberNotFound extends AppException {
+  constructor(memberID: string) {
+    super(
+      `El usuario con ID ${memberID} no se encuentra vinculado al inmueble!`,
+      406,
+      'NOT_ACCEPTABLE',
+    );
+  }
+}
+
 export class PropertyOccupationTypeNotFoundException extends AppException {
   constructor() {
     super(

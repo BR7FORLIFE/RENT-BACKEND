@@ -24,12 +24,14 @@ import type {
 } from '../dtos/request-dto.js';
 import type { Prisma } from '../../../../generated/prisma/client.js';
 import type { PropertyOccupationType, TypePropertyType } from '../types.js';
+import { GlobalRepository } from '../../global/repository-global.js';
 
 @Injectable()
 export class PropertyService {
   constructor(
     private readonly helper: PropertyHelper,
-    private readonly repository: PropertyRepository,
+    private readonly propertyRepository: PropertyRepository,
+    private readonly globalRepository: GlobalRepository,
   ) {}
 
   async registerProperty(
@@ -37,7 +39,7 @@ export class PropertyService {
     propertyDto: CreatePropertyType,
   ): Promise<{ id: string; message: string }> {
     //primero verificamos si la propiedad  no ha sido registrado
-    const exists = await this.repository.findByFMIOrPredialNumber(
+    const exists = await this.propertyRepository.findByFMIOrPredialNumber(
       userId,
       propertyDto.fmi,
       propertyDto.predialNumber,
@@ -48,13 +50,13 @@ export class PropertyService {
     }
 
     //creamos la direccion del inmueble
-    const { id: directionId } = await this.repository.saveDirection(
+    const { id: directionId } = await this.globalRepository.saveDirection(
       propertyDto.direction,
     );
 
     //buscamos la id asociada al PropertyOccupationType
     const occupationType =
-      await this.repository.findPropertyOccupationTypeByName(
+      await this.propertyRepository.findPropertyOccupationTypeByName(
         propertyDto.propertyOccupationType,
       );
 
@@ -63,7 +65,7 @@ export class PropertyService {
     }
 
     //buscamos la id del tipo de propiedad
-    const typeProperty = await this.repository.findTypePropertyByName(
+    const typeProperty = await this.propertyRepository.findTypePropertyByName(
       propertyDto.propertyType,
     );
 
@@ -72,9 +74,8 @@ export class PropertyService {
     }
 
     //registramos el recurso para la vivienda que se quiere crear
-    const { id: resourceImageId } = await this.repository.saveAssetResource(
-      propertyDto.resourceImage,
-    );
+    const { id: resourceImageId } =
+      await this.globalRepository.saveAssetResource(propertyDto.resourceImage);
 
     //registramos el inmueble
     const newProperty: PropertyType = {
@@ -91,7 +92,8 @@ export class PropertyService {
       resourceImageId: resourceImageId,
     };
 
-    const { id: propertyId } = await this.repository.saveProperty(newProperty);
+    const { id: propertyId } =
+      await this.propertyRepository.saveProperty(newProperty);
 
     //creamos el MemberRole ya que el usuario que digita un inmueble
     // posee un ROL de Arrendador o muchos mas
@@ -102,13 +104,13 @@ export class PropertyService {
     };
 
     const { id: propertyMemberId } =
-      await this.repository.savePropertyMember(propertyMember);
+      await this.propertyRepository.savePropertyMember(propertyMember);
 
     //creamos el ProperyMemberRole para saber el rol de dicho
     //recuperamos el id del role LANDORD
 
     const propertyActorRole =
-      await this.repository.findPropertyActorRoleByName('LANDLORD');
+      await this.propertyRepository.findPropertyActorRoleByName('LANDLORD');
 
     if (!propertyActorRole) {
       new PropertyActorRoleNotFoundException();
@@ -120,7 +122,7 @@ export class PropertyService {
       propertyActorRoleId: propertyActorRole!.id,
     };
 
-    await this.repository.savePropertyMemberRole(propertyMemberRole);
+    await this.propertyRepository.savePropertyMemberRole(propertyMemberRole);
 
     return { id: propertyId, message: 'propiedad registrada exitosamente!' };
   }
@@ -129,11 +131,11 @@ export class PropertyService {
     userId: string,
     paginationDto: PaginationType,
   ): Promise<PaginationResponse<PropertyInfoResponse>> {
-    return await this.repository.findAll(userId, paginationDto);
+    return await this.propertyRepository.findAll(userId, paginationDto);
   }
 
   async consultPropertyById(userId: string, id: string) {
-    const data = await this.repository.findPropertyById(userId, id);
+    const data = await this.propertyRepository.findPropertyById(userId, id);
 
     if (!data) {
       throw new PropertyNotFoundException();
@@ -147,7 +149,7 @@ export class PropertyService {
     partialProperty: EditingPropertyType,
   ): Promise<{ id: string; message: string }> {
     //verificamos que exista dicha propiedad
-    const property = await this.repository.findPropertyById(
+    const property = await this.propertyRepository.findPropertyById(
       userId,
       partialProperty.id,
     );
@@ -163,9 +165,10 @@ export class PropertyService {
     for (const [key, value] of Object.entries(cleanProperty)) {
       switch (key) {
         case 'propertyType': {
-          const propertyName = await this.repository.findTypePropertyByName(
-            value as TypePropertyType,
-          );
+          const propertyName =
+            await this.propertyRepository.findTypePropertyByName(
+              value as TypePropertyType,
+            );
 
           if (!propertyName) {
             break;
@@ -183,7 +186,7 @@ export class PropertyService {
 
         case 'propertyOccupationType': {
           const propertyOccupation =
-            await this.repository.findPropertyOccupationTypeByName(
+            await this.propertyRepository.findPropertyOccupationTypeByName(
               value as PropertyOccupationType,
             );
 
@@ -205,7 +208,7 @@ export class PropertyService {
       }
     }
 
-    const result = await this.repository.updateProperty(
+    const result = await this.propertyRepository.updateProperty(
       partialProperty.id,
       userId,
       data,
