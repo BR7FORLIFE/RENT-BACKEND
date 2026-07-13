@@ -4,6 +4,7 @@ import type {
   PropertyMemberRoleType,
   PropertyMemberType,
   PropertyType,
+  ResourceImageType,
 } from '../schemas/property-registration.schema.js';
 import type {
   PaginationResponse,
@@ -56,7 +57,7 @@ export class PropertyRepository {
           },
 
           direction: true,
-          resourceImage: true,
+          resourceImages: true,
         },
       }),
       this.prisma.property.count({
@@ -126,7 +127,7 @@ export class PropertyRepository {
         },
 
         direction: true,
-        resourceImage: true,
+        resourceImages: true,
       },
     });
   }
@@ -167,10 +168,43 @@ export class PropertyRepository {
     });
   }
 
+  async findAssetsResourcesByPropertyId(propertyId: string) {
+    return await this.prisma.resourceImages.findMany({
+      where: {
+        propertyId,
+      },
+    });
+  }
+
+  async findActorRoleByUserId(userId: string) {
+    return this.prisma.propertyActorRole.findMany({
+      where: {
+        propertyMemberRoles: {
+          some: {
+            propertyMember: {
+              userId,
+            },
+          },
+        },
+      },
+      select: {
+        name: true,
+      },
+    });
+  }
+
   //save functions
-  async saveProperty(property: PropertyType) {
+  async saveProperty(
+    property: PropertyType,
+    resourcesImages: ResourceImageType[],
+  ) {
     return await this.prisma.property.create({
-      data: property,
+      data: {
+        ...property,
+        resourceImages: {
+          create: resourcesImages,
+        },
+      },
     });
   }
 
@@ -196,6 +230,29 @@ export class PropertyRepository {
         userId,
       },
       data,
+    });
+  }
+
+  async updateResourcesImages(
+    toDelete: string[],
+    toInsert: Prisma.ResourceImagesCreateManyInput[],
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      if (toDelete.length > 0) {
+        await tx.resourceImages.deleteMany({
+          where: {
+            assetId: {
+              in: toDelete,
+            },
+          },
+        });
+      }
+
+      if (toInsert.length > 0) {
+        await tx.resourceImages.createMany({
+          data: toInsert,
+        });
+      }
     });
   }
 }
