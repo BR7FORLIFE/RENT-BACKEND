@@ -9,7 +9,7 @@ import { GlobalModule } from '../global/global.module.js';
 @Module({
   controllers: [PropertyRegistrationController],
   providers: [PropertyService, PropertyRepository, PropertyHelper],
-  exports: [PropertyRepository],
+  exports: [PropertyRepository, PropertyHelper],
   imports: [PrismaModule, GlobalModule],
 })
 export class PropertyRegistrationModule {}

@@ -43,5 +43,5 @@ export interface PropertyInfoResponse {
     name: string;
   };
 
-  resourceImage: ResourceImageResponse;
+  resourceImages: ResourceImageResponse[];
 }

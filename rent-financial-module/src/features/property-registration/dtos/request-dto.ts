@@ -33,11 +33,11 @@ export const createPropertyDtoRequest = z.object({
   propertyType: TypeProperty,
   propertyOccupationType: PropertyOccupation,
   direction: createDirectionDtoRequest,
-  resourceImage: createResourceImageDtoRequest,
   propertyName: z.string(),
   propertyDescription: z.string(),
   fmi: z.string(),
   predialNumber: z.string(),
+  resourcesImages: z.array(createResourceImageDtoRequest),
 });
 
 export type CreatePropertyType = z.infer<typeof createPropertyDtoRequest>;
@@ -50,7 +50,14 @@ export const EditingPropertyDtoRequest = z.object({
   propertyOccupationType: PropertyOccupation.optional(),
   propertyDescription: z.string().optional(),
   direction: createDirectionDtoRequest.optional(),
-  resourceImage: createResourceImageDtoRequest.optional(),
+  resourcesImages: z.array(createResourceImageDtoRequest).optional(),
 });
 
 export type EditingPropertyType = z.infer<typeof EditingPropertyDtoRequest>;
+
+//cambiar propietario del inmueble
+export const ChangeOwnerDtoRequest = z.object({
+  newOwner: z.uuid(),
+});
+
+export type ChangeOwnerType = z.infer<typeof ChangeOwnerDtoRequest>;

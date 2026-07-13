@@ -40,7 +40,6 @@ export const propertySchema = z.object({
   registerByUserId: z.uuid(),
   propertyTypeId: z.uuid(),
   propertyOccupationTypeId: z.uuid(),
-  resourceImageId: z.string(),
   propertyName: z.string().min(8).max(50),
   propertyDescription: z.string(),
   directionId: z.uuid(),
