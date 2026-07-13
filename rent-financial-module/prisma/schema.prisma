@@ -87,6 +87,7 @@ model PublicServiceType{
 
 model ResourceImages{
   id String @id @default(uuid())
+  propertyId String? @map("property_id")
   assetId String? @map("asset_id")
   width Int? 
   height Int?
@@ -96,7 +97,7 @@ model ResourceImages{
   createAt DateTime @default(now()) @map("create_at")
   updateAt DateTime @updatedAt @map("update_at")
 
-  property Property?
+  property Property? @relation(fields: [propertyId], references: [id])
   contract Contract[]
 }
 
@@ -123,7 +124,6 @@ model Property{
   propertyTypeId String @map("property_type_id")
   propertyOccupationTypeId String @map("property_occupation_type_id")
   directionId String @unique @map("direction_id")
-  resourceImageId String @unique @map("resource_image_id")
   propertyName String @map("property_name")
   propertyDescription String @map("property_description")
   fmi String
@@ -142,7 +142,7 @@ model Property{
   direction Direction @relation(fields: [directionId], references: [id])
   typeProperty TypeProperty @relation(fields: [propertyTypeId], references: [id])
   propertyOccupationType PropertyOccupationType @relation(fields: [propertyOccupationTypeId], references: [id])
-  resourceImage ResourceImages @relation(fields: [resourceImageId], references: [id])
+  resourceImages ResourceImages[]
 }
 
 model Contract{
