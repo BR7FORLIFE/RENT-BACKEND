@@ -9,7 +9,7 @@ import {
 import { JwtAuthGuard } from '../../core/auth/auth.guard.js';
 import { ContractService } from './services/contract.service.js';
 import { ZodValidation } from '../../core/pipes/zod-validation.pipe.js';
-import type { AuthRequest } from '../../types/auth-request.js';
+import type { AuthRequest } from '../../types/global-types.js';
 import {
   createContractDtoRequest,
   type CreateContractType,

@@ -15,14 +15,16 @@ import {
 import { JwtAuthGuard } from '../../core/auth/auth.guard.js';
 import { ZodValidation } from '../../core/pipes/zod-validation.pipe.js';
 import { PropertyService } from './services/property.service.js';
-import type { AuthRequest } from '../../types/auth-request.js';
+import type { AuthRequest } from '../../types/global-types.js';
 import {
   paginationSchema,
   type PaginationType,
 } from '../../shared/pagination/pagination-schemas.js';
 import {
+  ChangeOwnerDtoRequest,
   createPropertyDtoRequest,
   EditingPropertyDtoRequest,
+  type ChangeOwnerType,
   type CreatePropertyType,
   type EditingPropertyType,
 } from './dtos/request-dto.js';
@@ -94,6 +96,15 @@ export class PropertyRegistrationController {
       message,
     };
   }
+
+  //cambiar el dueño de la propiedad hacia otra persona manteniendo el registrador original
+  @UsePipes(new ZodValidation(ChangeOwnerDtoRequest))
+  @HttpCode(200)
+  @Post()
+  async changeOwnerProperty(
+    @Req() req: AuthRequest,
+    @Body newOwner: ChangeOwnerType,
+  ) {}
 
   @Delete()
   async deleteProperty() {}
