@@ -7,6 +7,8 @@ export const StatusContractEnum = z.enum([
   'DEFEATED', // vencido (el contrato llega a su finalizacion)
 ]);
 
+export type StatusContractType = z.infer<typeof StatusContractEnum>;
+
 export const contractSchema = z.object({
   id: z.uuid().optional(),
   propertyId: z.uuid(),
