@@ -48,10 +48,6 @@ export class TypePropertyNotFoundException extends AppException {
 
 export class PropertyActorRoleNotFoundException extends AppException {
   constructor() {
-    super(
-      'El tipo de rol de la persona no se encuentra registrado!',
-      404,
-      'NOT_FOUND',
-    );
+    super('El rol no se encuentra registrado!', 404, 'NOT_FOUND');
   }
 }
