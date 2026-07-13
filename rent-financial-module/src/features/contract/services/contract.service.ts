@@ -3,21 +3,33 @@ import { ContractRepository } from '../repository/contract.repository.js';
 import { PropertyRepository } from '../../property-registration/repository/property.repository.js';
 import type { CreateContractType } from '../dtos/request-dto.js';
 import {
+  PropertyActorRoleNotFoundException,
   PropertyMemberNotFound,
   PropertyNotFoundException,
 } from '../../property-registration/exceptions/exceptions.js';
 import type { ContractType } from '../schemas/contract.schema.js';
 import type { createResourceImageType } from '../../property-registration/dtos/request-dto.js';
 import { GlobalRepository } from '../../global/repository-global.js';
+import type { PropertyHelper } from '../../property-registration/services/helpers.service.js';
+import type { PropertyActorRoleType } from '../../property-registration/types.js';
+import { propertyWithContractAvalibityException } from '../exceptions/exceptions.js';
+import type {
+  PropertyMemberRoleType,
+  PropertyMemberType,
+} from '../../property-registration/schemas/property-registration.schema.js';
+
+// estos dos actores importantes en los contratos son miembros activos
+//dentro de la propiedad
 
 //Landord -> propietario
-//Tenant ->  Arrendatatio (a)
+//Tenant ->  Arrendatario (a)
 
 @Injectable()
 export class ContractService {
   constructor(
     private readonly contractRepository: ContractRepository,
     private readonly propertyRepository: PropertyRepository,
+    private readonly propertyHelperService: PropertyHelper,
     private readonly globalRepository: GlobalRepository,
   ) {}
 
@@ -25,6 +37,7 @@ export class ContractService {
     userId: string,
     contract: CreateContractType,
   ): Promise<{ id: string; message: string }> {
+    //verficamos que la propiedad exista! por el creador o propietario
     const optProperty = await this.propertyRepository.findPropertyById(
       userId,
       contract.propertyId,
@@ -32,6 +45,17 @@ export class ContractService {
 
     if (!optProperty) {
       throw new PropertyNotFoundException();
+    }
+    //verificamos que no tenga un contrato activo de arrendamiento la vivienda
+    const iscurrentContract =
+      await this.contractRepository.findContractByStatusContractAndPropertyId(
+        'EXECUTION',
+        optProperty.id,
+      );
+
+    //lanzamos la excepcion ya que no puede haber un contrato vigente si se quiere crear otro
+    if (iscurrentContract) {
+      throw new propertyWithContractAvalibityException();
     }
 
     //validamos si los miembros pertenecen a dicho inmueble menos la persona interesada en la casa
@@ -45,6 +69,53 @@ export class ContractService {
     if (!landordPropertyMember) {
       throw new PropertyMemberNotFound(contract.landlordMemberId);
     }
+
+    //verificamos que el propietario o el usuario que registro la vivienda
+    //sea propietario activo del inmueble
+    const actorRoleByLandord = (
+      await this.propertyRepository.findActorRoleByUserId(
+        contract.landlordMemberId,
+      )
+    ).map((role) => role.name as PropertyActorRoleType);
+
+    //esto lanzara una excepcion sino cumple con el actor role
+    this.propertyHelperService.IsActorRole('LANDLORD', actorRoleByLandord);
+
+    //verificamos que el arrendatario no tenga el actor role de tenant
+    // pq para cada vivienda hay una sola persona a quien se le hace el contrato
+    const actorRoleByTenant = (
+      await this.propertyRepository.findActorRoleByUserId(
+        contract.tenantMemberId,
+      )
+    ).map((role) => role.name as PropertyActorRoleType);
+
+    this.propertyHelperService.IsActorRole('TENANT', actorRoleByTenant, false); //no puede haber ese rol
+
+    //registramos el usuario como tenant en la vivienda
+    const propertyMember: PropertyMemberType = {
+      userId: contract.tenantMemberId,
+      assignedBy: userId,
+      propertyId: contract.propertyId,
+    };
+
+    const { id: propertyMemberId } =
+      await this.propertyRepository.savePropertyMember(propertyMember);
+
+    const tenantName =
+      await this.propertyRepository.findPropertyActorRoleByName('TENANT');
+
+    if (!tenantName) {
+      throw new PropertyActorRoleNotFoundException();
+    }
+
+    const propertyTenantMemberRole: PropertyMemberRoleType = {
+      propertyMemberId,
+      propertyActorRoleId: tenantName.id,
+    };
+
+    await this.propertyRepository.savePropertyMemberRole(
+      propertyTenantMemberRole,
+    );
 
     //creamos los recursos en este caso archivos de contratos
     const newResource: createResourceImageType = {
