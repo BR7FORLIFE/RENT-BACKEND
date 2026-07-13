@@ -20,6 +20,7 @@ import type { PropertyInfoResponse } from '../dtos/response-dto.js';
 import { PropertyHelper } from './helpers.service.js';
 import type {
   CreatePropertyType,
+  createResourceImageType,
   EditingPropertyType,
 } from '../dtos/request-dto.js';
 import type { Prisma } from '../../../../generated/prisma/client.js';
@@ -73,11 +74,7 @@ export class PropertyService {
       throw new TypePropertyNotFoundException();
     }
 
-    //registramos el recurso para la vivienda que se quiere crear
-    const { id: resourceImageId } =
-      await this.globalRepository.saveAssetResource(propertyDto.resourceImage);
-
-    //registramos el inmueble
+    //registramos el inmueble y guardamos los recursos correspondientes a la vivienda
     const newProperty: PropertyType = {
       userId,
       directionId,
@@ -89,11 +86,12 @@ export class PropertyService {
       registerByUserId: userId,
       propertyDescription: propertyDto.propertyDescription,
       propertyName: propertyDto.propertyName,
-      resourceImageId: resourceImageId,
     };
 
-    const { id: propertyId } =
-      await this.propertyRepository.saveProperty(newProperty);
+    const { id: propertyId } = await this.propertyRepository.saveProperty(
+      newProperty,
+      propertyDto.resourcesImages,
+    );
 
     //creamos el MemberRole ya que el usuario que digita un inmueble
     // posee un ROL de Arrendador o muchos mas
@@ -113,13 +111,13 @@ export class PropertyService {
       await this.propertyRepository.findPropertyActorRoleByName('LANDLORD');
 
     if (!propertyActorRole) {
-      new PropertyActorRoleNotFoundException();
+      throw new PropertyActorRoleNotFoundException();
     }
 
     //guardamos la informacion del usuario con rol en propertyMemberRole
     const propertyMemberRole: PropertyMemberRoleType = {
       propertyMemberId,
-      propertyActorRoleId: propertyActorRole!.id,
+      propertyActorRoleId: propertyActorRole.id,
     };
 
     await this.propertyRepository.savePropertyMemberRole(propertyMemberRole);
@@ -158,10 +156,12 @@ export class PropertyService {
       throw new PropertyNotFoundException();
     }
 
+    //limpiamos los datos
     const cleanProperty = this.helper.cleanUndefined(partialProperty);
 
     const data: Prisma.PropertyUpdateInput = {};
 
+    //edicion de parametros por keys
     for (const [key, value] of Object.entries(cleanProperty)) {
       switch (key) {
         case 'propertyType': {
@@ -203,6 +203,43 @@ export class PropertyService {
           };
           break;
         }
+
+        case 'resourcesImages': {
+          const currentImages =
+            await this.propertyRepository.findAssetsResourcesByPropertyId(
+              property.id,
+            );
+
+          const incomingImages = value as createResourceImageType[];
+
+          const current = new Set(currentImages.map((i) => i.assetId));
+          const incoming = new Set(incomingImages.map((i) => i.assetId));
+
+          const toDelete = currentImages
+            .filter((image) => !incoming.has(image.assetId!))
+            .map((image) => image.assetId!);
+
+          const toInsert: Prisma.ResourceImagesCreateManyInput[] =
+            incomingImages
+              .filter((image) => !current.has(image.assetId!))
+              .map((image) => ({
+                assetId: image.assetId,
+                width: image.width,
+                height: image.height,
+                format: image.format,
+                url: image.url,
+                secureUrl: image.secureUrl,
+                propertyId: property.id,
+              }));
+
+          await this.propertyRepository.updateResourcesImages(
+            toDelete,
+            toInsert,
+          );
+
+          break;
+        }
+
         default:
           data[key] = value;
       }
@@ -216,4 +253,7 @@ export class PropertyService {
 
     return { id: result.id, message: 'propiedad actualizada exitosamente!' };
   }
+
+  //cambiar el propietario de la vivienda
+  async changeOwnerProperty(oldOwner: string, newOwner: string) {}
 }
