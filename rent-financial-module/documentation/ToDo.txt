@@ -1,2 +1,2 @@
-1. [] IMPORTANTE! Mejorar la logica de los servicios en la creacion de recursos (Repositorios / transacciones)
+1. [x] IMPORTANTE! Mejorar la logica de los servicios en la creacion de recursos (Repositorios / transacciones)
 2. [] crear helpers para mejorar la legibilidad y evitar la repeticion de codigo
