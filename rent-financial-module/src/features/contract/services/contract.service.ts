@@ -3,20 +3,21 @@ import { ContractRepository } from '../repository/contract.repository.js';
 import { PropertyRepository } from '../../property-registration/repository/property.repository.js';
 import type { CreateContractType } from '../dtos/request-dto.js';
 import {
-  PropertyActorRoleNotFoundException,
   PropertyMemberNotFound,
   PropertyNotFoundException,
 } from '../../property-registration/exceptions/exceptions.js';
 import type { ContractType } from '../schemas/contract.schema.js';
 import type { createResourceImageType } from '../../property-registration/dtos/request-dto.js';
 import { GlobalRepository } from '../../global/repository-global.js';
-import type { PropertyHelper } from '../../property-registration/services/helpers.service.js';
+import { PropertyHelper } from '../../property-registration/services/helpers.service.js';
 import type { PropertyActorRoleType } from '../../property-registration/types.js';
 import { propertyWithContractAvalibityException } from '../exceptions/exceptions.js';
 import type {
   PropertyMemberRoleType,
   PropertyMemberType,
 } from '../../property-registration/schemas/property-registration.schema.js';
+import { PrismaService } from '../../../core/database/prisma.service.js';
+import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../../types/global-types.js';
 
 // estos dos actores importantes en los contratos son miembros activos
 //dentro de la propiedad
@@ -27,6 +28,7 @@ import type {
 @Injectable()
 export class ContractService {
   constructor(
+    private readonly prismaClient: PrismaService,
     private readonly contractRepository: ContractRepository,
     private readonly propertyRepository: PropertyRepository,
     private readonly propertyHelperService: PropertyHelper,
@@ -91,62 +93,66 @@ export class ContractService {
 
     this.propertyHelperService.IsActorRole('TENANT', actorRoleByTenant, false); //no puede haber ese rol
 
-    //registramos el usuario como tenant en la vivienda
-    const propertyMember: PropertyMemberType = {
-      userId: contract.tenantMemberId,
-      assignedBy: userId,
-      propertyId: contract.propertyId,
+    const result = await this.prismaClient.$transaction(async (tx) => {
+      //registramos el usuario como tenant en la vivienda
+      const propertyMember: PropertyMemberType = {
+        userId: contract.tenantMemberId,
+        assignedBy: userId,
+        propertyId: contract.propertyId,
+      };
+
+      const { id: tenantPropertyMemberId } =
+        await this.propertyRepository.savePropertyMember(propertyMember, tx);
+
+      const propertyTenantMemberRole: PropertyMemberRoleType = {
+        propertyMemberId: tenantPropertyMemberId,
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.TENANT,
+      };
+
+      await this.propertyRepository.savePropertyMemberRole(
+        propertyTenantMemberRole,
+        tx,
+      );
+
+      //creamos los recursos en este caso archivos de contratos
+      const newResource: createResourceImageType = {
+        url: contract.resourceImage.url,
+        assetId: contract.resourceImage.assetId,
+        format: contract.resourceImage.format,
+        height: contract.resourceImage.height,
+        secureUrl: contract.resourceImage.secureUrl,
+        width: contract.resourceImage.width,
+      };
+
+      const { id: resourceImageId } =
+        await this.globalRepository.saveAssetResource(newResource, tx);
+
+      const newContract: ContractType = {
+        // la idea es que si hay mas actores se pueda setear la id de quien genero el contracto
+        createByUserId: userId,
+        depositAmount: contract.depositAmount,
+        endDate: contract.endDate,
+        landlordMemberId: landordPropertyMember.id,
+        monthlyRent: contract.monthlyRent,
+        propertyId: optProperty.id,
+        resourceImageId,
+        startDate: contract.startDate,
+        status: 'DRAFT',
+        // si cambia el estado a PENDING o EXECUTION puede ser miembro activo del inmueble
+        tenantMemberId: tenantPropertyMemberId,
+      };
+
+      const { id: contractId } = await this.contractRepository.saveContract(
+        newContract,
+        tx,
+      );
+
+      return { contractId };
+    });
+
+    return {
+      id: result.contractId,
+      message: 'contrato creado satisfactoriamente!',
     };
-
-    const { id: propertyMemberId } =
-      await this.propertyRepository.savePropertyMember(propertyMember);
-
-    const tenantName =
-      await this.propertyRepository.findPropertyActorRoleByName('TENANT');
-
-    if (!tenantName) {
-      throw new PropertyActorRoleNotFoundException();
-    }
-
-    const propertyTenantMemberRole: PropertyMemberRoleType = {
-      propertyMemberId,
-      propertyActorRoleId: tenantName.id,
-    };
-
-    await this.propertyRepository.savePropertyMemberRole(
-      propertyTenantMemberRole,
-    );
-
-    //creamos los recursos en este caso archivos de contratos
-    const newResource: createResourceImageType = {
-      url: contract.resourceImage.url,
-      assetId: contract.resourceImage.assetId,
-      format: contract.resourceImage.format,
-      height: contract.resourceImage.height,
-      secureUrl: contract.resourceImage.secureUrl,
-      width: contract.resourceImage.width,
-    };
-
-    const { id: resourceImageId } =
-      await this.globalRepository.saveAssetResource(newResource);
-
-    const newContract: ContractType = {
-      // la idea es que si hay mas actores se pueda setear la id de quien genero el contracto
-      createByUserId: userId,
-      depositAmount: contract.depositAmount,
-      endDate: contract.endDate,
-      landlordMemberId: contract.landlordMemberId,
-      monthlyRent: contract.monthlyRent,
-      propertyId: optProperty.id,
-      resourceImageId,
-      startDate: contract.startDate,
-      status: 'DRAFT',
-      // si cambia el estado a PENDING o EXECUTION puede ser miembro activo del inmueble
-      tenantMemberId: contract.tenantMemberId,
-    };
-
-    const { id } = await this.contractRepository.saveContract(newContract);
-
-    return { id, message: 'contrato creado satisfactoriamente!' };
   }
 }
