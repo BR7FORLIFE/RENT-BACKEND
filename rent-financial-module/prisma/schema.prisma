@@ -53,7 +53,7 @@ enum PaymentStatus{
 }
 
 model TypeProperty{
-  id String @id @default(uuid())
+  id String @id
   name String @unique
   description String?
 
@@ -61,7 +61,7 @@ model TypeProperty{
 }
 
 model PropertyOccupationType{
-  id String @id @default(uuid())
+  id String @id
   name String @unique
   description String?
 
@@ -69,7 +69,7 @@ model PropertyOccupationType{
 }
 
 model PropertyActorRole{
-  id String @id @default(uuid())
+  id String @id
   name String @unique
   description String?
 
