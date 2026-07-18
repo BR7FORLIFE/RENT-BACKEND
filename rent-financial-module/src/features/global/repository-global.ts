@@ -4,6 +4,7 @@ import type {
   DirectionType,
   ResourceImageType,
 } from '../property-registration/schemas/property-registration.schema.js';
+import type { Prisma } from '../../../generated/prisma/client.js';
 
 /*
  *Repositorio global para utilizacion entre las distintas features sin repetir codigo
@@ -12,10 +13,16 @@ import type {
 export class GlobalRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async saveDirection(direction: DirectionType) {
-    return await this.prisma.direction.create({ data: direction });
+  async saveDirection(
+    direction: DirectionType,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.direction.create({ data: direction });
   }
-  async saveAssetResource(resourceimage: ResourceImageType) {
-    return await this.prisma.resourceImages.create({ data: resourceimage });
+  async saveAssetResource(
+    resourceimage: ResourceImageType,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.resourceImages.create({ data: resourceimage });
   }
 }

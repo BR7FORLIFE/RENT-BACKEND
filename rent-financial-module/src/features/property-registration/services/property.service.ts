@@ -6,7 +6,6 @@ import type {
 } from '../schemas/property-registration.schema.js';
 import { PropertyRepository } from '../repository/property.repository.js';
 import {
-  PropertyActorRoleNotFoundException,
   PropertyAlreadyRegisterException,
   PropertyNotFoundException,
   PropertyOccupationTypeNotFoundException,
@@ -26,10 +25,17 @@ import type {
 import type { Prisma } from '../../../../generated/prisma/client.js';
 import type { PropertyOccupationType, TypePropertyType } from '../types.js';
 import { GlobalRepository } from '../../global/repository-global.js';
+import {
+  TYPE_PROPERTY_ACTOR_ROLE_UUIDS,
+  TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS,
+  TYPE_PROPERTY_UUIDS,
+} from '../../../types/global-types.js';
+import { PrismaService } from '../../../core/database/prisma.service.js';
 
 @Injectable()
 export class PropertyService {
   constructor(
+    private readonly prismaClient: PrismaService,
     private readonly helper: PropertyHelper,
     private readonly propertyRepository: PropertyRepository,
     private readonly globalRepository: GlobalRepository,
@@ -50,79 +56,79 @@ export class PropertyService {
       throw new PropertyAlreadyRegisterException();
     }
 
-    //creamos la direccion del inmueble
-    const { id: directionId } = await this.globalRepository.saveDirection(
-      propertyDto.direction,
-    );
+    //Asignamos las respectivas id de las tablas logicas segun el dto que se recibe
+    const occupationTypeId =
+      TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS[propertyDto.propertyOccupationType];
 
-    //buscamos la id asociada al PropertyOccupationType
-    const occupationType =
-      await this.propertyRepository.findPropertyOccupationTypeByName(
-        propertyDto.propertyOccupationType,
-      );
-
-    if (!occupationType) {
+    if (!occupationTypeId) {
       throw new PropertyOccupationTypeNotFoundException();
     }
 
-    //buscamos la id del tipo de propiedad
-    const typeProperty = await this.propertyRepository.findTypePropertyByName(
-      propertyDto.propertyType,
-    );
+    const typePropertyId = TYPE_PROPERTY_UUIDS[propertyDto.propertyType];
 
-    if (!typeProperty) {
+    if (!typePropertyId) {
       throw new TypePropertyNotFoundException();
     }
 
-    //registramos el inmueble y guardamos los recursos correspondientes a la vivienda
-    const newProperty: PropertyType = {
-      userId,
-      directionId,
-      fmi: propertyDto.fmi,
-      isPublished: false,
-      predialNumber: propertyDto.predialNumber,
-      propertyOccupationTypeId: occupationType.id,
-      propertyTypeId: typeProperty.id,
-      registerByUserId: userId,
-      propertyDescription: propertyDto.propertyDescription,
-      propertyName: propertyDto.propertyName,
+    //creamos la transaccion atomica de los principios ACID para guardar de forma segura el inmueble
+    const result = await this.prismaClient.$transaction(async (tx) => {
+      //creamos la direccion del inmueble
+      const { id: directionId } = await this.globalRepository.saveDirection(
+        propertyDto.direction,
+        tx,
+      );
+
+      //registramos el inmueble y guardamos los recursos correspondientes a la vivienda
+      const newProperty: PropertyType = {
+        userId,
+        directionId,
+        fmi: propertyDto.fmi,
+        isPublished: false,
+        predialNumber: propertyDto.predialNumber,
+        propertyOccupationTypeId: occupationTypeId,
+        propertyTypeId: typePropertyId,
+        registerByUserId: userId,
+        propertyDescription: propertyDto.propertyDescription,
+        propertyName: propertyDto.propertyName,
+      };
+
+      const { id: propertyId } = await this.propertyRepository.saveProperty(
+        newProperty,
+        propertyDto.resourcesImages,
+        tx,
+      );
+
+      //creamos el MemberRole ya que el usuario que digita un inmueble
+      // posee un ROL de Arrendador o muchos mas
+      const propertyMember: PropertyMemberType = {
+        userId,
+        assignedBy: userId,
+        propertyId,
+      };
+
+      const { id: propertyMemberId } =
+        await this.propertyRepository.savePropertyMember(propertyMember, tx);
+
+      //guardamos la informacion del usuario con rol en propertyMemberRole
+      const propertyMemberRole: PropertyMemberRoleType = {
+        propertyMemberId,
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.LANDLORD,
+      };
+
+      await this.propertyRepository.savePropertyMemberRole(
+        propertyMemberRole,
+        tx,
+      );
+
+      return {
+        propertyId,
+      };
+    });
+
+    return {
+      id: result.propertyId,
+      message: 'propiedad registrada exitosamente!',
     };
-
-    const { id: propertyId } = await this.propertyRepository.saveProperty(
-      newProperty,
-      propertyDto.resourcesImages,
-    );
-
-    //creamos el MemberRole ya que el usuario que digita un inmueble
-    // posee un ROL de Arrendador o muchos mas
-    const propertyMember: PropertyMemberType = {
-      userId,
-      assignedBy: userId,
-      propertyId,
-    };
-
-    const { id: propertyMemberId } =
-      await this.propertyRepository.savePropertyMember(propertyMember);
-
-    //creamos el ProperyMemberRole para saber el rol de dicho
-    //recuperamos el id del role LANDORD
-
-    const propertyActorRole =
-      await this.propertyRepository.findPropertyActorRoleByName('LANDLORD');
-
-    if (!propertyActorRole) {
-      throw new PropertyActorRoleNotFoundException();
-    }
-
-    //guardamos la informacion del usuario con rol en propertyMemberRole
-    const propertyMemberRole: PropertyMemberRoleType = {
-      propertyMemberId,
-      propertyActorRoleId: propertyActorRole.id,
-    };
-
-    await this.propertyRepository.savePropertyMemberRole(propertyMemberRole);
-
-    return { id: propertyId, message: 'propiedad registrada exitosamente!' };
   }
 
   async consultAllProperties(
@@ -165,40 +171,33 @@ export class PropertyService {
     for (const [key, value] of Object.entries(cleanProperty)) {
       switch (key) {
         case 'propertyType': {
-          const propertyName =
-            await this.propertyRepository.findTypePropertyByName(
-              value as TypePropertyType,
-            );
+          const propertyId = TYPE_PROPERTY_UUIDS[value as TypePropertyType];
 
-          if (!propertyName) {
+          if (!propertyId) {
             break;
           }
 
-          const { id } = propertyName;
-
           data.typeProperty = {
             connect: {
-              id,
+              id: propertyId,
             },
           };
           break;
         }
 
         case 'propertyOccupationType': {
-          const propertyOccupation =
-            await this.propertyRepository.findPropertyOccupationTypeByName(
-              value as PropertyOccupationType,
-            );
+          const propertyOccupationId =
+            TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS[
+              value as PropertyOccupationType
+            ];
 
-          if (!propertyOccupation) {
+          if (!propertyOccupationId) {
             break;
           }
 
-          const { id } = propertyOccupation;
-
           data.propertyOccupationType = {
             connect: {
-              id,
+              id: propertyOccupationId,
             },
           };
           break;
@@ -255,5 +254,5 @@ export class PropertyService {
   }
 
   //cambiar el propietario de la vivienda
-  async changeOwnerProperty(oldOwner: string, newOwner: string) {}
+  //async changeOwnerProperty(oldOwner: string, newOwner: string) {}
 }

@@ -12,11 +12,6 @@ import type {
 } from '../../../shared/pagination/pagination-schemas.js';
 import type { PropertyInfoResponse } from '../dtos/response-dto.js';
 import type { Prisma } from '../../../../generated/prisma/client.js';
-import type {
-  PropertyActorRoleType,
-  PropertyOccupationType,
-  TypePropertyType,
-} from '../types.js';
 
 @Injectable()
 export class PropertyRepository {
@@ -26,12 +21,13 @@ export class PropertyRepository {
   async findAll(
     userId: string,
     paginationDto: PaginationType,
+    db: Prisma.TransactionClient = this.prisma,
   ): Promise<PaginationResponse<PropertyInfoResponse>> {
     const { limit, page } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 
-    const [data, total] = await this.prisma.$transaction([
-      this.prisma.property.findMany({
+    const [data, total] = await db.$transaction([
+      db.property.findMany({
         where: { userId },
         skip,
         take: limit,
@@ -60,7 +56,7 @@ export class PropertyRepository {
           resourceImages: true,
         },
       }),
-      this.prisma.property.count({
+      db.property.count({
         where: { userId },
       }),
     ]);
@@ -81,9 +77,10 @@ export class PropertyRepository {
     userId: string,
     fmi: string | null,
     predialNumber: string | null,
+    db: Prisma.TransactionClient = this.prisma,
   ) {
     if (fmi) {
-      return await this.prisma.property.findFirst({
+      return await db.property.findFirst({
         where: {
           userId,
           fmi,
@@ -102,8 +99,12 @@ export class PropertyRepository {
     return null;
   }
 
-  async findPropertyById(userId: string, id: string) {
-    return await this.prisma.property.findFirst({
+  async findPropertyById(
+    userId: string,
+    id: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.property.findFirst({
       where: { userId, id },
       select: {
         id: true,
@@ -135,8 +136,9 @@ export class PropertyRepository {
   async findPropertyMemberByUserIdAndPropertyId(
     userId: string,
     propertyId: string,
+    db: Prisma.TransactionClient = this.prisma,
   ) {
-    return await this.prisma.propertyMember.findFirst({
+    return await db.propertyMember.findFirst({
       where: {
         userId,
         propertyId,
@@ -144,40 +146,22 @@ export class PropertyRepository {
     });
   }
 
-  async findPropertyOccupationTypeByName(name: PropertyOccupationType) {
-    return await this.prisma.propertyOccupationType.findFirst({
-      where: {
-        name,
-      },
-    });
-  }
-
-  async findTypePropertyByName(name: TypePropertyType) {
-    return await this.prisma.typeProperty.findFirst({
-      where: {
-        name,
-      },
-    });
-  }
-
-  async findPropertyActorRoleByName(name: PropertyActorRoleType) {
-    return await this.prisma.propertyActorRole.findFirst({
-      where: {
-        name,
-      },
-    });
-  }
-
-  async findAssetsResourcesByPropertyId(propertyId: string) {
-    return await this.prisma.resourceImages.findMany({
+  async findAssetsResourcesByPropertyId(
+    propertyId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.resourceImages.findMany({
       where: {
         propertyId,
       },
     });
   }
 
-  async findActorRoleByUserId(userId: string) {
-    return this.prisma.propertyActorRole.findMany({
+  async findActorRoleByUserId(
+    userId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return db.propertyActorRole.findMany({
       where: {
         propertyMemberRoles: {
           some: {
@@ -197,8 +181,9 @@ export class PropertyRepository {
   async saveProperty(
     property: PropertyType,
     resourcesImages: ResourceImageType[],
+    db: Prisma.TransactionClient = this.prisma,
   ) {
-    return await this.prisma.property.create({
+    return await db.property.create({
       data: {
         ...property,
         resourceImages: {
@@ -208,12 +193,18 @@ export class PropertyRepository {
     });
   }
 
-  async savePropertyMember(propertyMember: PropertyMemberType) {
-    return await this.prisma.propertyMember.create({ data: propertyMember });
+  async savePropertyMember(
+    propertyMember: PropertyMemberType,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.propertyMember.create({ data: propertyMember });
   }
 
-  async savePropertyMemberRole(properyMemberRole: PropertyMemberRoleType) {
-    return await this.prisma.propertyMemberRole.create({
+  async savePropertyMemberRole(
+    properyMemberRole: PropertyMemberRoleType,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.propertyMemberRole.create({
       data: properyMemberRole,
     });
   }
@@ -223,8 +214,9 @@ export class PropertyRepository {
     id: string,
     userId: string,
     data: Prisma.PropertyUpdateInput,
+    db: Prisma.TransactionClient = this.prisma,
   ) {
-    return await this.prisma.property.update({
+    return await db.property.update({
       where: {
         id,
         userId,
@@ -236,8 +228,9 @@ export class PropertyRepository {
   async updateResourcesImages(
     toDelete: string[],
     toInsert: Prisma.ResourceImagesCreateManyInput[],
+    db: Prisma.TransactionClient = this.prisma,
   ): Promise<void> {
-    await this.prisma.$transaction(async (tx) => {
+    await db.$transaction(async (tx) => {
       if (toDelete.length > 0) {
         await tx.resourceImages.deleteMany({
           where: {

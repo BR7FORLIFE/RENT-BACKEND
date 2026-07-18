@@ -103,7 +103,7 @@ export class PropertyRegistrationController {
   @Post()
   async changeOwnerProperty(
     @Req() req: AuthRequest,
-    @Body newOwner: ChangeOwnerType,
+    @Body() newOwner: ChangeOwnerType,
   ) {}
 
   @Delete()
