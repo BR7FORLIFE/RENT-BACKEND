@@ -7,8 +7,8 @@ export const createContractDtoRequest = z.object({
   tenantMemberId: z.uuid(),
   monthlyRent: z.coerce.number(),
   depositAmount: z.coerce.number(),
-  startDate: z.date(),
-  endDate: z.date(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
   resourceImage: createResourceImageDtoRequest,
 });
 
