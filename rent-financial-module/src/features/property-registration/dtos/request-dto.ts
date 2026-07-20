@@ -61,3 +61,8 @@ export const ChangeOwnerDtoRequest = z.object({
 });
 
 export type ChangeOwnerType = z.infer<typeof ChangeOwnerDtoRequest>;
+
+//sugerencias de Inteligencia artificial
+export const GetAISuggestion = z.object({
+  propertyField: z.enum(['PropertyName', 'PropertyDescription']),
+});

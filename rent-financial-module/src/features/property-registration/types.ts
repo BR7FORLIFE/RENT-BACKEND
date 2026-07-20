@@ -31,3 +31,11 @@ export type PropertyActorRoleType =
   | 'TENANT'
   | 'PROPERTY_ADMINISTRATOR'
   | 'OPERATION_SUPPORT';
+
+// IA Response Suggestion
+export type PropertyField = 'PropertyName' | 'PropertyDescription';
+
+export interface IASuggestionPropertyFields {
+  name: keyof PropertyField;
+  description: string;
+}

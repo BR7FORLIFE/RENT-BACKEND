@@ -16,35 +16,35 @@ export class ContractRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   //finds
-  async findAllContractByPropertyId(
-    propertyId: string,
-    paginationDto: PaginationType,
-    db: Prisma.TransactionClient = this.prisma,
-  ): Promise<PaginationResponse<ContractInfoResponse>> {
-    const { limit, page } = paginationDto;
-    const skip = (paginationDto.page - 1) * paginationDto.limit;
+  // async findAllContractByPropertyId(
+  //   propertyId: string,
+  //   paginationDto: PaginationType,
+  //   db: Prisma.TransactionClient = this.prisma,
+  // ): Promise<PaginationResponse<ContractInfoResponse>> {
+  //   const { limit, page } = paginationDto;
+  //   const skip = (paginationDto.page - 1) * paginationDto.limit;
 
-    const [data, total] = await db.$transaction([
-      db.contract.findMany({
-        where: { propertyId },
-        skip,
-        take: limit,
-      }),
-      db.contract.count({ where: { propertyId } }),
-    ]);
+  //   const [data, total] = await db.$transaction([
+  //     db.contract.findMany({
+  //       where: { propertyId },
+  //       skip,
+  //       take: limit,
+  //     }),
+  //     db.contract.count({ where: { propertyId } }),
+  //   ]);
 
-    return {
-      data,
-      metadata: {
-        limit: limit,
-        page,
-        hasNextPage: page * limit < total,
-        hasPreviousPage: page > 1,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
-  }
+  //   return {
+  //     data,
+  //     metadata: {
+  //       limit: limit,
+  //       page,
+  //       hasNextPage: page * limit < total,
+  //       hasPreviousPage: page > 1,
+  //       total,
+  //       totalPages: Math.ceil(total / limit),
+  //     },
+  //   };
+  // }
 
   async findContractByStatusContractAndPropertyId(
     statusContract: StatusContractType,
