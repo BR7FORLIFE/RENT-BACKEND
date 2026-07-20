@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import type { PropertyActorRoleType } from '../types.js';
+import type {
+  IASuggestionPropertyFields,
+  PropertyActorRoleType,
+  PropertyField,
+} from '../types.js';
 import { ActorRoleException } from '../exceptions/domain-exceptions.js';
+import { CallModelStream } from '../../../core/IA/IA-cclient.js';
 
 @Injectable()
 export class PropertyHelper {
@@ -34,4 +39,34 @@ export class PropertyHelper {
       }
     }
   }
+}
+
+export async function CreateSuggestionByPropertyField(field: PropertyField) {
+  const STRUCTURE_PROMPT = `
+    You are assisting a user in creating a new real estate property listing.
+
+    Generate a generic suggestion for the following property field: "${field}".
+The suggestion should serve as a template that the user can later personalize.
+
+    Requirements:
+    - The response MUST be entirely in Spanish.
+    - The property name must be short, attractive, professional, and generic.
+    - Do not mention any specific city, country, address, neighborhood, or real location.
+    - Do not invent specific details such as bedrooms, bathrooms, area, amenities, or price.
+    - The description must be generic, professional, and suitable for almost any residential property.
+    - The description should encourage the user to personalize it later.
+    - The description must be between 60 and 100 words.
+    - Return ONLY a valid JSON object.
+    - Do not include markdown, code fences, explanations, or any extra text.
+
+    Response format:
+
+    {
+      "name": "Property name",
+      "description": "Property description"
+    }
+  `;
+
+  const IAresponse = await CallModelStream(STRUCTURE_PROMPT);
+  return JSON.parse(IAresponse.message.content) as IASuggestionPropertyFields;
 }

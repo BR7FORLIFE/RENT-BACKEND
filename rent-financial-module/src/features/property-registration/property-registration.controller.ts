@@ -24,10 +24,13 @@ import {
   ChangeOwnerDtoRequest,
   createPropertyDtoRequest,
   EditingPropertyDtoRequest,
+  GetAISuggestion,
   type ChangeOwnerType,
   type CreatePropertyType,
   type EditingPropertyType,
 } from './dtos/request-dto.js';
+import { CreateSuggestionByPropertyField } from './services/helpers.service.js';
+import type { PropertyField } from './types.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller({
@@ -108,4 +111,13 @@ export class PropertyRegistrationController {
 
   @Delete()
   async deleteProperty() {}
+
+  // IA suggestion
+  @UsePipes(new ZodValidation(GetAISuggestion))
+  @HttpCode(200)
+  @Post('IA-registration-suggestion')
+  async handleAISuggestion(@Body() propertyField: PropertyField) {
+    const suggestion = await CreateSuggestionByPropertyField(propertyField);
+    return suggestion;
+  }
 }
