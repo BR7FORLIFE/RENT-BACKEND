@@ -1,4 +1,4 @@
-import { Decimal } from '@prisma/client/runtime/index-browser';
+import { Prisma } from '../../../../generated/prisma/client.js';
 import type { TypeStreet } from '../types.js';
 
 interface ResourceImageResponse {
@@ -16,8 +16,9 @@ interface ResourceImageResponse {
 export interface Direction {
   typeStreet: TypeStreet;
   id: string;
-  latitute: Decimal;
-  longitud: Decimal;
+  propertyId: string;
+  latitute: Prisma.Decimal;
+  longitud: Prisma.Decimal;
   department: string;
   city: string;
   neighborhood: string;
@@ -35,13 +36,8 @@ export interface PropertyInfoResponse {
   isPublished: boolean;
   propertyName: string;
   propertyDescription: string;
-  direction: Direction;
-  typeProperty: {
-    name: string;
-  };
-  propertyOccupationType: {
-    name: string;
-  };
-
+  direction: Direction | null;
+  typeProperty: string;
+  propertyOccupationType: string;
   resourceImages: ResourceImageResponse[];
 }

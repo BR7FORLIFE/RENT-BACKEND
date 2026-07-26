@@ -4,6 +4,7 @@ import { Street } from '../types.js';
 //direction
 export const DirectionSchema = z.object({
   id: z.uuid().optional(),
+  propertyId: z.uuid(),
   latitute: z.number(),
   longitud: z.number(),
   department: z.string(),
@@ -16,6 +17,13 @@ export const DirectionSchema = z.object({
   updateAt: z.date().optional(),
 });
 export type DirectionType = z.infer<typeof DirectionSchema>;
+
+export const PropertyResourcesSchema = z.object({
+  propertyId: z.uuid(),
+  resourceId: z.uuid(),
+});
+
+export type PropertyResourceType = z.infer<typeof PropertyResourcesSchema>;
 
 //resources images
 export const ResourceImageSchema = z.object({
@@ -42,7 +50,6 @@ export const propertySchema = z.object({
   propertyOccupationTypeId: z.uuid(),
   propertyName: z.string().min(8).max(50),
   propertyDescription: z.string(),
-  directionId: z.uuid(),
   fmi: z.string(),
   predialNumber: z.string(),
   isPublished: z.boolean(),
