@@ -9,7 +9,7 @@ export const createContractDtoRequest = z.object({
   depositAmount: z.coerce.number(),
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
-  resourceImage: createResourceImageDtoRequest,
+  resourcesImage: z.array(createResourceImageDtoRequest),
 });
 
 export type CreateContractType = z.infer<typeof createContractDtoRequest>;
