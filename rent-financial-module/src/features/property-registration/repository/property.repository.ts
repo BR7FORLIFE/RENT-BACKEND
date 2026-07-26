@@ -11,7 +11,7 @@ import type {
   PaginationType,
 } from '../../../shared/pagination/pagination-schemas.js';
 import type { PropertyInfoResponse } from '../dtos/response-dto.js';
-import type { Prisma } from '../../../../generated/prisma/client.js';
+import { Prisma } from '../../../../generated/prisma/client.js';
 
 @Injectable()
 export class PropertyRepository {
@@ -40,6 +40,12 @@ export class PropertyRepository {
           propertyDescription: true,
           propertyName: true,
 
+          propertyResources: {
+            select: {
+              resourcesImage: true,
+            },
+          },
+
           typeProperty: {
             select: {
               name: true,
@@ -53,7 +59,6 @@ export class PropertyRepository {
           },
 
           direction: true,
-          resourceImages: true,
         },
       }),
       db.property.count({
@@ -61,8 +66,25 @@ export class PropertyRepository {
       }),
     ]);
 
+    //transformamos con un dto la respuesta que enviaremos al servidor
+    const transformData: PropertyInfoResponse[] = data.map((res) => ({
+      id: res.id,
+      createAt: res.createAt,
+      fmi: res.fmi,
+      predialNumber: res.predialNumber,
+      isPublished: res.isPublished,
+      propertyName: res.propertyName,
+      propertyDescription: res.propertyDescription,
+      direction: res.direction,
+      typeProperty: res.typeProperty.name,
+      propertyOccupationType: res.propertyOccupationType.name,
+      resourceImages: res.propertyResources.map(
+        (resources) => resources.resourcesImage,
+      ),
+    }));
+
     return {
-      data,
+      data: transformData,
       metadata: {
         limit: limit,
         page,
@@ -104,7 +126,7 @@ export class PropertyRepository {
     id: string,
     db: Prisma.TransactionClient = this.prisma,
   ) {
-    return await db.property.findFirst({
+    const data = await db.property.findFirst({
       where: { userId, id },
       select: {
         id: true,
@@ -128,9 +150,33 @@ export class PropertyRepository {
         },
 
         direction: true,
-        resourceImages: true,
+        propertyResources: {
+          select: {
+            resourcesImage: true,
+          },
+        },
       },
     });
+
+    if (!data) return null;
+
+    const transformData: PropertyInfoResponse = {
+      id: data.id,
+      createAt: data.createAt,
+      fmi: data.fmi,
+      predialNumber: data.predialNumber,
+      isPublished: data.isPublished,
+      propertyName: data.propertyName,
+      propertyDescription: data.propertyDescription,
+      direction: data.direction,
+      typeProperty: data.typeProperty.name,
+      propertyOccupationType: data.propertyOccupationType.name,
+      resourceImages: data.propertyResources.map(
+        (resources) => resources.resourcesImage,
+      ),
+    };
+
+    return transformData;
   }
 
   async findPropertyMemberByUserIdAndPropertyId(
@@ -150,9 +196,12 @@ export class PropertyRepository {
     propertyId: string,
     db: Prisma.TransactionClient = this.prisma,
   ) {
-    return await db.resourceImages.findMany({
+    return await db.propertyResources.findMany({
       where: {
         propertyId,
+      },
+      select: {
+        resourcesImage: true,
       },
     });
   }
@@ -186,8 +235,19 @@ export class PropertyRepository {
     return await db.property.create({
       data: {
         ...property,
-        resourceImages: {
-          create: resourcesImages,
+        propertyResources: {
+          create: resourcesImages.map((resource) => ({
+            resourcesImage: {
+              create: {
+                assetId: resource.assetId,
+                url: resource.url,
+                width: resource.width,
+                height: resource.height,
+                format: resource.format,
+                secureUrl: resource.secureUrl,
+              },
+            },
+          })),
         },
       },
     });

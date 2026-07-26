@@ -72,16 +72,9 @@ export class PropertyService {
 
     //creamos la transaccion atomica de los principios ACID para guardar de forma segura el inmueble
     const result = await this.prismaClient.$transaction(async (tx) => {
-      //creamos la direccion del inmueble
-      const { id: directionId } = await this.globalRepository.saveDirection(
-        propertyDto.direction,
-        tx,
-      );
-
       //registramos el inmueble y guardamos los recursos correspondientes a la vivienda
       const newProperty: PropertyType = {
         userId,
-        directionId,
         fmi: propertyDto.fmi,
         isPublished: false,
         predialNumber: propertyDto.predialNumber,
@@ -92,11 +85,16 @@ export class PropertyService {
         propertyName: propertyDto.propertyName,
       };
 
+      //guardar la correspondiente propiedad
       const { id: propertyId } = await this.propertyRepository.saveProperty(
         newProperty,
         propertyDto.resourcesImages,
         tx,
       );
+
+      //creamos la direccion del inmueble
+      const direction = { ...propertyDto.direction, propertyId };
+      await this.globalRepository.saveDirection(direction, tx);
 
       //creamos el MemberRole ya que el usuario que digita un inmueble
       // posee un ROL de Arrendador o muchos mas
@@ -211,12 +209,16 @@ export class PropertyService {
 
           const incomingImages = value as createResourceImageType[];
 
-          const current = new Set(currentImages.map((i) => i.assetId));
+          const current = new Set(
+            currentImages.map((i) => i.resourcesImage.assetId),
+          );
           const incoming = new Set(incomingImages.map((i) => i.assetId));
 
           const toDelete = currentImages
-            .filter((image) => !incoming.has(image.assetId!))
-            .map((image) => image.assetId!);
+            .filter(
+              (resource) => !incoming.has(resource.resourcesImage.assetId!),
+            )
+            .map((resource) => resource.resourcesImage.assetId!);
 
           const toInsert: Prisma.ResourceImagesCreateManyInput[] =
             incomingImages
