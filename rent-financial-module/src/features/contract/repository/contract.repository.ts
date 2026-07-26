@@ -5,11 +5,7 @@ import type {
   StatusContractType,
 } from '../schemas/contract.schema.js';
 import type { Prisma } from '../../../../generated/prisma/client.js';
-import type {
-  PaginationResponse,
-  PaginationType,
-} from '../../../shared/pagination/pagination-schemas.js';
-import type { ContractInfoResponse } from '../dtos/response-dto.js';
+import type { ResourceImageType } from '../../property-registration/schemas/property-registration.schema.js';
 
 @Injectable()
 export class ContractRepository {
@@ -62,8 +58,27 @@ export class ContractRepository {
   //saves
   async saveContract(
     contract: ContractType,
+    resourcesImages: ResourceImageType[],
     db: Prisma.TransactionClient = this.prisma,
   ) {
-    return await db.contract.create({ data: contract });
+    return await db.contract.create({
+      data: {
+        ...contract,
+        contractResources: {
+          create: resourcesImages.map((resource) => ({
+            resourcesImage: {
+              create: {
+                assetId: resource.assetId,
+                url: resource.url,
+                width: resource.width,
+                height: resource.height,
+                format: resource.format,
+                secureUrl: resource.secureUrl,
+              },
+            },
+          })),
+        },
+      },
+    });
   }
 }

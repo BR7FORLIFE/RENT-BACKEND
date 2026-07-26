@@ -7,7 +7,6 @@ import {
   PropertyNotFoundException,
 } from '../../property-registration/exceptions/exceptions.js';
 import type { ContractType } from '../schemas/contract.schema.js';
-import type { createResourceImageType } from '../../property-registration/dtos/request-dto.js';
 import { GlobalRepository } from '../../global/repository-global.js';
 import { PropertyHelper } from '../../property-registration/services/helpers.service.js';
 import type { PropertyActorRoleType } from '../../property-registration/types.js';
@@ -114,19 +113,6 @@ export class ContractService {
         tx,
       );
 
-      //creamos los recursos en este caso archivos de contratos
-      const newResource: createResourceImageType = {
-        url: contract.resourceImage.url,
-        assetId: contract.resourceImage.assetId,
-        format: contract.resourceImage.format,
-        height: contract.resourceImage.height,
-        secureUrl: contract.resourceImage.secureUrl,
-        width: contract.resourceImage.width,
-      };
-
-      const { id: resourceImageId } =
-        await this.globalRepository.saveAssetResource(newResource, tx);
-
       const newContract: ContractType = {
         // la idea es que si hay mas actores se pueda setear la id de quien genero el contracto
         createByUserId: userId,
@@ -135,7 +121,6 @@ export class ContractService {
         landlordMemberId: landordPropertyMember.id,
         monthlyRent: contract.monthlyRent,
         propertyId: optProperty.id,
-        resourceImageId,
         startDate: contract.startDate,
         status: 'DRAFT',
         // si cambia el estado a PENDING o EXECUTION puede ser miembro activo del inmueble
@@ -144,6 +129,7 @@ export class ContractService {
 
       const { id: contractId } = await this.contractRepository.saveContract(
         newContract,
+        contract.resourcesImage,
         tx,
       );
 
