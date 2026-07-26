@@ -1,8 +1,11 @@
 package com.files.rent_auth_module.application.auth.usecases;
 
+import java.util.UUID;
+
 import com.files.rent_auth_module.application.auth.command.actions.LoginUserUserCommand;
 import com.files.rent_auth_module.application.auth.command.actions.RegisterUserCommand;
 import com.files.rent_auth_module.application.auth.command.response.LoginUserCommandResult;
+import com.files.rent_auth_module.application.auth.command.response.MeCommandResult;
 import com.files.rent_auth_module.application.auth.command.response.RegisterUserCommandResult;
 import com.files.rent_auth_module.application.refreshToken.command.response.GenerateRefreshTokenCommandResult;
 
@@ -17,6 +20,8 @@ public interface AuthUseCase {
             String fullname);
 
     Mono<GenerateRefreshTokenCommandResult> oauth2GetCredentials(String oauth2SessionID);
+
+    Mono<MeCommandResult> me(UUID userId);
 
     Mono<String> logout();
 }

@@ -1,9 +1,12 @@
 package com.files.rent_auth_module.infra.auth.controllers;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,12 +20,14 @@ import com.files.rent_auth_module.application.auth.dtos.request.LoginUserRequest
 import com.files.rent_auth_module.application.auth.dtos.request.Oauth2SessionID;
 import com.files.rent_auth_module.application.auth.dtos.request.RegisterUserRequestDto;
 import com.files.rent_auth_module.application.auth.dtos.response.LoginUserResponseDto;
+import com.files.rent_auth_module.application.auth.dtos.response.MeResponseDto;
 import com.files.rent_auth_module.application.auth.dtos.response.RegisterUserResponseDto;
 import com.files.rent_auth_module.application.auth.usecases.AuthUseCase;
 import com.files.rent_auth_module.application.refreshToken.dto.ObtainAccessTokenRequestDto;
 import com.files.rent_auth_module.application.refreshToken.dto.ObtainAccessTokenResponseDto;
 import com.files.rent_auth_module.application.refreshToken.dto.RefreshRevokedRequestDto;
 import com.files.rent_auth_module.application.refreshToken.usecases.RefreshTokenUseCase;
+import com.files.rent_auth_module.infra.security.CustomUserDetails;
 
 import reactor.core.publisher.Mono;
 
@@ -55,8 +60,11 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public Mono<?> Me() {
-        return null;
+    public Mono<ResponseEntity<MeResponseDto>> Me(@AuthenticationPrincipal Authentication authentication) {
+        CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();
+
+        return authUseCase.me(details.getUserId()).map(res -> ResponseEntity.ok()
+                .body(new MeResponseDto(res.username(), res.email(), res.cellphone(), res.fullname())));
     }
 
     @PostMapping("/login")

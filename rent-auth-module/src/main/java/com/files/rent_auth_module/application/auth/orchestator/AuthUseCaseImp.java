@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.files.rent_auth_module.application.auth.command.actions.LoginUserUserCommand;
 import com.files.rent_auth_module.application.auth.command.actions.RegisterUserCommand;
 import com.files.rent_auth_module.application.auth.command.response.LoginUserCommandResult;
+import com.files.rent_auth_module.application.auth.command.response.MeCommandResult;
 import com.files.rent_auth_module.application.auth.command.response.RegisterUserCommandResult;
 import com.files.rent_auth_module.application.auth.exceptions.AuthExceptions;
 import com.files.rent_auth_module.application.auth.ports.AuthRepositoryPort;
@@ -55,6 +56,17 @@ public class AuthUseCaseImp implements AuthUseCase {
         this.refreshTokenRepositoryPort = refreshTokenRepositoryPort;
         this.cachePort = cachePort;
         this.generateCodeService = generateCodeService;
+    }
+
+    @Override
+    public Mono<MeCommandResult> me(UUID userId) {
+        return authRepositoryPort.findById(userId)
+                .switchIfEmpty(Mono.error(AuthExceptions.userNotFound()))
+                .map(user -> new MeCommandResult(
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getCellphone(),
+                        user.getFullname()));
     }
 
     @Override
