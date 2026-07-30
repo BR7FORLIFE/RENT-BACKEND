@@ -1,7 +1,6 @@
 package com.files.rent_auth_module.infra.auth.controllers;
 
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,7 +63,8 @@ public class AuthController {
         CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();
 
         return authUseCase.me(details.getUserId()).map(res -> ResponseEntity.ok()
-                .body(new MeResponseDto(res.username(), res.email(), res.cellphone(), res.fullname())));
+                .body(new MeResponseDto(res.username(), res.email(), res.cellphone(), res.fullname(),
+                        res.isEnabled())));
     }
 
     @PostMapping("/login")
