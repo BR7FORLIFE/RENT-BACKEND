@@ -66,6 +66,7 @@ export const PropertyMemberSchema = z.object({
   userId: z.uuid(),
   propertyId: z.uuid(),
   assignedBy: z.uuid(),
+  status: z.enum(['ACTIVE', 'DESACTIVE', 'IN_PROCESS']),
   assignedAt: z.date().optional(),
   updateAt: z.date().optional(),
 });
@@ -80,3 +81,36 @@ export const PropertyMemberRoleSchema = z.object({
 });
 
 export type PropertyMemberRoleType = z.infer<typeof PropertyMemberRoleSchema>;
+
+//invitation property member schema
+const statusInvitationLinked = z.enum([
+  'REVOCKED',
+  'CONSUMED',
+  'EXPIRED',
+  'DRAFT',
+]);
+
+export const invitationPropertyMemberSchema = z.object({
+  id: z.uuid(),
+  invitedBy: z.uuid(),
+  invitedEmailTo: z.email(),
+  status: statusInvitationLinked,
+  token: z.string(),
+  createAt: z.date().optional(),
+  updateAt: z.date().optional(),
+});
+
+export type InvitationPropertyMemberType = z.infer<
+  typeof invitationPropertyMemberSchema
+>;
+
+export const createInvitationPropertyMemberSchema = z.object({
+  invitedBy: z.uuid(),
+  invitedEmailTo: z.email(),
+  status: statusInvitationLinked,
+  token: z.string(),
+});
+
+export type createInvitationPropertyMemberType = z.infer<
+  typeof createInvitationPropertyMemberSchema
+>;

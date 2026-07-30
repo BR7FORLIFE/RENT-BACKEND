@@ -66,3 +66,14 @@ export type ChangeOwnerType = z.infer<typeof ChangeOwnerDtoRequest>;
 export const GetAISuggestion = z.object({
   propertyField: z.enum(['PropertyName', 'PropertyDescription']),
 });
+
+//invitacion de miembros de propiedades para vinculacion
+export const InvitePropertyMemberDtoRequest = z.object({
+  email: z.email(),
+  propertyId: z.uuid(),
+  propertyActorRole: z.array(z.string()), //los roles que tendrá el usuario dentro de la propiedad
+});
+
+export type InvitePropertyMemberType = z.infer<
+  typeof InvitePropertyMemberDtoRequest
+>;
