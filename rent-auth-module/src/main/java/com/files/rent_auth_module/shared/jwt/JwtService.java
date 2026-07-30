@@ -4,6 +4,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,48 @@ public class JwtService implements JwtServicePort {
         return this.generateAccessToken(details);
     }
 
+    @Override
+    public Mono<String> obtainMicroserviceAccessToken(String microserviceName) {
+        return this.generateMicroserviceAccessToken(microserviceName);
+    }
+
+    private Mono<String> generateMicroserviceAccessToken(String microserviceName) {
+        // fecha de emision del token y fecha de expiracion
+        Instant now = Instant.now();
+        Instant expirationTime = now.plusSeconds(this.accessTokenExpiredTime);
+
+        Date issueTimeDate = Date.from(now);
+        Date expirationDate = Date.from(expirationTime);
+
+        return Mono.fromCallable(() -> {
+
+            // payload del JWT
+            JWTClaimsSet payload = new JWTClaimsSet.Builder()
+                    .issuer("microservice-rent-auth")
+                    .subject(microserviceName)
+                    .expirationTime(expirationDate)
+                    .issueTime(issueTimeDate)
+                    .claim("type", "SERVICE")
+                    .claim("scope", List.of("users:read"))
+                    // indica para que microservicio es valido este JWT
+                    .claim("aud", "auth-service")
+                    .jwtID(UUID.randomUUID().toString())
+                    .build();
+
+            // header JWT metadata
+            JWSHeader headerJwt = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                    .type(JOSEObjectType.JWT)
+                    .build();
+
+            // representa un objeto que ha sido firmado mediante JSON WEB SIGNATURE
+            SignedJWT signedJWT = new SignedJWT(headerJwt, payload);
+            RSASSASigner signer = new RSASSASigner(this.rsaPrivateKey);
+            signedJWT.sign(signer); // aplicamos la firma JWS
+
+            return signedJWT.serialize(); // retornamos el JWT ya firmado
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
     private Mono<String> generateAccessToken(UserDetails userDetails) {
         // fecha de emision del token y fecha de expiracion
         Instant now = Instant.now();
@@ -69,6 +112,7 @@ public class JwtService implements JwtServicePort {
                     .subject(details.getUsername())
                     .expirationTime(expirationDate)
                     .issueTime(issueTimeDate)
+                    .claim("type", "USER")
                     .claim("userId", details.getUserId())
                     .claim("rols", details.getAuthorities()
                             .stream()

@@ -6,4 +6,5 @@ import reactor.core.publisher.Mono;
 
 public interface JwtServicePort {
     Mono<String> obtainAccessToken(UserModel data);
+    Mono<String> obtainMicroserviceAccessToken(String microserviceName);
 }
