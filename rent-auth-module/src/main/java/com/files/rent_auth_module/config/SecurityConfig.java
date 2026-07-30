@@ -25,7 +25,8 @@ import com.files.rent_auth_module.shared.jwt.JwtService;
 @EnableReactiveMethodSecurity
 public class SecurityConfig {
     /* por el callback de google */
-    private final String[] PUBLIC_PATHS = { "/auth/**", "/email/**", "/oauth2/**", "/login/**" };
+    private final String[] PUBLIC_PATHS = { "/auth/**", "/email/**", "/oauth2/**", "/login/**",
+            "/microservice-identification" };
 
     private final JwtService jwtService;
 
