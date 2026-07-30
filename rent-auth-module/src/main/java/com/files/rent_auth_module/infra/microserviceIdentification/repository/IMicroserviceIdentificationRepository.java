@@ -6,7 +6,9 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 import com.files.rent_auth_module.infra.microserviceIdentification.entity.MicroserviceIdentificationDocument;
 
-public interface IMicroserviceIdentificationRepository
-        extends ReactiveMongoRepository<MicroserviceIdentificationDocument, UUID> {
+import reactor.core.publisher.Mono;
 
+public interface IMicroserviceIdentificationRepository
+                extends ReactiveMongoRepository<MicroserviceIdentificationDocument, UUID> {
+        Mono<MicroserviceIdentificationDocument> findByClientId(String ClientId);
 }

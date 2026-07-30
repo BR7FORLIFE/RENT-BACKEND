@@ -2,13 +2,25 @@ package com.files.rent_auth_module.infra.microserviceIdentification.repository;
 
 import org.springframework.stereotype.Repository;
 
+import com.files.rent_auth_module.application.microserviceIdentification.ports.MicroserviceIdentificationPort;
+import com.files.rent_auth_module.domain.microservicesIdentification.MicroserviceIdentificationModel;
+import com.files.rent_auth_module.infra.microserviceIdentification.mapper.MicroserviceIdentificationMapper;
+
+import reactor.core.publisher.Mono;
+
 @Repository
-public class MicroserviceIdentificationRepositoryAdapter {
+public class MicroserviceIdentificationRepositoryAdapter implements MicroserviceIdentificationPort {
 
     private final IMicroserviceIdentificationRepository microserviceIdentificationRepository;
 
     public MicroserviceIdentificationRepositoryAdapter(
             IMicroserviceIdentificationRepository microserviceIdentificationRepository) {
         this.microserviceIdentificationRepository = microserviceIdentificationRepository;
+    }
+
+    @Override
+    public Mono<MicroserviceIdentificationModel> findByClientId(String clientId) {
+        return microserviceIdentificationRepository.findByClientId(clientId)
+                .map(MicroserviceIdentificationMapper::toDomain);
     }
 }
