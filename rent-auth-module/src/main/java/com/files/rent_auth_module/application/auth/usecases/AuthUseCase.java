@@ -23,5 +23,7 @@ public interface AuthUseCase {
 
     Mono<MeCommandResult> me(UUID userId);
 
+    Mono<MeCommandResult> me(String email);
+
     Mono<String> logout();
 }

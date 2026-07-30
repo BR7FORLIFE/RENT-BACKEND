@@ -66,7 +66,20 @@ public class AuthUseCaseImp implements AuthUseCase {
                         user.getUsername(),
                         user.getEmail(),
                         user.getCellphone(),
-                        user.getFullname()));
+                        user.getFullname(),
+                        user.isEnabled()));
+    }
+
+    @Override
+    public Mono<MeCommandResult> me(String email) {
+        return authRepositoryPort.findByEmail(email)
+                .switchIfEmpty(Mono.error(AuthExceptions.userNotFound()))
+                .map(user -> new MeCommandResult(
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getCellphone(),
+                        user.getFullname(),
+                        user.isEnabled()));
     }
 
     @Override
