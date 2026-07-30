@@ -237,10 +237,21 @@ Ademas los miembros pueden ser ya sea Arrendados o Arrendadores vinculados a dic
 integridad referencial
 
 **/
+enum statusPropertyMember {
+  ACTIVE //miembro activo con el inmueble y puede operar en ella
+  DESACTIVE // no puede interactuar con el inmueble hasta que el propietario lo decida
+
+  // en proceso de convertirse un miembro pero no cumple todos los requisitos antes de serlo
+  // ṕor ejemplo -> ha aceptado la invitacion para unise a la vivienda pero el propietario no le
+  // ha asignado sus roles
+  IN_PROCESS 
+}
+
 model PropertyMember{
   id String @id @default(uuid())
   userId String @map("user_id")
   propertyId String @map("property_id")
+  status statusPropertyMember
   assignedBy String @map("assigned_by")
   assignedAt DateTime @default(now()) @map("assigned_at")
   updateAt DateTime @updatedAt @map("update_at")
@@ -330,4 +341,22 @@ model PublicService{
   publicServiceType PublicServiceType @relation(fields:[publicServiceTypeId], references:[id])
   property Property @relation(fields:[propertyId], references:[id], onDelete: Cascade)
   @@unique([propertyId, publicServiceTypeId])
+}
+
+//invitation linked
+enum StatusInvitationLinked{
+  REVOCKED // invitaciones revocadas
+  CONSUMED // enlaces de invitacion consumidas o utilizadas
+  EXPIRED // enlaces de invitacion en tiempo expiradas
+  DRAFT //recien creada a la espera de un estado
+}
+
+model InvitationLinked{
+  id String @id @default(uuid())
+  invitedBy String @map("invited_by")
+  invitedEmailTo String @map("invited_email_to")
+  token String 
+  status StatusInvitationLinked @default(DRAFT)
+  createAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
 }

@@ -12,13 +12,13 @@ async function main() {
     data: [
       {
         id: TYPE_PROPERTY_UUIDS.RESIDENTIAL,
-        name: 'RESIDENTIAL',
+        name: 'RESIDENCIAL',
         description:
           'Propiedades destinadas principalmente para uso habitacional, como casas, apartamentos o condominios.',
       },
       {
         id: TYPE_PROPERTY_UUIDS.COMMERCIAL,
-        name: 'COMMERCIAL',
+        name: 'COMERCIAL',
         description:
           'Propiedades destinadas al desarrollo de actividades comerciales, como locales, oficinas o centros comerciales.',
       },
@@ -30,25 +30,25 @@ async function main() {
       },
       {
         id: TYPE_PROPERTY_UUIDS.LAND_OR_SOIL,
-        name: 'LAND_OR_SOIL',
+        name: 'TERRENO',
         description:
           'Terrenos o lotes sin construcciones, aptos para desarrollo, inversión o conservación.',
       },
       {
         id: TYPE_PROPERTY_UUIDS.URBAN,
-        name: 'URBAN',
+        name: 'URBANO',
         description:
           'Propiedades ubicadas dentro del perímetro urbano con acceso a servicios públicos e infraestructura.',
       },
       {
         id: TYPE_PROPERTY_UUIDS.AGRARIAN,
-        name: 'AGRARIAN',
+        name: 'AGRARIO',
         description:
           'Propiedades destinadas a actividades agrícolas, ganaderas o agropecuarias.',
       },
       {
         id: TYPE_PROPERTY_UUIDS.MIXED,
-        name: 'MIXED',
+        name: 'MIXTO',
         description:
           'Propiedades que permiten una combinación de usos, como residencial y comercial.',
       },
@@ -60,19 +60,19 @@ async function main() {
     data: [
       {
         id: TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS.OCCUPIED,
-        name: 'OCCUPIED',
+        name: 'OCUPADO',
         description:
           'La propiedad se encuentra ocupada por uno o más residentes, propietarios o arrendatarios.',
       },
       {
         id: TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS.VACANT,
-        name: 'VACANT',
+        name: 'DESOCUPADA',
         description:
           'La propiedad está desocupada y disponible para venta, arriendo o uso.',
       },
       {
         id: TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS.IN_PROCESS,
-        name: 'IN_PROCESS',
+        name: 'EN_PROCESO',
         description:
           'La propiedad se encuentra en proceso de ocupación, desocupación, entrega o trámite administrativo.',
       },
@@ -84,23 +84,23 @@ async function main() {
     data: [
       {
         id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.LANDLORD,
-        name: 'LANDLORD',
+        name: 'PROPIETARIO',
         description: 'Propietario o arrendador del inmueble.',
       },
       {
         id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.TENANT,
-        name: 'TENANT',
+        name: 'ARRENDADO',
         description: 'Arrendatario que ocupa el inmueble mediante contrato.',
       },
       {
         id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.PROPERTY_ADMINISTRATOR,
-        name: 'PROPERTY_ADMINISTRATOR',
+        name: 'ADMINISTRADOR',
         description:
           'Persona encargada de administrar el inmueble por cuenta del propietario.',
       },
       {
         id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.OPERATION_SUPPORT,
-        name: 'OPERATION_SUPPORT',
+        name: 'SOPORTE_OPERATIVO',
         description:
           'Encargado de inspecciones, entregas, mantenimientos y apoyo operativo.',
       },

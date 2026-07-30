@@ -8,3 +8,9 @@ export abstract class AppException extends Error {
     this.name = this.constructor.name;
   }
 }
+
+export class ResendException extends AppException {
+  constructor(error: string) {
+    super('Failed to send the email!', 503, error);
+  }
+}

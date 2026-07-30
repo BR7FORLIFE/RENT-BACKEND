@@ -2,6 +2,11 @@ import { readFileSync } from 'fs';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
+dotenv.config({ path: 'microservice-identification/microservice-id.env' }); //cargamos las variables de entorno del microservice identification
+
+//variables de identidad para el microservicio de rent financial
+export const MICROSERVICE_CLIENT_ID = process.env.CLIENT_ID;
+export const MICROSERVICE_CLIENT_SECRET = process.env.CLIENT_SECRET;
 
 //public Key del microservicio de autentication
 function obtainPublicKey() {

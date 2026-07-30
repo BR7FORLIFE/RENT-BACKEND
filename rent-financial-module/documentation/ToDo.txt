@@ -1,2 +1,8 @@
 1. [x] IMPORTANTE! Mejorar la logica de los servicios en la creacion de recursos (Repositorios / transacciones)
 2. [] crear helpers para mejorar la legibilidad y evitar la repeticion de codigo
+
+
+# BASES DE DATOS Y LOGICA DE NEGOCIO
+
+[] Crear una tabla para el historial de contratos para mejor auditoria
+[] Crear una tabla para log a nivel de software un audi_logs para ver los logs del sistema y como se comporta
