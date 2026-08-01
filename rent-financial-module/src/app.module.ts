@@ -5,6 +5,7 @@ import { PropertyRegistrationModule } from './features/property-registration/pro
 import { PrismaModule } from './core/database/prisma.module.js';
 import { ContractModule } from './features/contract/contract.module.js';
 import { GlobalModule } from './features/global/global.module.js';
+import { MicroserviceAuthModule } from './features/microservice-auth/auth-microservice.module.js';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { GlobalModule } from './features/global/global.module.js';
     PrismaModule,
     ContractModule,
     GlobalModule,
+    MicroserviceAuthModule,
   ],
   providers: [JwtPassport, JwtAuthGuard],
 })
