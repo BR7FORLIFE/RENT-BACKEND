@@ -353,10 +353,13 @@ enum StatusInvitationLinked{
 
 model InvitationLinked{
   id String @id @default(uuid())
+  propertyId String @map("property_id") //hacia que propiedad es la invitacion
   invitedBy String @map("invited_by")
+  invitedUserId String @map("invited_user_id") //id del usuario activo para la persona invitada
   invitedEmailTo String @map("invited_email_to")
   token String 
   status StatusInvitationLinked @default(DRAFT)
+  expirationTime DateTime @map("expiration_time")
   createAt DateTime @default(now()) @map("create_at")
   updateAt DateTime @updatedAt @map("update_at")
 }

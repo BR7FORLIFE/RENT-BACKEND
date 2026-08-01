@@ -83,6 +83,11 @@ async function main() {
   await prisma.propertyActorRole.createMany({
     data: [
       {
+        id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.MEMBER,
+        name: 'MIEMBRO',
+        description: 'Miembro sin privilegios pero hacen parte de la propiedad',
+      },
+      {
         id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.LANDLORD,
         name: 'PROPIETARIO',
         description: 'Propietario o arrendador del inmueble.',
