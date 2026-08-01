@@ -25,9 +25,11 @@ import {
   createPropertyDtoRequest,
   EditingPropertyDtoRequest,
   GetAISuggestion,
+  InvitePropertyMemberDtoRequest,
   type ChangeOwnerType,
   type CreatePropertyType,
   type EditingPropertyType,
+  type InvitePropertyMemberType,
 } from './dtos/request-dto.js';
 import { CreateSuggestionByPropertyField } from './services/helpers.service.js';
 import type { PropertyField } from './types.js';
@@ -119,5 +121,21 @@ export class PropertyRegistrationController {
   async handleAISuggestion(@Body() propertyField: PropertyField) {
     const suggestion = await CreateSuggestionByPropertyField(propertyField);
     return suggestion;
+  }
+
+  //invitaciones de property Members
+  @UsePipes(new ZodValidation(InvitePropertyMemberDtoRequest))
+  @Post('invite-property-member')
+  async invitePropertyMembers(
+    @Req() req: AuthRequest,
+    @Body() invitationReq: InvitePropertyMemberType,
+  ) {
+    const { id, invitedEmailTo, message } =
+      await this.propertyService.invitePropertyMembers(
+        req.user.userId,
+        invitationReq,
+      );
+
+    return { id, invitedEmailTo, message };
   }
 }

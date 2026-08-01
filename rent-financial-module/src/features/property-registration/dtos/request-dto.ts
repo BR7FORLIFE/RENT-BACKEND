@@ -71,7 +71,6 @@ export const GetAISuggestion = z.object({
 export const InvitePropertyMemberDtoRequest = z.object({
   email: z.email(),
   propertyId: z.uuid(),
-  propertyActorRole: z.array(z.string()), //los roles que tendrá el usuario dentro de la propiedad
 });
 
 export type InvitePropertyMemberType = z.infer<
