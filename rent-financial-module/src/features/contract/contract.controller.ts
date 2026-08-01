@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   Req,
   UseGuards,
@@ -37,5 +39,11 @@ export class ContractController {
       id,
       message,
     };
+  }
+
+  @Get(':id')
+  async findContractById(@Req() req: AuthRequest, @Param('id') id: string) {
+    const data = this.service.getContractbyId(req.user.userId, id);
+    return data;
   }
 }

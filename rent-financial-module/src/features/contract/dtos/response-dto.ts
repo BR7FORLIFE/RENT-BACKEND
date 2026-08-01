@@ -1,3 +1,5 @@
+import { Prisma } from '../../../../generated/prisma/client.js';
+
 type StatusContractType = 'DRAFT' | 'PENDING' | 'EXECUTION' | 'DEFEATED';
 
 export interface ContractInfoResponse {
@@ -5,11 +7,10 @@ export interface ContractInfoResponse {
   propertyId: string;
   landlordMemberId: string;
   tenantMemberId: string;
-  monthlyRent: number;
-  depositAmount: number;
+  monthlyRent: Prisma.Decimal;
+  depositAmount: Prisma.Decimal;
   startDate: Date;
   endDate: Date;
   status: StatusContractType;
   createByUserId: string;
-  resourceImageId: string;
 }

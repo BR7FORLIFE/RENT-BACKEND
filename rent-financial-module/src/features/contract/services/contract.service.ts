@@ -10,13 +10,17 @@ import type { ContractType } from '../schemas/contract.schema.js';
 import { GlobalRepository } from '../../global/repository-global.js';
 import { PropertyHelper } from '../../property-registration/services/helpers.service.js';
 import type { PropertyActorRoleType } from '../../property-registration/types.js';
-import { propertyWithContractAvalibityException } from '../exceptions/exceptions.js';
+import {
+  contractNotFound,
+  propertyWithContractAvalibityException,
+} from '../exceptions/exceptions.js';
 import type {
   PropertyMemberRoleType,
   PropertyMemberType,
 } from '../../property-registration/schemas/property-registration.schema.js';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../../types/global-types.js';
+import type { ContractInfoResponse } from '../dtos/response-dto.js';
 
 // estos dos actores importantes en los contratos son miembros activos
 //dentro de la propiedad
@@ -98,6 +102,7 @@ export class ContractService {
         userId: contract.tenantMemberId,
         assignedBy: userId,
         propertyId: contract.propertyId,
+        status: 'ACTIVE',
       };
 
       const { id: tenantPropertyMemberId } =
@@ -140,5 +145,21 @@ export class ContractService {
       id: result.contractId,
       message: 'contrato creado satisfactoriamente!',
     };
+  }
+
+  async getContractbyId(
+    propertyMemberId: string,
+    contractId: string,
+  ): Promise<ContractInfoResponse> {
+    const data = await this.contractRepository.findContractById(
+      propertyMemberId,
+      contractId,
+    );
+
+    if (!data) {
+      throw new contractNotFound();
+    }
+
+    return data;
   }
 }

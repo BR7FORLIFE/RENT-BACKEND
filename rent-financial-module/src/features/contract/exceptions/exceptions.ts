@@ -5,3 +5,9 @@ export class propertyWithContractAvalibityException extends AppException {
     super('La propiedad posee un contrato activo!', 406, 'NOT_ACCEPTABLE');
   }
 }
+
+export class contractNotFound extends AppException {
+  constructor() {
+    super('Contrato no encontrado!', 404, 'NOT_FOUND');
+  }
+}

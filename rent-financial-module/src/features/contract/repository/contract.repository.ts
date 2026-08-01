@@ -55,6 +55,18 @@ export class ContractRepository {
     });
   }
 
+  async findContractById(propertyMemberId: string, contractId: string) {
+    return await this.prisma.contract.findFirst({
+      where: {
+        id: contractId,
+        OR: [
+          { landlordMemberId: propertyMemberId },
+          { tenantMemberId: propertyMemberId },
+        ],
+      },
+    });
+  }
+
   //saves
   async saveContract(
     contract: ContractType,
