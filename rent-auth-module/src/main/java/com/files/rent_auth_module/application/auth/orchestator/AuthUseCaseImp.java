@@ -63,6 +63,7 @@ public class AuthUseCaseImp implements AuthUseCase {
         return authRepositoryPort.findById(userId)
                 .switchIfEmpty(Mono.error(AuthExceptions.userNotFound()))
                 .map(user -> new MeCommandResult(
+                        user.getId(),
                         user.getUsername(),
                         user.getEmail(),
                         user.getCellphone(),
@@ -75,6 +76,7 @@ public class AuthUseCaseImp implements AuthUseCase {
         return authRepositoryPort.findByEmail(email)
                 .switchIfEmpty(Mono.error(AuthExceptions.userNotFound()))
                 .map(user -> new MeCommandResult(
+                        user.getId(),
                         user.getUsername(),
                         user.getEmail(),
                         user.getCellphone(),
