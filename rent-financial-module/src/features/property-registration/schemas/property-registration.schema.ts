@@ -92,10 +92,13 @@ const statusInvitationLinked = z.enum([
 
 export const invitationPropertyMemberSchema = z.object({
   id: z.uuid(),
+  propertyId: z.uuid(),
   invitedBy: z.uuid(),
+  invitedUserId: z.uuid(),
   invitedEmailTo: z.email(),
   status: statusInvitationLinked,
   token: z.string(),
+  expirationTime: z.date(),
   createAt: z.date().optional(),
   updateAt: z.date().optional(),
 });
@@ -105,9 +108,12 @@ export type InvitationPropertyMemberType = z.infer<
 >;
 
 export const createInvitationPropertyMemberSchema = z.object({
+  propertyId: z.uuid(),
   invitedBy: z.uuid(),
+  invitedUserId: z.uuid(),
   invitedEmailTo: z.email(),
   status: statusInvitationLinked,
+  expirationTime: z.date(),
   token: z.string(),
 });
 

@@ -6,6 +6,11 @@ import type {
 } from '../types.js';
 import { ActorRoleException } from '../exceptions/domain-exceptions.js';
 import { CallModelStream } from '../../../core/IA/IA-cclient.js';
+import type { InvitationPropertyMemberType } from '../schemas/property-registration.schema.js';
+import {
+  InvitationLinkedExpiredException,
+  InvitationLinkedStatusNotAllowedException,
+} from '../exceptions/exceptions.js';
 
 @Injectable()
 export class PropertyHelper {
@@ -69,4 +74,20 @@ The suggestion should serve as a template that the user can later personalize.
 
   const IAresponse = await CallModelStream(STRUCTURE_PROMPT);
   return JSON.parse(IAresponse.message.content) as IASuggestionPropertyFields;
+}
+
+//property member invitation linked
+export function validateInvitationLinked(
+  invitationLinked: InvitationPropertyMemberType,
+) {
+  //verificamos que el enlace de invitacion este en estado de borrador
+  if (invitationLinked.status !== 'DRAFT') {
+    throw new InvitationLinkedStatusNotAllowedException();
+  }
+
+  //verificamos la expiracion del token
+  const now = new Date();
+  if (now >= invitationLinked.expirationTime) {
+    throw new InvitationLinkedExpiredException();
+  }
 }

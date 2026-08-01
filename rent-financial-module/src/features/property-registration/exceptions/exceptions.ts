@@ -51,3 +51,30 @@ export class PropertyActorRoleNotFoundException extends AppException {
     super('El rol no se encuentra registrado!', 404, 'NOT_FOUND');
   }
 }
+
+//PropertyMembers
+export class InvitationLinkedNotFoundException extends AppException {
+  constructor() {
+    super('No se encontró enlace de invitacion valido!', 404, 'NOT_FOUND');
+  }
+}
+
+export class InvitationLinkedStatusNotAllowedException extends AppException {
+  constructor() {
+    super(
+      'El estado actual de la invitacion no permite ejecutar la accion propuesta!',
+      406,
+      'NOT_ACCEPTABLE',
+    );
+  }
+}
+
+export class InvitationLinkedExpiredException extends AppException {
+  constructor() {
+    super(
+      'La invitacion actual esta expirada, intenta generar uno nuevo',
+      406,
+      'NOT_ACCEPTABLE',
+    );
+  }
+}

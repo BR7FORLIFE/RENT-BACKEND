@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import type {
+  createInvitationPropertyMemberType,
   PropertyMemberRoleType,
   PropertyMemberType,
   PropertyType,
 } from '../schemas/property-registration.schema.js';
 import { PropertyRepository } from '../repository/property.repository.js';
 import {
+  InvitationLinkedNotFoundException,
   PropertyAlreadyRegisterException,
   PropertyNotFoundException,
   PropertyOccupationTypeNotFoundException,
@@ -16,11 +18,12 @@ import type {
   PaginationType,
 } from '../../../shared/pagination/pagination-schemas.js';
 import type { PropertyInfoResponse } from '../dtos/response-dto.js';
-import { PropertyHelper } from './helpers.service.js';
+import { PropertyHelper, validateInvitationLinked } from './helpers.service.js';
 import type {
   CreatePropertyType,
   createResourceImageType,
   EditingPropertyType,
+  InvitePropertyMemberType,
 } from '../dtos/request-dto.js';
 import type { Prisma } from '../../../../generated/prisma/client.js';
 import type { PropertyOccupationType, TypePropertyType } from '../types.js';
@@ -31,6 +34,12 @@ import {
   TYPE_PROPERTY_UUIDS,
 } from '../../../types/global-types.js';
 import { PrismaService } from '../../../core/database/prisma.service.js';
+import { getUserData } from '../api.js';
+import {
+  generateSecureString,
+  sendInvitedEmailTo,
+} from './invitation-generation.service.js';
+import { UserNotFound } from '../../../core/global-exception.js';
 
 @Injectable()
 export class PropertyService {
@@ -102,6 +111,7 @@ export class PropertyService {
         userId,
         assignedBy: userId,
         propertyId,
+        status: 'ACTIVE',
       };
 
       const { id: propertyMemberId } =
@@ -257,4 +267,106 @@ export class PropertyService {
 
   //cambiar el propietario de la vivienda
   //async changeOwnerProperty(oldOwner: string, newOwner: string) {}
+
+  //invitacion de miembros en la propiedad
+  async invitePropertyMembers(
+    userId: string,
+    invitationReq: InvitePropertyMemberType,
+  ): Promise<{ id: string; invitedEmailTo: string; message: string }> {
+    //verificamos que el usuario sea propietario de dicho inmueble
+    const optIsOwnerToProperty = await this.propertyRepository.findPropertyById(
+      userId,
+      invitationReq.propertyId,
+    );
+
+    if (!optIsOwnerToProperty) {
+      throw new PropertyNotFoundException();
+    }
+
+    //llamamos al microservicio de auth para obtener la informacion del usuario del correo
+    // para no despediciar el servicio de correos en una invitacion que no llegará a nada
+    const { isEnabled, userId: invitedUserId } = await getUserData(
+      invitationReq.email,
+    );
+
+    if (!isEnabled) {
+      //hacemos algo si no esta activo dicho usuario
+      throw new UserNotFound();
+    }
+
+    //si el usuario ya se encuentra registrado en la aplicacion enviamos el correo,
+    // y despues guardaremos en la base de datos ya que, primero usar el servicio garantiza
+    // de que si hay un error toda la funcionalidad no se ejecuta, asi evitamos escrituras
+    // en la base de datos y evitar de que nunca el invitado reciba el correo.
+    const invitationToken = generateSecureString(20);
+
+    await sendInvitedEmailTo(
+      invitationReq.email,
+      invitationToken,
+      optIsOwnerToProperty.propertyName,
+    ); //enviamos el email
+
+    const timestamp = Date.now() + 15 * 60 * 1000;
+    const expirationTime = new Date(timestamp);
+    //creamos la transaccion en la base de datos
+    const invitation: createInvitationPropertyMemberType = {
+      propertyId: invitationReq.propertyId,
+      invitedBy: userId,
+      invitedUserId,
+      invitedEmailTo: invitationReq.email,
+      status: 'DRAFT',
+      token: invitationToken,
+      expirationTime,
+    };
+
+    const { id, invitedEmailTo } =
+      await this.globalRepository.saveInvitationLinked(invitation);
+
+    return {
+      id,
+      invitedEmailTo,
+      message: 'Email de invitacion enviado exitosamente!',
+    };
+  }
+
+  async acceptPropertyMemberInvitation(
+    token: string,
+  ): Promise<{ message: string }> {
+    const optInvitationLinked =
+      await this.globalRepository.findPropertyInvitationByToken(token);
+
+    if (!optInvitationLinked) {
+      throw new InvitationLinkedNotFoundException();
+    }
+
+    //verificamos que cumpla con las condiciones para ser miembro en la propiedad
+    validateInvitationLinked(optInvitationLinked);
+
+    //creamos el property member ya que cumplio todos los requisitos para serlo
+    await this.prismaClient.$transaction(async (tx) => {
+      const newPropertyMember: PropertyMemberType = {
+        userId: optInvitationLinked.invitedUserId,
+        assignedBy: optInvitationLinked.invitedBy,
+        propertyId: optInvitationLinked.propertyId,
+        status: 'IN_PROCESS',
+      };
+
+      const { id: propertyMemberId } =
+        await this.propertyRepository.savePropertyMember(newPropertyMember, tx);
+
+      const propertyMemberRole: PropertyMemberRoleType = {
+        propertyMemberId,
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.MEMBER,
+      };
+
+      await this.propertyRepository.savePropertyMemberRole(
+        propertyMemberRole,
+        tx,
+      );
+    });
+
+    return {
+      message: 'Invitacion aceptada!, miembro en proceso de la propiedad',
+    };
+  }
 }
