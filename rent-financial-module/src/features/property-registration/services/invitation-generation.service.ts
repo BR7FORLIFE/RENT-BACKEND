@@ -41,7 +41,7 @@ export async function sendInvitedEmailTo(
   token: string,
   propertyName: string,
 ) {
-  const ACCEPT_INVITATION_PATH = `https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/accept-invitation?token=${token}`;
+  const ACCEPT_INVITATION_PATH = `https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-process-public/accept-invitation?token=${token}`;
 
   const html = `
     <!DOCTYPE html>

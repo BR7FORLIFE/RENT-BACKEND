@@ -14,7 +14,7 @@ export interface MicroserviceIdentificationData {
 
 @Injectable()
 export class MicroserviceAuthService {
-  private token: string; // JWT
+  private token: string | null; // JWT
 
   async obtainToken() {
     if (this.token) {
@@ -33,12 +33,13 @@ export class MicroserviceAuthService {
 
     try {
       const { data } = await axiosRentAuth.post<{ jwt: string }>(
-        `${RENT_AUTH_HOST}/microservice-identification`,
+        `${RENT_AUTH_HOST}/rent-auth/microservice-identification`,
         body,
       );
       this.token = data.jwt;
       return data.jwt;
     } catch (error) {
+      this.token = null;
       if (axios.isAxiosError(error)) {
         //hacemos algo con el error para mejor auditoria
         throw new Error('Error al obtener el token de acceso', {

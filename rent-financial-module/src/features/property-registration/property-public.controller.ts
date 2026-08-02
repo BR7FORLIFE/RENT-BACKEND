@@ -1,9 +1,8 @@
 import { Controller, Get, HttpCode, Query } from '@nestjs/common';
 import { PropertyService } from './services/property.service.js';
-import type { Response } from 'express';
 
 @Controller({
-  path: 'property',
+  path: 'property-process-public',
 })
 export class propertyPublicController {
   constructor(private readonly propertyService: PropertyService) {}

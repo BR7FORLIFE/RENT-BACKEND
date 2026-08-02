@@ -14,7 +14,7 @@ interface UserData {
 export async function getUserData(email: string): Promise<UserData> {
   try {
     const { data } = await axiosMicroserviceClient.get<UserData>(
-      `${RENT_AUTH_HOST}/microservice-identification/user`,
+      `${RENT_AUTH_HOST}/rent-auth/microservice-identification/user`,
       {
         params: {
           email,
@@ -27,7 +27,6 @@ export async function getUserData(email: string): Promise<UserData> {
     if (axios.isAxiosError<ApiError>(error)) {
       //hacemos algo con el error para mejor auditoria
       const apiError = error.response?.data;
-
       throw new Error(apiError?.message, { cause: error });
     }
     throw error;

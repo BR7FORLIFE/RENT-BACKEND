@@ -63,8 +63,13 @@ public class AuthController {
         CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();
 
         return authUseCase.me(details.getUserId()).map(res -> ResponseEntity.ok()
-                .body(new MeResponseDto(res.username(), res.email(), res.cellphone(), res.fullname(),
-                        res.isEnabled())));
+                .body(new MeResponseDto(
+                    res.userId(), 
+                    res.username(), 
+                    res.email(), 
+                    res.cellphone(), 
+                    res.fullname(),
+                    res.isEnabled())));
     }
 
     @PostMapping("/login")

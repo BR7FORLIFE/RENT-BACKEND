@@ -44,6 +44,7 @@ public class MicroserviceIdentificationController {
     public Mono<ResponseEntity<MeResponseDto>> getUserInfo(@RequestParam String email) {
         return authUseCase.me(email)
                 .map(res -> ResponseEntity.ok().body(new MeResponseDto(
+                        res.userId(),
                         res.username(),
                         res.email(),
                         res.cellphone(),
