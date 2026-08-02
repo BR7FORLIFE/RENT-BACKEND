@@ -486,7 +486,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"juan.perez@gmail.com\",\n    \"propertyId\": \"ff503021-7578-476f-ba32-1ca18c090975\"\n}",
+									"raw": "{\n    \"email\": \"juan.perez@gmail.com\",\n    \"propertyId\": \"a367294f-1363-465b-be45-16d96cce46c4\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -513,10 +513,13 @@
 						{
 							"name": "Accept Invitation Property Member",
 							"request": {
+								"auth": {
+									"type": "noauth"
+								},
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/accept-invitation?token",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-process-public/accept-invitation?token=6jHc6609t6oUfufh9zVi",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -525,12 +528,13 @@
 									],
 									"path": [
 										"rent-financial",
+										"property-process-public",
 										"accept-invitation"
 									],
 									"query": [
 										{
 											"key": "token",
-											"value": null
+											"value": "6jHc6609t6oUfufh9zVi"
 										}
 									]
 								}
@@ -625,20 +629,13 @@
 					"name": "Get Microservice Jwt",
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{MICROSERVICE_JWT}}",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"clientId\": \"rent-financial\",\n    \"clientSecret\": \"<YOUR_CLIENT_SECRET>\"\n}",
+							"raw": "{\n    \"clientId\": \"rent-financial\",\n    \"clientSecret\": \"ee31d461300344a6aac6ac4283877162\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -673,7 +670,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{DEFAULT_PATH}}/microservice-identification/user?email=diazpachecobrayan@gmail.com",
+							"raw": "{{DEFAULT_PATH}}/microservice-identification/user?email=juan.perez@gmail.com",
 							"host": [
 								"{{DEFAULT_PATH}}"
 							],
@@ -684,7 +681,7 @@
 							"query": [
 								{
 									"key": "email",
-									"value": "diazpachecobrayan@gmail.com"
+									"value": "juan.perez@gmail.com"
 								}
 							]
 						}
