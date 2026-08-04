@@ -540,6 +540,43 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Get All Property Members",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member?status=ACTIVE",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"property-member"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "ACTIVE"
+										}
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -683,6 +720,43 @@
 									"key": "email",
 									"value": "juan.perez@gmail.com"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{MICROSERVICE_JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"usersIds\": [\"a2b70fb0-8fbf-4dc6-a1cc-ee75e2bd9d8e\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{DEFAULT_PATH}}/microservice-identification/users",
+							"host": [
+								"{{DEFAULT_PATH}}"
+							],
+							"path": [
+								"microservice-identification",
+								"users"
 							]
 						}
 					},
