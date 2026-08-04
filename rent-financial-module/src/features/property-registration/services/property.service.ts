@@ -40,6 +40,7 @@ import {
   sendInvitedEmailTo,
 } from './invitation-generation.service.js';
 import { UserNotFound } from '../../../core/global-exception.js';
+import { PropertyMemberRepository } from '../repository/property-member.repository.js';
 
 @Injectable()
 export class PropertyService {
@@ -47,6 +48,7 @@ export class PropertyService {
     private readonly prismaClient: PrismaService,
     private readonly helper: PropertyHelper,
     private readonly propertyRepository: PropertyRepository,
+    private readonly propertyMemberRepository: PropertyMemberRepository,
     private readonly globalRepository: GlobalRepository,
   ) {}
 
@@ -115,7 +117,10 @@ export class PropertyService {
       };
 
       const { id: propertyMemberId } =
-        await this.propertyRepository.savePropertyMember(propertyMember, tx);
+        await this.propertyMemberRepository.savePropertyMember(
+          propertyMember,
+          tx,
+        );
 
       //guardamos la informacion del usuario con rol en propertyMemberRole
       const propertyMemberRole: PropertyMemberRoleType = {
@@ -123,7 +128,7 @@ export class PropertyService {
         propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.LANDLORD,
       };
 
-      await this.propertyRepository.savePropertyMemberRole(
+      await this.propertyMemberRepository.savePropertyMemberRole(
         propertyMemberRole,
         tx,
       );
@@ -352,14 +357,17 @@ export class PropertyService {
       };
 
       const { id: propertyMemberId } =
-        await this.propertyRepository.savePropertyMember(newPropertyMember, tx);
+        await this.propertyMemberRepository.savePropertyMember(
+          newPropertyMember,
+          tx,
+        );
 
       const propertyMemberRole: PropertyMemberRoleType = {
         propertyMemberId,
         propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.MEMBER,
       };
 
-      await this.propertyRepository.savePropertyMemberRole(
+      await this.propertyMemberRepository.savePropertyMemberRole(
         propertyMemberRole,
         tx,
       );

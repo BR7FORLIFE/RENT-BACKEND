@@ -6,11 +6,15 @@ import type {
 } from '../types.js';
 import { ActorRoleException } from '../exceptions/domain-exceptions.js';
 import { CallModelStream } from '../../../core/IA/IA-cclient.js';
-import type { InvitationPropertyMemberType } from '../schemas/property-registration.schema.js';
+import type {
+  InvitationPropertyMemberType,
+  PropertyMemberStatus,
+} from '../schemas/property-registration.schema.js';
 import {
   InvitationLinkedExpiredException,
   InvitationLinkedStatusNotAllowedException,
 } from '../exceptions/exceptions.js';
+import type { UserData } from '../api.js';
 
 @Injectable()
 export class PropertyHelper {
@@ -90,4 +94,22 @@ export function validateInvitationLinked(
   if (now >= invitationLinked.expirationTime) {
     throw new InvitationLinkedExpiredException();
   }
+}
+
+//union user info (AUTH RENT / FINANCIAL RENT)
+export function unionInfoUser(
+  part1: {
+    userId: string;
+    status: PropertyMemberStatus;
+    assignedAt: Date;
+  }[],
+  part2: UserData[],
+) {
+  const userInfo = new Map(part1.map((p1) => [p1.userId, p1]));
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return part2.map(({ isEnabled, ...member }) => ({
+    ...member,
+    ...userInfo.get(member.userId),
+  }));
 }
