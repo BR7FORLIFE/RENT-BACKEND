@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.files.rent_auth_module.application.auth.command.response.UsersCommandResult;
+import com.files.rent_auth_module.application.auth.dtos.request.GetAllUsersRequestDto;
 import com.files.rent_auth_module.application.auth.dtos.response.MeResponseDto;
 import com.files.rent_auth_module.application.auth.usecases.AuthUseCase;
 import com.files.rent_auth_module.application.microserviceIdentification.dto.request.GenerateMicroserviceAccessTokenRequestDto;
@@ -51,4 +53,12 @@ public class MicroserviceIdentificationController {
                         res.fullname(),
                         res.isEnabled())));
     }
+
+    @PreAuthorize("hasAuthority('users:read')")
+    @PostMapping("/users")
+    public Mono<ResponseEntity<UsersCommandResult>> usersInformation(@RequestBody GetAllUsersRequestDto requestDto) {
+        return authUseCase.getAllUsers(requestDto.usersIds())
+                .map(res -> ResponseEntity.ok().body(res));
+    }
+
 }
