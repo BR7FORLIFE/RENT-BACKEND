@@ -4,10 +4,11 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.files.rent_auth_module.application.auth.command.actions.LoginUserUserCommand;
 import com.files.rent_auth_module.application.auth.command.actions.RegisterUserCommand;
+import com.files.rent_auth_module.application.auth.dtos.request.EditUserRequestDto;
 import com.files.rent_auth_module.application.auth.dtos.request.LoginUserRequestDto;
 import com.files.rent_auth_module.application.auth.dtos.request.Oauth2SessionID;
 import com.files.rent_auth_module.application.auth.dtos.request.RegisterUserRequestDto;
@@ -70,6 +72,16 @@ public class AuthController {
                         res.cellphone(),
                         res.fullname(),
                         res.isEnabled())));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("user-edit")
+    public Mono<ResponseEntity<Map<String, String>>> editUserInfo(Authentication authentication,
+            @RequestBody EditUserRequestDto requestDto) {
+        CustomUserDetails details = (CustomUserDetails) authentication.getPrincipal();
+
+        return authUseCase.editUserInfo(details.getUserId(), requestDto.username(), requestDto.cellphone())
+                .map(res -> ResponseEntity.status(HttpStatus.CREATED).body(res));
     }
 
     @PostMapping("/login")

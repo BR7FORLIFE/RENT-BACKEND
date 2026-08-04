@@ -17,5 +17,7 @@ public interface AuthRepositoryPort {
 
     Mono<UserModel> save(UserModel userModel);
 
+    Mono<Void> save(UUID userId, String username, String cellphone);
+
     Mono<Void> deleteByUserId(UUID userId);
 }

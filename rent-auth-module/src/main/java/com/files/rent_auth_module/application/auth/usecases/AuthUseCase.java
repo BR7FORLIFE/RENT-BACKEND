@@ -1,6 +1,7 @@
 package com.files.rent_auth_module.application.auth.usecases;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.files.rent_auth_module.application.auth.command.actions.LoginUserUserCommand;
@@ -22,6 +23,8 @@ public interface AuthUseCase {
             String fullname);
 
     Mono<GenerateRefreshTokenCommandResult> oauth2GetCredentials(String oauth2SessionID);
+
+    Mono<Map<String, String>> editUserInfo(UUID userId, String username, String cellphone);
 
     Mono<MeCommandResult> me(UUID userId);
 

@@ -2,6 +2,7 @@ package com.files.rent_auth_module.application.auth.orchestator;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -85,6 +86,12 @@ public class AuthUseCaseImp implements AuthUseCase {
                         user.getCellphone(),
                         user.getFullname(),
                         user.isEnabled()));
+    }
+
+    @Override
+    public Mono<Map<String, String>> editUserInfo(UUID userId,String username, String cellphone) {
+        return authRepositoryPort.save(userId,username, cellphone)
+                .thenReturn(Map.of("message", "usuario editado correctamente!"));
     }
 
     @Override
