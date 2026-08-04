@@ -1,5 +1,6 @@
 package com.files.rent_auth_module.infra.auth.repository;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -24,6 +25,13 @@ public class UserRepositoryAdapter implements AuthRepositoryPort {
     public Mono<UserModel> findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .map(UserMapper::toDomain);
+    }
+
+    @Override
+    public Mono<List<UserModel>> findAllUsers(List<UUID> usersIds) {
+        return userRepository.findByIdIn(usersIds)
+                .map(UserMapper::toDomain)
+                .collectList();
     }
 
     @Override
