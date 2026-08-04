@@ -6,11 +6,24 @@ import { PropertyHelper } from './services/helpers.service.js';
 import { PrismaModule } from '../../core/database/prisma.module.js';
 import { GlobalModule } from '../global/global.module.js';
 import { propertyPublicController } from './property-public.controller.js';
+import { PropertyMemberController } from './property-member.controller.js';
+import { PropertyMemberService } from './services/property-member.service.js';
+import { PropertyMemberRepository } from './repository/property-member.repository.js';
 
 @Module({
-  controllers: [PropertyRegistrationController, propertyPublicController],
-  providers: [PropertyService, PropertyRepository, PropertyHelper],
-  exports: [PropertyRepository, PropertyHelper],
+  controllers: [
+    PropertyRegistrationController,
+    propertyPublicController,
+    PropertyMemberController,
+  ],
+  providers: [
+    PropertyService,
+    PropertyRepository,
+    PropertyHelper,
+    PropertyMemberService,
+    PropertyMemberRepository,
+  ],
+  exports: [PropertyRepository, PropertyHelper, PropertyMemberRepository],
   imports: [PrismaModule, GlobalModule],
 })
 export class PropertyRegistrationModule {}
