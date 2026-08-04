@@ -21,6 +21,7 @@ import type {
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../../types/global-types.js';
 import type { ContractInfoResponse } from '../dtos/response-dto.js';
+import { PropertyMemberRepository } from '../../property-registration/repository/property-member.repository.js';
 
 // estos dos actores importantes en los contratos son miembros activos
 //dentro de la propiedad
@@ -34,6 +35,7 @@ export class ContractService {
     private readonly prismaClient: PrismaService,
     private readonly contractRepository: ContractRepository,
     private readonly propertyRepository: PropertyRepository,
+    private readonly propertyMemberRepository: PropertyMemberRepository,
     private readonly propertyHelperService: PropertyHelper,
     private readonly globalRepository: GlobalRepository,
   ) {}
@@ -66,7 +68,7 @@ export class ContractService {
     //validamos si los miembros pertenecen a dicho inmueble menos la persona interesada en la casa
     // ya que hará parte del inmueble si esta en un estado PENDING o EXECUTION
     const landordPropertyMember =
-      await this.propertyRepository.findPropertyMemberByUserIdAndPropertyId(
+      await this.propertyMemberRepository.findPropertyMemberByUserIdAndPropertyId(
         contract.landlordMemberId,
         optProperty.id,
       );
@@ -78,7 +80,7 @@ export class ContractService {
     //verificamos que el propietario o el usuario que registro la vivienda
     //sea propietario activo del inmueble
     const actorRoleByLandord = (
-      await this.propertyRepository.findActorRoleByUserId(
+      await this.propertyMemberRepository.findActorRoleByUserId(
         contract.landlordMemberId,
       )
     ).map((role) => role.name as PropertyActorRoleType);
@@ -89,7 +91,7 @@ export class ContractService {
     //verificamos que el arrendatario no tenga el actor role de tenant
     // pq para cada vivienda hay una sola persona a quien se le hace el contrato
     const actorRoleByTenant = (
-      await this.propertyRepository.findActorRoleByUserId(
+      await this.propertyMemberRepository.findActorRoleByUserId(
         contract.tenantMemberId,
       )
     ).map((role) => role.name as PropertyActorRoleType);
@@ -106,14 +108,17 @@ export class ContractService {
       };
 
       const { id: tenantPropertyMemberId } =
-        await this.propertyRepository.savePropertyMember(propertyMember, tx);
+        await this.propertyMemberRepository.savePropertyMember(
+          propertyMember,
+          tx,
+        );
 
       const propertyTenantMemberRole: PropertyMemberRoleType = {
         propertyMemberId: tenantPropertyMemberId,
         propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.TENANT,
       };
 
-      await this.propertyRepository.savePropertyMemberRole(
+      await this.propertyMemberRepository.savePropertyMemberRole(
         propertyTenantMemberRole,
         tx,
       );
