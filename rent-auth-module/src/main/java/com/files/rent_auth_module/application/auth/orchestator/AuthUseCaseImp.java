@@ -1,6 +1,7 @@
 package com.files.rent_auth_module.application.auth.orchestator;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -12,6 +13,8 @@ import com.files.rent_auth_module.application.auth.command.actions.RegisterUserC
 import com.files.rent_auth_module.application.auth.command.response.LoginUserCommandResult;
 import com.files.rent_auth_module.application.auth.command.response.MeCommandResult;
 import com.files.rent_auth_module.application.auth.command.response.RegisterUserCommandResult;
+import com.files.rent_auth_module.application.auth.command.response.UsersCommandResult;
+import com.files.rent_auth_module.application.auth.dtos.response.MeResponseDto;
 import com.files.rent_auth_module.application.auth.exceptions.AuthExceptions;
 import com.files.rent_auth_module.application.auth.ports.AuthRepositoryPort;
 import com.files.rent_auth_module.application.auth.ports.CachePort;
@@ -82,6 +85,24 @@ public class AuthUseCaseImp implements AuthUseCase {
                         user.getCellphone(),
                         user.getFullname(),
                         user.isEnabled()));
+    }
+
+    @Override
+    public Mono<UsersCommandResult> getAllUsers(List<UUID> usersIds) {
+        return authRepositoryPort.findAllUsers(usersIds)
+                .map(usersModels -> {
+                    List<MeResponseDto> users = usersModels
+                            .stream()
+                            .map(user -> new MeResponseDto(
+                                    user.getId(),
+                                    user.getUsername(),
+                                    user.getEmail(),
+                                    user.getCellphone(),
+                                    user.getFullname(),
+                                    user.isEnabled()))
+                            .toList();
+                    return new UsersCommandResult(users);
+                });
     }
 
     @Override

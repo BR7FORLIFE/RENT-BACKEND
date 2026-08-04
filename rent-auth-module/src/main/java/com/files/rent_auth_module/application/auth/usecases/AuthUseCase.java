@@ -1,5 +1,6 @@
 package com.files.rent_auth_module.application.auth.usecases;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.files.rent_auth_module.application.auth.command.actions.LoginUserUserCommand;
@@ -7,6 +8,7 @@ import com.files.rent_auth_module.application.auth.command.actions.RegisterUserC
 import com.files.rent_auth_module.application.auth.command.response.LoginUserCommandResult;
 import com.files.rent_auth_module.application.auth.command.response.MeCommandResult;
 import com.files.rent_auth_module.application.auth.command.response.RegisterUserCommandResult;
+import com.files.rent_auth_module.application.auth.command.response.UsersCommandResult;
 import com.files.rent_auth_module.application.refreshToken.command.response.GenerateRefreshTokenCommandResult;
 
 import reactor.core.publisher.Mono;
@@ -24,6 +26,8 @@ public interface AuthUseCase {
     Mono<MeCommandResult> me(UUID userId);
 
     Mono<MeCommandResult> me(String email);
+
+    Mono<UsersCommandResult> getAllUsers(List<UUID> usersIds);
 
     Mono<String> logout();
 }
