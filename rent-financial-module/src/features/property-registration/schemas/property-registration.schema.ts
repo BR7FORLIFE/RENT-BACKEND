@@ -61,15 +61,25 @@ export const propertySchema = z.object({
 export type PropertyType = z.infer<typeof propertySchema>;
 
 //property member
+export const statusEnumSchema = z.enum(['ACTIVE', 'DESACTIVE', 'IN_PROCESS']);
 export const PropertyMemberSchema = z.object({
   id: z.uuid().optional(),
   userId: z.uuid(),
   propertyId: z.uuid(),
   assignedBy: z.uuid(),
-  status: z.enum(['ACTIVE', 'DESACTIVE', 'IN_PROCESS']),
+  status: statusEnumSchema,
   assignedAt: z.date().optional(),
   updateAt: z.date().optional(),
 });
+export type PropertyMemberStatus = z.infer<typeof statusEnumSchema>;
+
+export const getMembersQuerySchema = z.object({
+  status: z.enum(['ACTIVE', 'DESACTIVE', 'IN_PROCESS']),
+}); //validar en los param de la peticion
+
+export type GetMembersQuery = {
+  status: PropertyMemberStatus;
+};
 
 //Property members
 export type PropertyMemberType = z.infer<typeof PropertyMemberSchema>;

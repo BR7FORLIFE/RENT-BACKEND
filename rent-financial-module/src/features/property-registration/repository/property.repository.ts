@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import type {
-  PropertyMemberRoleType,
-  PropertyMemberType,
   PropertyType,
   ResourceImageType,
 } from '../schemas/property-registration.schema.js';
@@ -179,19 +177,6 @@ export class PropertyRepository {
     return transformData;
   }
 
-  async findPropertyMemberByUserIdAndPropertyId(
-    userId: string,
-    propertyId: string,
-    db: Prisma.TransactionClient = this.prisma,
-  ) {
-    return await db.propertyMember.findFirst({
-      where: {
-        userId,
-        propertyId,
-      },
-    });
-  }
-
   async findAssetsResourcesByPropertyId(
     propertyId: string,
     db: Prisma.TransactionClient = this.prisma,
@@ -202,26 +187,6 @@ export class PropertyRepository {
       },
       select: {
         resourcesImage: true,
-      },
-    });
-  }
-
-  async findActorRoleByUserId(
-    userId: string,
-    db: Prisma.TransactionClient = this.prisma,
-  ) {
-    return db.propertyActorRole.findMany({
-      where: {
-        propertyMemberRoles: {
-          some: {
-            propertyMember: {
-              userId,
-            },
-          },
-        },
-      },
-      select: {
-        name: true,
       },
     });
   }
@@ -250,22 +215,6 @@ export class PropertyRepository {
           })),
         },
       },
-    });
-  }
-
-  async savePropertyMember(
-    propertyMember: PropertyMemberType,
-    db: Prisma.TransactionClient = this.prisma,
-  ) {
-    return await db.propertyMember.create({ data: propertyMember });
-  }
-
-  async savePropertyMemberRole(
-    properyMemberRole: PropertyMemberRoleType,
-    db: Prisma.TransactionClient = this.prisma,
-  ) {
-    return await db.propertyMemberRole.create({
-      data: properyMemberRole,
     });
   }
 
