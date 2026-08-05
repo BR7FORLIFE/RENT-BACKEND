@@ -10,6 +10,10 @@ import type {
 } from '../../../shared/pagination/pagination-schemas.js';
 import type { PropertyInfoResponse } from '../dtos/response-dto.js';
 import { Prisma } from '../../../../generated/prisma/client.js';
+import type {
+  CreateEconomicPropertyInfoType,
+  CreateStructurePropertyInfo,
+} from '../dtos/request-dto.js';
 
 @Injectable()
 export class PropertyRepository {
@@ -56,6 +60,27 @@ export class PropertyRepository {
             },
           },
 
+          economicPropertyInformation: {
+            select: {
+              monthlyRent: true,
+              depositAmount: true,
+              currency: true,
+              utilitiesIncluded: true,
+            },
+          },
+
+          propertyStructureDescription: {
+            select: {
+              bedrooms: true,
+              bathrooms: true,
+              floors: true,
+              parkingSpaces: true,
+              area: true,
+              lotArea: true,
+              constructionYear: true,
+            },
+          },
+
           direction: true,
         },
       }),
@@ -79,6 +104,8 @@ export class PropertyRepository {
       resourceImages: res.propertyResources.map(
         (resources) => resources.resourcesImage,
       ),
+      economicInfoResponse: res.economicPropertyInformation,
+      structureInfoResponse: res.propertyStructureDescription,
     }));
 
     return {
@@ -153,6 +180,9 @@ export class PropertyRepository {
             resourcesImage: true,
           },
         },
+
+        economicPropertyInformation: true,
+        propertyStructureDescription: true,
       },
     });
 
@@ -172,6 +202,8 @@ export class PropertyRepository {
       resourceImages: data.propertyResources.map(
         (resources) => resources.resourcesImage,
       ),
+      economicInfoResponse: data.economicPropertyInformation,
+      structureInfoResponse: data.propertyStructureDescription,
     };
 
     return transformData;
@@ -195,6 +227,8 @@ export class PropertyRepository {
   async saveProperty(
     property: PropertyType,
     resourcesImages: ResourceImageType[],
+    economicPropertyInfo: CreateEconomicPropertyInfoType,
+    structurePropertyInfo: CreateStructurePropertyInfo,
     db: Prisma.TransactionClient = this.prisma,
   ) {
     return await db.property.create({
@@ -213,6 +247,27 @@ export class PropertyRepository {
               },
             },
           })),
+        },
+
+        economicPropertyInformation: {
+          create: {
+            currency: economicPropertyInfo.currency,
+            depositAmount: economicPropertyInfo.depositAmount,
+            monthlyRent: economicPropertyInfo.monthlyRent,
+            utilitiesIncluded: economicPropertyInfo.utilitiesIncluded,
+          },
+        },
+
+        propertyStructureDescription: {
+          create: {
+            area: structurePropertyInfo.area,
+            bathrooms: structurePropertyInfo.bathrooms,
+            bedrooms: structurePropertyInfo.bathrooms,
+            floors: structurePropertyInfo.floors,
+            lotArea: structurePropertyInfo.lotArea,
+            parkingSpaces: structurePropertyInfo.parkingSpaces,
+            constructionYear: structurePropertyInfo.constructionYear,
+          },
         },
       },
     });

@@ -43,6 +43,7 @@ export class PropertyMemberRepository {
           userId: true,
           status: true,
           assignedAt: true,
+          propertyId: true,
         },
       }),
       db.propertyMember.count({
@@ -76,6 +77,19 @@ export class PropertyMemberRepository {
     });
   }
 
+  async findPropertyMemberByPropertyMemberIdAndPropertyId(
+    propertyMemberId: string,
+    propertyId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.propertyMember.findFirst({
+      where: {
+        userId: propertyMemberId,
+        propertyId,
+      },
+    });
+  }
+
   async findActorRoleByUserId(
     userId: string,
     db: Prisma.TransactionClient = this.prisma,
@@ -102,6 +116,18 @@ export class PropertyMemberRepository {
     db: Prisma.TransactionClient = this.prisma,
   ) {
     return await db.propertyMember.create({ data: propertyMember });
+  }
+
+  async savePropertyMemberWithRoles(
+    propertyMemberId: string,
+    propertyActorRoleIds: string[],
+  ) {
+    await this.prisma.propertyMemberRole.createMany({
+      data: propertyActorRoleIds.map((roleId) => ({
+        propertyMemberId,
+        propertyActorRoleId: roleId,
+      })),
+    });
   }
 
   async savePropertyMemberRole(
