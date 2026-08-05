@@ -33,13 +33,17 @@ import {
 } from './dtos/request-dto.js';
 import { CreateSuggestionByPropertyField } from './services/helpers.service.js';
 import type { PropertyField } from './types.js';
+import { PropertyMemberService } from './services/property-member.service.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller({
   path: 'property',
 })
 export class PropertyRegistrationController {
-  constructor(private readonly propertyService: PropertyService) {}
+  constructor(
+    private readonly propertyService: PropertyService,
+    private propertyMemberService: PropertyMemberService,
+  ) {}
 
   @UsePipes(new ZodValidation(createPropertyDtoRequest))
   @HttpCode(201)
@@ -131,7 +135,7 @@ export class PropertyRegistrationController {
     @Body() invitationReq: InvitePropertyMemberType,
   ) {
     const { id, invitedEmailTo, message } =
-      await this.propertyService.invitePropertyMembers(
+      await this.propertyMemberService.invitePropertyMembers(
         req.user.userId,
         invitationReq,
       );

@@ -1,11 +1,11 @@
 import { Controller, Get, HttpCode, Query } from '@nestjs/common';
-import { PropertyService } from './services/property.service.js';
+import { PropertyMemberService } from './services/property-member.service.js';
 
 @Controller({
   path: 'property-process-public',
 })
 export class propertyPublicController {
-  constructor(private readonly propertyService: PropertyService) {}
+  constructor(private readonly propertyMemberService: PropertyMemberService) {}
 
   @HttpCode(200)
   @Get('accept-invitation')
@@ -18,7 +18,7 @@ export class propertyPublicController {
     }
 
     const { message } =
-      await this.propertyService.acceptPropertyMemberInvitation(token);
+      await this.propertyMemberService.acceptPropertyMemberInvitation(token);
 
     return { message };
   }

@@ -1,4 +1,13 @@
-import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../../core/auth/auth.guard.js';
 import type { AuthRequest } from '../../types/global-types.js';
 import {
@@ -11,6 +20,10 @@ import {
 } from '../../shared/pagination/pagination-schemas.js';
 import { ZodValidation } from '../../core/pipes/zod-validation.pipe.js';
 import { PropertyMemberService } from './services/property-member.service.js';
+import {
+  assignmentRolesToMember,
+  type assignmentRolesToMemberType,
+} from './dtos/request-dto.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller({
@@ -32,6 +45,22 @@ export class PropertyMemberController {
       propertyId,
       queryStatus.status,
       paginationDto,
+    );
+  }
+
+  //controlador para asignar una lista de roles al usuario
+  @Post(':propertyMemberId')
+  async assignmentRolesToMember(
+    @Req() req: AuthRequest,
+    @Param('propertyMemberId') propertyMemberId: string,
+    @Body(new ZodValidation(assignmentRolesToMember))
+    body: assignmentRolesToMemberType,
+  ) {
+    return await this.propertyMemberService.assignmentRolesToMember(
+      req.user.userId,
+      propertyMemberId,
+      body.propertyId,
+      body.roles,
     );
   }
 }
