@@ -1,4 +1,5 @@
 import z from 'zod';
+import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../types/global-types.js';
 
 export const TypeProperty = z.enum([
   'RESIDENTIAL',
@@ -26,11 +27,7 @@ export const Street = z.enum([
 
 export type TypeStreet = z.infer<typeof Street>;
 
-export type PropertyActorRoleType =
-  | 'LANDLORD'
-  | 'TENANT'
-  | 'PROPERTY_ADMINISTRATOR'
-  | 'OPERATION_SUPPORT';
+export type PropertyActorRoleType = keyof typeof TYPE_PROPERTY_ACTOR_ROLE_UUIDS;
 
 // IA Response Suggestion
 export type PropertyField = 'PropertyName' | 'PropertyDescription';
