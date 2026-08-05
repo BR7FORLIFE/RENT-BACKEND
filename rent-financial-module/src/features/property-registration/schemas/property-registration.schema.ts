@@ -1,6 +1,10 @@
 import * as z from 'zod';
 import { Street } from '../types.js';
 
+//currency
+export const currencyStatus = z.enum(['USD', 'COP']);
+export type CurrencyType = z.infer<typeof currencyStatus>;
+
 //direction
 export const DirectionSchema = z.object({
   id: z.uuid().optional(),
@@ -129,4 +133,35 @@ export const createInvitationPropertyMemberSchema = z.object({
 
 export type createInvitationPropertyMemberType = z.infer<
   typeof createInvitationPropertyMemberSchema
+>;
+
+//economic property info
+export const economicPropertyInformationSchema = z.object({
+  id: z.uuid().optional(),
+  propertyId: z.uuid(),
+  monthlyRent: z.coerce.number(),
+  depositAmount: z.coerce.number(),
+  currency: currencyStatus,
+  utilitiesIncluded: z.boolean(),
+});
+
+export type EconomicPropertyInformationType = z.infer<
+  typeof economicPropertyInformationSchema
+>;
+
+// property structure description
+export const structurePropertyDescriptionSchema = z.object({
+  id: z.uuid().optional(),
+  propertyId: z.uuid(),
+  bedrooms: z.coerce.number().positive(),
+  bathrooms: z.coerce.number().positive(),
+  floors: z.coerce.number().positive(),
+  parkingSpaces: z.coerce.number().positive(),
+  area: z.coerce.number().positive(),
+  lotArea: z.coerce.number().positive(),
+  constructionYear: z.coerce.number().positive().optional(),
+});
+
+export type StructurePropertyDescriptionType = z.infer<
+  typeof structurePropertyDescriptionSchema
 >;
