@@ -78,3 +78,15 @@ export class InvitationLinkedExpiredException extends AppException {
     );
   }
 }
+
+//Error de estado de property Member
+
+export class NotAllowedStatusByPropertyMember extends AppException {
+  constructor() {
+    super(
+      'El miembro actual necesita estar en un proceso para poder realizar ciertas acciones en la app',
+      406,
+      'NOT_ACCEPTABLE',
+    );
+  }
+}

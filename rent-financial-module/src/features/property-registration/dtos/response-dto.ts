@@ -1,5 +1,6 @@
 import { Prisma } from '../../../../generated/prisma/client.js';
 import type { TypeStreet } from '../types.js';
+import type { CurrencyType } from '../schemas/property-registration.schema.js';
 
 interface ResourceImageResponse {
   id: string;
@@ -28,6 +29,25 @@ export interface Direction {
   updateAt: Date;
 }
 
+//economic info response
+export interface EconomicInfoResponse {
+  monthlyRent: Prisma.Decimal;
+  depositAmount: Prisma.Decimal;
+  currency: CurrencyType;
+  utilitiesIncluded: boolean;
+}
+
+//structure info response
+export interface StructureInfoResponse {
+  bedrooms: number;
+  bathrooms: number;
+  floors: number;
+  parkingSpaces: number;
+  area: Prisma.Decimal;
+  lotArea: Prisma.Decimal;
+  constructionYear: number | null;
+}
+
 export interface PropertyInfoResponse {
   id: string;
   createAt: Date;
@@ -40,4 +60,6 @@ export interface PropertyInfoResponse {
   typeProperty: string;
   propertyOccupationType: string;
   resourceImages: ResourceImageResponse[];
+  economicInfoResponse: EconomicInfoResponse | null;
+  structureInfoResponse: StructureInfoResponse | null;
 }

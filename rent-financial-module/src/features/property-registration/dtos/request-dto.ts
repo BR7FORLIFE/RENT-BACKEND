@@ -1,5 +1,7 @@
 import z from 'zod';
 import { PropertyOccupation, Street, TypeProperty } from '../types.js';
+import { currencyStatus } from '../schemas/property-registration.schema.js';
+import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../../types/global-types.js';
 
 //resources images dtos
 export const createResourceImageDtoRequest = z.object({
@@ -28,8 +30,36 @@ export const createDirectionDtoRequest = z.object({
 });
 export type CreateDirectionType = z.infer<typeof createDirectionDtoRequest>;
 
+//economic property info
+export const createEconomicPropertyInfo = z.object({
+  monthlyRent: z.coerce.number(),
+  depositAmount: z.coerce.number(),
+  currency: currencyStatus,
+  utilitiesIncluded: z.boolean(),
+});
+
+export type CreateEconomicPropertyInfoType = z.infer<
+  typeof createEconomicPropertyInfo
+>;
+
+// structure property info
+export const createStructurePropertyInfo = z.object({
+  bedrooms: z.coerce.number().positive(),
+  bathrooms: z.coerce.number().positive(),
+  floors: z.coerce.number().positive(),
+  parkingSpaces: z.coerce.number().nonnegative(),
+  area: z.coerce.number().positive(),
+  lotArea: z.coerce.number().positive(),
+  constructionYear: z.coerce.number().positive().optional(),
+});
+
+export type CreateStructurePropertyInfo = z.infer<
+  typeof createStructurePropertyInfo
+>;
+
 //property dto
 export const createPropertyDtoRequest = z.object({
+  //property table
   propertyType: TypeProperty,
   propertyOccupationType: PropertyOccupation,
   direction: createDirectionDtoRequest,
@@ -38,6 +68,9 @@ export const createPropertyDtoRequest = z.object({
   fmi: z.string(),
   predialNumber: z.string(),
   resourcesImages: z.array(createResourceImageDtoRequest),
+
+  structurePropertyInfo: createStructurePropertyInfo,
+  economicPropertyInfo: createEconomicPropertyInfo,
 });
 
 export type CreatePropertyType = z.infer<typeof createPropertyDtoRequest>;
@@ -75,4 +108,23 @@ export const InvitePropertyMemberDtoRequest = z.object({
 
 export type InvitePropertyMemberType = z.infer<
   typeof InvitePropertyMemberDtoRequest
+>;
+
+//validar los roles de miembros
+const PropertyActorRoleSchema = z.enum(
+  Object.keys(TYPE_PROPERTY_ACTOR_ROLE_UUIDS) as [
+    keyof typeof TYPE_PROPERTY_ACTOR_ROLE_UUIDS,
+    ...(keyof typeof TYPE_PROPERTY_ACTOR_ROLE_UUIDS)[],
+  ],
+);
+
+export type PropertyActorRoleType = z.infer<typeof PropertyActorRoleSchema>;
+
+export const assignmentRolesToMember = z.object({
+  propertyId: z.uuid(),
+  roles: z.array(PropertyActorRoleSchema),
+});
+
+export type assignmentRolesToMemberType = z.infer<
+  typeof assignmentRolesToMember
 >;
