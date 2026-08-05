@@ -162,6 +162,8 @@ model Property{
   propertyResources PropertyResources[]
   typeProperty TypeProperty @relation(fields: [propertyTypeId], references: [id])
   propertyOccupationType PropertyOccupationType @relation(fields: [propertyOccupationTypeId], references: [id])
+  economicPropertyInformation EconomicPropertyInformation?
+  propertyStructureDescription PropertyStructureDescription?
 }
 
 //tabla intermedia para hacer la comunicacion N:M con resourcesImages
@@ -175,6 +177,30 @@ model PropertyResources{
   @@id([propertyId, resourceId])
 }
 
+model EconomicPropertyInformation{
+  id String @id @default(uuid())
+  propertyId String @unique @map("property_id")
+  monthlyRent Decimal @map("monthly_rent")
+  depositAmount Decimal @map("deposit_amount") //cantidad de deposito (para daños o pagos de facturas)
+  currency Currency 
+  utilitiesIncluded Boolean @map("utilities_included") // si es servicios por aparte o vienen incluidos
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+model PropertyStructureDescription {
+  id String @id @default(uuid())
+  propertyId String @unique @map("property_id")
+  bedrooms Int // numero de habitaciones de la propiedad
+  bathrooms Int //numero de baños de la propiedad
+  floors Int //cantidad de pisos de la vivienda
+  parkingSpaces Int //espacios de parqueo
+  area Decimal // area total de la vivienda 
+  lotArea Decimal // area total del lote donde esta construido la propiedad
+  constructionYear Int? // año de contruccion de la vivienda
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
 
 /**
 Contratos ¿Que refleja?  - Tabla muy dependiente a otras
