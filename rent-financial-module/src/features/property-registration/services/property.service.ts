@@ -118,7 +118,7 @@ export class PropertyService {
       //guardamos la informacion del usuario con rol en propertyMemberRole
       const propertyMemberRole: PropertyMemberRoleType = {
         propertyMemberId,
-        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.LANDLORD,
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.PROPIETARIO,
       };
 
       await this.propertyMemberRepository.savePropertyMemberRole(
