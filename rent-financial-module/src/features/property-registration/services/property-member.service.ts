@@ -8,8 +8,9 @@ import type {
 } from '../schemas/property-registration.schema.js';
 import { PropertyRepository } from '../repository/property.repository.js';
 import {
+  AssingnmentStatusNotAllowedException,
   InvitationLinkedNotFoundException,
-  NotAllowedStatusByPropertyMember,
+  NotAllowedStatusByPropertyMemberException,
   PropertyMemberNotFound,
   PropertyNotFoundException,
 } from '../exceptions/exceptions.js';
@@ -199,7 +200,7 @@ export class PropertyMemberService {
 
       const propertyMemberRole: PropertyMemberRoleType = {
         propertyMemberId,
-        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.MEMBER,
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.MIEMBRO,
       };
 
       await this.propertyMemberRepository.savePropertyMemberRole(
@@ -241,36 +242,47 @@ export class PropertyMemberService {
     }
 
     if (optPropertyMember.status != 'IN_PROCESS') {
-      throw new NotAllowedStatusByPropertyMember();
+      throw new NotAllowedStatusByPropertyMemberException();
     }
 
-    //asignamos los respectivos roles al dicho miembro de la propiedad y transicionamos su estado
-    //de IN_PROCCESS a ACTIVE
-    const rolesUuids = roles.map((rol) => TYPE_PROPERTY_ACTOR_ROLE_UUIDS[rol]);
+    //nos aseguramos que dicho property member no tiene los mismos roles
+    // que le quiere añadir el usuario
+    const { propertyMemberRole, ...propertyMember } = optPropertyMember;
 
-    console.log(optPropertyMember.id);
-    //asignamos los distintos roles al usuario
-    await this.propertyMemberRepository.savePropertyMemberWithRoles(
-      optPropertyMember.id,
-      rolesUuids,
+    const assignedRoles = new Set(roles);
+
+    const exists = propertyMemberRole.some((role) =>
+      assignedRoles.has(role.propertyActorRole.name as PropertyActorRoleType),
     );
 
-    //cambiamos el estado del miembro a ACTIVE
-    const changeStatusPropertyMember: PropertyMemberType = {
-      ...optPropertyMember,
-      status: 'ACTIVE',
-    };
+    if (exists) {
+      throw new AssingnmentStatusNotAllowedException();
+    }
 
-    //guardamos en la base de datos
-    await this.propertyMemberRepository.savePropertyMember(
-      changeStatusPropertyMember,
-    );
+    await this.prismaClient.$transaction(async (tx) => {
+      //asignamos los respectivos roles al dicho miembro de la propiedad y transicionamos su estado
+      //de IN_PROCCESS a ACTIVE
+      const rolesUuids = roles.map(
+        (rol) => TYPE_PROPERTY_ACTOR_ROLE_UUIDS[rol],
+      );
+      //asignamos los distintos roles al usuario
+      await this.propertyMemberRepository.savePropertyMemberWithRoles(
+        propertyMember.id,
+        rolesUuids,
+        tx,
+      );
+
+      //guardamos en la base de datos
+      await this.propertyMemberRepository.updatePropertyMemberStatus(
+        propertyMember.id,
+        'ACTIVE',
+        tx,
+      );
+    });
 
     return {
       message:
         'el rol(es) han sido asignados correctamente al miembro de la propiedad',
     };
-    //IMPORTANTE VALIDAR  QUE DICHO MIEMBRO NO TENGA LOS ROLES QUE SE LE QUIERE ASIGNAR SINO
-    // HAY ERROR DE CONSTRAINT
   }
 }

@@ -87,6 +87,26 @@ export class PropertyMemberRepository {
         userId: propertyMemberId,
         propertyId,
       },
+      select: {
+        id: true,
+        userId: true,
+        propertyId: true,
+        status: true,
+        assignedBy: true,
+        assignedAt: true,
+        updateAt: true,
+
+        propertyMemberRole: {
+          select: {
+            propertyActorRole: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
@@ -121,8 +141,9 @@ export class PropertyMemberRepository {
   async savePropertyMemberWithRoles(
     propertyMemberId: string,
     propertyActorRoleIds: string[],
+    db: Prisma.TransactionClient = this.prisma,
   ) {
-    await this.prisma.propertyMemberRole.createMany({
+    await db.propertyMemberRole.createMany({
       data: propertyActorRoleIds.map((roleId) => ({
         propertyMemberId,
         propertyActorRoleId: roleId,
@@ -136,6 +157,22 @@ export class PropertyMemberRepository {
   ) {
     return await db.propertyMemberRole.create({
       data: properyMemberRole,
+    });
+  }
+
+  //updates
+  async updatePropertyMemberStatus(
+    id: string,
+    status: PropertyMemberStatus,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return db.propertyMember.update({
+      where: {
+        id,
+      },
+      data: {
+        status,
+      },
     });
   }
 }

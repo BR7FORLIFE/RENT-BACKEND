@@ -81,10 +81,19 @@ export class InvitationLinkedExpiredException extends AppException {
 
 //Error de estado de property Member
 
-export class NotAllowedStatusByPropertyMember extends AppException {
+export class NotAllowedStatusByPropertyMemberException extends AppException {
   constructor() {
     super(
       'El miembro actual necesita estar en un proceso para poder realizar ciertas acciones en la app',
+      406,
+      'NOT_ACCEPTABLE',
+    );
+  }
+}
+export class AssingnmentStatusNotAllowedException extends AppException {
+  constructor() {
+    super(
+      'No se permite asignar los estados actuales dado que el miembro ya los posee',
       406,
       'NOT_ACCEPTABLE',
     );
