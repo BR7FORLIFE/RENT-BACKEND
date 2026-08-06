@@ -523,7 +523,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"juan.perez@gmail.com\",\n    \"propertyId\": \"a367294f-1363-465b-be45-16d96cce46c4\"\n}",
+									"raw": "{\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"propertyId\": \"c2100df1-d53f-4fae-9efe-9552f4d76438\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -556,7 +556,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-process-public/accept-invitation?token=6jHc6609t6oUfufh9zVi",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-process-public/accept-invitation?token=FUb6GREIa1rYU8AdaFVX",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -571,7 +571,7 @@
 									"query": [
 										{
 											"key": "token",
-											"value": "6jHc6609t6oUfufh9zVi"
+											"value": "FUb6GREIa1rYU8AdaFVX"
 										}
 									]
 								}
@@ -632,7 +632,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"propertyId\": \"a367294f-1363-465b-be45-16d96cce46c4\",\n    \"roles\": [\"PROPERTY_ADMINISTRATOR\"]\n}",
+									"raw": "{\n    \"propertyId\": \"c2100df1-d53f-4fae-9efe-9552f4d76438\",\n    \"roles\": [\"ARRENDADO\"]\n}",
 									"options": {
 										"raw": {
 											"language": "json"

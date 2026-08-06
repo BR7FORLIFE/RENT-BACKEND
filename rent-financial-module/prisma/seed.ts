@@ -83,28 +83,28 @@ async function main() {
   await prisma.propertyActorRole.createMany({
     data: [
       {
-        id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.MEMBER,
+        id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.MIEMBRO,
         name: 'MIEMBRO',
         description: 'Miembro sin privilegios pero hacen parte de la propiedad',
       },
       {
-        id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.LANDLORD,
+        id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.PROPIETARIO,
         name: 'PROPIETARIO',
         description: 'Propietario o arrendador del inmueble.',
       },
       {
-        id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.TENANT,
+        id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ARRENDADO,
         name: 'ARRENDADO',
         description: 'Arrendatario que ocupa el inmueble mediante contrato.',
       },
       {
-        id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.PROPERTY_ADMINISTRATOR,
+        id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ADMINISTRADOR,
         name: 'ADMINISTRADOR',
         description:
           'Persona encargada de administrar el inmueble por cuenta del propietario.',
       },
       {
-        id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.OPERATION_SUPPORT,
+        id: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.SOPORTE_OPERATIVO,
         name: 'SOPORTE_OPERATIVO',
         description:
           'Encargado de inspecciones, entregas, mantenimientos y apoyo operativo.',
