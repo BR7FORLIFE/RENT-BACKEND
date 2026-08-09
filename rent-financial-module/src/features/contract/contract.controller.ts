@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   UseGuards,
   UsePipes,
@@ -16,6 +17,10 @@ import {
   createContractDtoRequest,
   type CreateContractType,
 } from './dtos/request-dto.js';
+import {
+  paginationSchema,
+  type PaginationType,
+} from '../../shared/pagination/pagination-schemas.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller({
@@ -45,5 +50,18 @@ export class ContractController {
   async findContractById(@Req() req: AuthRequest, @Param('id') id: string) {
     const data = this.service.getContractbyId(req.user.userId, id);
     return data;
+  }
+
+  @Get(':propertyId')
+  async findAllContractByPropertyId(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+    @Query(new ZodValidation(paginationSchema)) paginationDto: PaginationType,
+  ) {
+    return await this.service.getAllContracts(
+      req.user.userId,
+      propertyId,
+      paginationDto,
+    );
   }
 }

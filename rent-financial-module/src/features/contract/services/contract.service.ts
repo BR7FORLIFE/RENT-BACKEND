@@ -22,6 +22,7 @@ import { PrismaService } from '../../../core/database/prisma.service.js';
 import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../../types/global-types.js';
 import type { ContractInfoResponse } from '../dtos/response-dto.js';
 import { PropertyMemberRepository } from '../../property-registration/repository/property-member.repository.js';
+import type { PaginationType } from '../../../shared/pagination/pagination-schemas.js';
 
 // estos dos actores importantes en los contratos son miembros activos
 //dentro de la propiedad
@@ -170,5 +171,26 @@ export class ContractService {
     }
 
     return data;
+  }
+
+  async getAllContracts(
+    userId: string,
+    propertyId: string,
+    paginationDto: PaginationType,
+  ) {
+    //validamos que dicho usuario es el dueño de la propiedad
+    const optProperty = await this.propertyRepository.findPropertyById(
+      userId,
+      propertyId,
+    );
+
+    if (!optProperty) {
+      throw new PropertyNotFoundException();
+    }
+
+    return await this.contractRepository.findAllContractByPropertyId(
+      propertyId,
+      paginationDto,
+    );
   }
 }
