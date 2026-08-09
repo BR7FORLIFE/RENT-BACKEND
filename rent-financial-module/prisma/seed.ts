@@ -11,13 +11,13 @@ async function main() {
   await prisma.typeProperty.createMany({
     data: [
       {
-        id: TYPE_PROPERTY_UUIDS.RESIDENTIAL,
+        id: TYPE_PROPERTY_UUIDS.RESIDENCIAL,
         name: 'RESIDENCIAL',
         description:
           'Propiedades destinadas principalmente para uso habitacional, como casas, apartamentos o condominios.',
       },
       {
-        id: TYPE_PROPERTY_UUIDS.COMMERCIAL,
+        id: TYPE_PROPERTY_UUIDS.COMERCIAL,
         name: 'COMERCIAL',
         description:
           'Propiedades destinadas al desarrollo de actividades comerciales, como locales, oficinas o centros comerciales.',
@@ -29,25 +29,25 @@ async function main() {
           'Propiedades destinadas a procesos industriales, fabricación, almacenamiento o logística.',
       },
       {
-        id: TYPE_PROPERTY_UUIDS.LAND_OR_SOIL,
+        id: TYPE_PROPERTY_UUIDS.TERRENO,
         name: 'TERRENO',
         description:
           'Terrenos o lotes sin construcciones, aptos para desarrollo, inversión o conservación.',
       },
       {
-        id: TYPE_PROPERTY_UUIDS.URBAN,
+        id: TYPE_PROPERTY_UUIDS.URBANO,
         name: 'URBANO',
         description:
           'Propiedades ubicadas dentro del perímetro urbano con acceso a servicios públicos e infraestructura.',
       },
       {
-        id: TYPE_PROPERTY_UUIDS.AGRARIAN,
+        id: TYPE_PROPERTY_UUIDS.AGRARIO,
         name: 'AGRARIO',
         description:
           'Propiedades destinadas a actividades agrícolas, ganaderas o agropecuarias.',
       },
       {
-        id: TYPE_PROPERTY_UUIDS.MIXED,
+        id: TYPE_PROPERTY_UUIDS.MIXTO,
         name: 'MIXTO',
         description:
           'Propiedades que permiten una combinación de usos, como residencial y comercial.',
@@ -59,19 +59,19 @@ async function main() {
   await prisma.propertyOccupationType.createMany({
     data: [
       {
-        id: TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS.OCCUPIED,
+        id: TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS.OCUPADO,
         name: 'OCUPADO',
         description:
           'La propiedad se encuentra ocupada por uno o más residentes, propietarios o arrendatarios.',
       },
       {
-        id: TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS.VACANT,
+        id: TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS.DESOCUPADO,
         name: 'DESOCUPADA',
         description:
           'La propiedad está desocupada y disponible para venta, arriendo o uso.',
       },
       {
-        id: TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS.IN_PROCESS,
+        id: TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS.EN_PROCESO,
         name: 'EN_PROCESO',
         description:
           'La propiedad se encuentra en proceso de ocupación, desocupación, entrega o trámite administrativo.',

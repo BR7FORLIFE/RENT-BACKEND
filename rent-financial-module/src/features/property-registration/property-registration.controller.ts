@@ -21,12 +21,12 @@ import {
   type PaginationType,
 } from '../../shared/pagination/pagination-schemas.js';
 import {
-  ChangeOwnerDtoRequest,
+  //ChangeOwnerDtoRequest,
   createPropertyDtoRequest,
   EditingPropertyDtoRequest,
   GetAISuggestion,
   InvitePropertyMemberDtoRequest,
-  type ChangeOwnerType,
+  //type ChangeOwnerType,
   type CreatePropertyType,
   type EditingPropertyType,
   type InvitePropertyMemberType,
@@ -90,13 +90,15 @@ export class PropertyRegistrationController {
 
   @UsePipes(new ZodValidation(EditingPropertyDtoRequest))
   @HttpCode(201)
-  @Patch()
+  @Patch(':propertyId')
   async modifyProperty(
     @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
     @Body() editingProperty: EditingPropertyType,
   ) {
     const { id, message } = await this.propertyService.editingProperty(
       req.user.userId,
+      propertyId,
       editingProperty,
     );
 
@@ -106,14 +108,14 @@ export class PropertyRegistrationController {
     };
   }
 
-  //cambiar el dueño de la propiedad hacia otra persona manteniendo el registrador original
-  @UsePipes(new ZodValidation(ChangeOwnerDtoRequest))
-  @HttpCode(200)
-  @Post()
-  async changeOwnerProperty(
-    @Req() req: AuthRequest,
-    @Body() newOwner: ChangeOwnerType,
-  ) {}
+  // //cambiar el dueño de la propiedad hacia otra persona manteniendo el registrador original
+  // @UsePipes(new ZodValidation(ChangeOwnerDtoRequest))
+  // @HttpCode(200)
+  // @Post()
+  // async changeOwnerProperty(
+  //   @Req() req: AuthRequest,
+  //   @Body() newOwner: ChangeOwnerType,
+  // ) {}
 
   @Delete()
   async deleteProperty() {}

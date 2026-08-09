@@ -77,7 +77,6 @@ export type CreatePropertyType = z.infer<typeof createPropertyDtoRequest>;
 
 // esquemas de edicion de propiedades
 export const EditingPropertyDtoRequest = z.object({
-  id: z.uuid(),
   propertyName: z.string().min(8).max(50).optional(),
   propertyType: TypeProperty.optional(),
   propertyOccupationType: PropertyOccupation.optional(),

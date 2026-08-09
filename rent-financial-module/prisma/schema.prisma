@@ -20,11 +20,10 @@ enum StatusContract{
 }
 
 enum TypeStreet{
-  STREET // calle
-  CAREER // carrera
-  AVENUE // avenida
+  CALLE // calle
+  CARRERA // carrera
+  AVENIDA // avenida
   DIAGONAL // diagonal
-  CROSS // transversal
 }
 
 // tipos de precios o pagos de servicio por medio de acuerdos

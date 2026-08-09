@@ -2,28 +2,26 @@ import z from 'zod';
 import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../types/global-types.js';
 
 export const TypeProperty = z.enum([
-  'RESIDENTIAL',
-  'COMMERCIAL',
+  'RESIDENCIAL',
+  'COMERCIAL',
   'INDUSTRIAL',
-  'LAND_OR_SOIL',
-  'URBAN',
-  'AGRARIAN',
-  'MIXED',
+  'TERRENO',
+  'URBANO',
+  'AGRARIO',
+  'MIXTO',
 ]);
 
 export type TypePropertyType = z.infer<typeof TypeProperty>;
 
-export const PropertyOccupation = z.enum(['OCCUPIED', 'VACANT', 'IN_PROCESS']);
+export const PropertyOccupation = z.enum([
+  'OCUPADO',
+  'DESOCUPADO',
+  'EN_PROCESO',
+]);
 
 export type PropertyOccupationType = z.infer<typeof PropertyOccupation>;
 
-export const Street = z.enum([
-  'STREET',
-  'CAREER',
-  'AVENUE',
-  'DIAGONAL',
-  'CROSS',
-]);
+export const Street = z.enum(['CALLE', 'CARRERA', 'AVENIDA', 'DIAGONAL']);
 
 export type TypeStreet = z.infer<typeof Street>;
 

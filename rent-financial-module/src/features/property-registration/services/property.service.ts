@@ -156,12 +156,13 @@ export class PropertyService {
 
   async editingProperty(
     userId: string,
+    propertyId: string,
     partialProperty: EditingPropertyType,
   ): Promise<{ id: string; message: string }> {
     //verificamos que exista dicha propiedad
     const property = await this.propertyRepository.findPropertyById(
       userId,
-      partialProperty.id,
+      propertyId,
     );
 
     if (!property) {
@@ -255,7 +256,7 @@ export class PropertyService {
     }
 
     const result = await this.propertyRepository.updateProperty(
-      partialProperty.id,
+      propertyId,
       userId,
       data,
     );
