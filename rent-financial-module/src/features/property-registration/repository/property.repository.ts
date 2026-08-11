@@ -8,12 +8,12 @@ import type {
   PaginationResponse,
   PaginationType,
 } from '../../../shared/pagination/pagination-schemas.js';
-import type { PropertyInfoResponse } from '../dtos/response-dto.js';
 import { Prisma } from '../../../../generated/prisma/client.js';
 import type {
   CreateEconomicPropertyInfoType,
   CreateStructurePropertyInfo,
 } from '../dtos/request-dto.js';
+import type { PropertyInfoPersistence } from './repository-types.js';
 
 @Injectable()
 export class PropertyRepository {
@@ -24,7 +24,7 @@ export class PropertyRepository {
     userId: string,
     paginationDto: PaginationType,
     db: Prisma.TransactionClient = this.prisma,
-  ): Promise<PaginationResponse<PropertyInfoResponse>> {
+  ): Promise<PaginationResponse<PropertyInfoPersistence>> {
     const { limit, page } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 
@@ -90,7 +90,7 @@ export class PropertyRepository {
     ]);
 
     //transformamos con un dto la respuesta que enviaremos al servidor
-    const transformData: PropertyInfoResponse[] = data.map((res) => ({
+    const transformData: PropertyInfoPersistence[] = data.map((res) => ({
       id: res.id,
       createAt: res.createAt,
       fmi: res.fmi,
@@ -188,7 +188,7 @@ export class PropertyRepository {
 
     if (!data) return null;
 
-    const transformData: PropertyInfoResponse = {
+    const transformData: PropertyInfoPersistence = {
       id: data.id,
       createAt: data.createAt,
       fmi: data.fmi,
