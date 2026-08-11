@@ -1,8 +1,7 @@
-import { Prisma } from '../../../../generated/prisma/client.js';
-import type { TypeStreet } from '../types.js';
 import type { CurrencyType } from '../schemas/property-registration.schema.js';
+import type { TypeStreet } from '../types.js';
 
-interface ResourceImageResponse {
+interface ResourcesImages {
   id: string;
   assetId: string | null;
   width: number | null;
@@ -10,47 +9,47 @@ interface ResourceImageResponse {
   format: string | null;
   url: string;
   secureUrl: string | null;
-  createAt: Date;
-  updateAt: Date;
+  createAt: string;
+  updateAt: string;
 }
 
 export interface Direction {
   typeStreet: TypeStreet;
   id: string;
   propertyId: string;
-  latitute: Prisma.Decimal;
-  longitud: Prisma.Decimal;
+  latitute: number;
+  longitud: number;
   department: string;
   city: string;
   neighborhood: string;
   numberStreet: number;
   complement: string | null;
-  createAt: Date;
-  updateAt: Date;
+  createAt: string;
+  updateAt: string;
 }
 
 //economic info response
-export interface EconomicInfoResponse {
-  monthlyRent: Prisma.Decimal;
-  depositAmount: Prisma.Decimal;
+export interface Economic {
+  monthlyRent: number;
+  depositAmount: number;
   currency: CurrencyType;
   utilitiesIncluded: boolean;
 }
 
 //structure info response
-export interface StructureInfoResponse {
+export interface Structure {
   bedrooms: number;
   bathrooms: number;
   floors: number;
   parkingSpaces: number;
-  area: Prisma.Decimal;
-  lotArea: Prisma.Decimal;
+  area: number;
+  lotArea: number;
   constructionYear: number | null;
 }
 
-export interface PropertyInfoResponse {
+export interface Property {
   id: string;
-  createAt: Date;
+  createAt: string;
   fmi: string;
   predialNumber: string;
   isPublished: boolean;
@@ -59,7 +58,7 @@ export interface PropertyInfoResponse {
   direction: Direction | null;
   typeProperty: string;
   propertyOccupationType: string;
-  resourceImages: ResourceImageResponse[];
-  economicInfoResponse: EconomicInfoResponse | null;
-  structureInfoResponse: StructureInfoResponse | null;
+  resourcesImages: ResourcesImages[];
+  economicInfoResponse: Economic | null;
+  structureInfoResponse: Structure | null;
 }
