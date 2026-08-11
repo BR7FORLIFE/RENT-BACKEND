@@ -15,7 +15,6 @@ import type {
   PaginationResponse,
   PaginationType,
 } from '../../../shared/pagination/pagination-schemas.js';
-import type { PropertyInfoResponse } from '../dtos/response-dto.js';
 import { PropertyHelper } from './helpers.service.js';
 import type {
   CreatePropertyType,
@@ -32,6 +31,8 @@ import {
 } from '../../../types/global-types.js';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import { PropertyMemberRepository } from '../repository/property-member.repository.js';
+import type { Property } from '../dtos/response-dto.js';
+import { PropertyServiceMapper } from '../repository/mappers/property-mapper.service.js';
 
 @Injectable()
 export class PropertyService {
@@ -40,6 +41,7 @@ export class PropertyService {
     private readonly helper: PropertyHelper,
     private readonly propertyRepository: PropertyRepository,
     private readonly propertyMemberRepository: PropertyMemberRepository,
+    private readonly propertyMapper: PropertyServiceMapper,
     private readonly globalRepository: GlobalRepository,
   ) {}
 
@@ -140,18 +142,24 @@ export class PropertyService {
   async consultAllProperties(
     userId: string,
     paginationDto: PaginationType,
-  ): Promise<PaginationResponse<PropertyInfoResponse>> {
-    return await this.propertyRepository.findAll(userId, paginationDto);
+  ): Promise<PaginationResponse<Property>> {
+    const { data, metadata } = await this.propertyRepository.findAll(
+      userId,
+      paginationDto,
+    );
+    const res = data.map((p) => this.propertyMapper.toDomain(p));
+
+    return { data: res, metadata };
   }
 
-  async consultPropertyById(userId: string, id: string) {
+  async consultPropertyById(userId: string, id: string): Promise<Property> {
     const data = await this.propertyRepository.findPropertyById(userId, id);
 
     if (!data) {
       throw new PropertyNotFoundException();
     }
 
-    return data;
+    return this.propertyMapper.toDomain(data);
   }
 
   async editingProperty(

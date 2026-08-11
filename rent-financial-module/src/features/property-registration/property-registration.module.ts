@@ -9,6 +9,7 @@ import { propertyPublicController } from './property-public.controller.js';
 import { PropertyMemberController } from './property-member.controller.js';
 import { PropertyMemberService } from './services/property-member.service.js';
 import { PropertyMemberRepository } from './repository/property-member.repository.js';
+import { PropertyServiceMapper } from './repository/mappers/property-mapper.service.js';
 
 @Module({
   controllers: [
@@ -22,6 +23,7 @@ import { PropertyMemberRepository } from './repository/property-member.repositor
     PropertyHelper,
     PropertyMemberService,
     PropertyMemberRepository,
+    PropertyServiceMapper,
   ],
   exports: [PropertyRepository, PropertyHelper, PropertyMemberRepository],
   imports: [PrismaModule, GlobalModule],
