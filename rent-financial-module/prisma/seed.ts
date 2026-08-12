@@ -66,7 +66,7 @@ async function main() {
       },
       {
         id: TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS.DESOCUPADO,
-        name: 'DESOCUPADA',
+        name: 'DESOCUPADO',
         description:
           'La propiedad está desocupada y disponible para venta, arriendo o uso.',
       },
