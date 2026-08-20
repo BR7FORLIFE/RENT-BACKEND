@@ -101,6 +101,7 @@ export const GetAISuggestion = z.object({
 
 //invitacion de miembros de propiedades para vinculacion
 export const InvitePropertyMemberDtoRequest = z.object({
+  userId: z.uuid(), // userID dueño de la propiedad
   email: z.email(),
   propertyId: z.uuid(),
 });

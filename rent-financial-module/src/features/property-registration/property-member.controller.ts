@@ -7,6 +7,7 @@ import {
   Query,
   Req,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../core/auth/auth.guard.js';
 import type { AuthRequest } from '../../types/global-types.js';
@@ -22,7 +23,9 @@ import { ZodValidation } from '../../core/pipes/zod-validation.pipe.js';
 import { PropertyMemberService } from './services/property-member.service.js';
 import {
   assignmentRolesToMember,
+  InvitePropertyMemberDtoRequest,
   type assignmentRolesToMemberType,
+  type InvitePropertyMemberType,
 } from './dtos/request-dto.js';
 
 @UseGuards(JwtAuthGuard)
@@ -62,5 +65,15 @@ export class PropertyMemberController {
       body.propertyId,
       body.roles,
     );
+  }
+
+  //invitaciones de property Members
+  @UsePipes(new ZodValidation(InvitePropertyMemberDtoRequest))
+  @Post('invite-property-member')
+  async invitePropertyMembers(@Body() invitationReq: InvitePropertyMemberType) {
+    const { id, invitedEmailTo, message } =
+      await this.propertyMemberService.invitePropertyMembers(invitationReq);
+
+    return { id, invitedEmailTo, message };
   }
 }

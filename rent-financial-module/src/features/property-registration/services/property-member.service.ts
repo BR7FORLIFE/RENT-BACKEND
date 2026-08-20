@@ -111,12 +111,11 @@ export class PropertyMemberService {
 
   //invitacion de miembros en la propiedad
   async invitePropertyMembers(
-    userId: string,
     invitationReq: InvitePropertyMemberType,
   ): Promise<{ id: string; invitedEmailTo: string; message: string }> {
     //verificamos que el usuario sea propietario de dicho inmueble
     const optIsOwnerToProperty = await this.propertyRepository.findPropertyById(
-      userId,
+      invitationReq.userId,
       invitationReq.propertyId,
     );
 
@@ -152,7 +151,7 @@ export class PropertyMemberService {
     //creamos la transaccion en la base de datos
     const invitation: createInvitationPropertyMemberType = {
       propertyId: invitationReq.propertyId,
-      invitedBy: userId,
+      invitedBy: invitationReq.userId,
       invitedUserId,
       invitedEmailTo: invitationReq.email,
       status: 'DRAFT',
