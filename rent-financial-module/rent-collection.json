@@ -400,7 +400,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/rent-financial/property/e570be2b-a162-4f50-91c7-3ef2665359ba",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property/37d22037-8b1f-4fad-bdb9-355e0772b763",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -409,9 +409,8 @@
 									],
 									"path": [
 										"rent-financial",
-										"rent-financial",
 										"property",
-										"e570be2b-a162-4f50-91c7-3ef2665359ba"
+										"37d22037-8b1f-4fad-bdb9-355e0772b763"
 									]
 								}
 							},
@@ -434,7 +433,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"id\": \"f4b3bf91-4149-4c89-ba60-c6b0b3dc6b8a\",\n    \"propertyName\": \"Apartamento frente al mar\",\n    \"propertyType\": \"COMMERCIAL\",\n    \"propertyOccupationType\": \"VACANT\",\n    \"resourcesImages\": [\n        {\n        \"assetId\": \"e3d8d8f0-8c53-4b8a-9d5f-0b7e3d2f1a11\",\n        \"width\": 1280,\n        \"height\": 720,\n        \"format\": \"jpg\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-1.jpg\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-1.jpg\"\n        },\n        {\n        \"assetId\": \"8f4e2a10-9b35-4f4e-91f2-4c9d6a1d9b22\",\n        \"width\": 1920,\n        \"height\": 1080,\n        \"format\": \"png\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-2.png\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-2.png\"\n        },\n        {\n        \"assetId\": \"1b7c6f4d-3e92-4c86-8a5e-6d7f9a3b4c33\",\n        \"width\": 1024,\n        \"height\": 768,\n        \"format\": \"webp\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-3.webp\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-3.webp\"\n        }\n    ]\n}",
+									"raw": "{\n    \"propertyName\": \"Apartamento frente al mar\",\n    \"propertyType\": \"COMMERCIAL\",\n    \"propertyOccupationType\": \"VACANT\",\n    \"resourcesImages\": [\n        {\n        \"assetId\": \"e3d8d8f0-8c53-4b8a-9d5f-0b7e3d2f1a11\",\n        \"width\": 1280,\n        \"height\": 720,\n        \"format\": \"jpg\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-1.jpg\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-1.jpg\"\n        },\n        {\n        \"assetId\": \"8f4e2a10-9b35-4f4e-91f2-4c9d6a1d9b22\",\n        \"width\": 1920,\n        \"height\": 1080,\n        \"format\": \"png\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-2.png\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-2.png\"\n        },\n        {\n        \"assetId\": \"1b7c6f4d-3e92-4c86-8a5e-6d7f9a3b4c33\",\n        \"width\": 1024,\n        \"height\": 768,\n        \"format\": \"webp\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-3.webp\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-3.webp\"\n        }\n    ]\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -442,7 +441,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property/f4b3bf91-4149-4c89-ba60-c6b0b3dc6b8a",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -451,7 +450,8 @@
 									],
 									"path": [
 										"rent-financial",
-										"property"
+										"property",
+										"f4b3bf91-4149-4c89-ba60-c6b0b3dc6b8a"
 									]
 								}
 							},
@@ -523,7 +523,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"propertyId\": \"c2100df1-d53f-4fae-9efe-9552f4d76438\"\n}",
+									"raw": "{\n    \"userId\": \"4c9919b4-4d5c-4824-b8c2-589c8bcf76c4\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"propertyId\": \"a743c7a2-46a7-4b69-8b9c-d5b90c1fb062\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -531,7 +531,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property/invite-property-member",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/invite-property-member",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -540,7 +540,7 @@
 									],
 									"path": [
 										"rent-financial",
-										"property",
+										"property-member",
 										"invite-property-member"
 									]
 								}
@@ -728,6 +728,44 @@
 										"rent-financial",
 										"contract",
 										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Contracts",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/?page=0",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"contract",
+										""
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										}
 									]
 								}
 							},

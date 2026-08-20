@@ -267,6 +267,43 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Edit Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": null,\n    \"cellphone\": \"987654321\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{DEFAULT_PATH}}/auth/user-edit",
+							"host": [
+								"{{DEFAULT_PATH}}"
+							],
+							"path": [
+								"auth",
+								"user-edit"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -293,7 +330,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "  {\n    \"propertyType\": \"RESIDENTIAL\",\n    \"propertyOccupationType\": \"VACANT\",\n    \"direction\": {\n      \"latitute\": 10.4365,\n      \"longitud\": -75.5123,\n      \"department\": \"Bolivar\",\n      \"city\": \"Cartagena\",\n      \"neighborhood\": \"La Boquilla\",\n      \"typeStreet\": \"STREET\",\n      \"numberStreet\": 5,\n      \"complement\": \"Al lado del mar\"\n    },\n    \"resourcesImages\": [\n        {\n            \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n            \"width\": 70,\n            \"height\": 35,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-1.png\",\n            \"secureUrl\": \"https://example.com/images/property-1.png\"\n        },\n        {\n            \"assetId\": \"a1d8f1d9-9f8c-4d18-9d90-5b8c9e8d12a4\",\n            \"width\": 1280,\n            \"height\": 720,\n            \"format\": \"jpg\",\n            \"url\": \"http://example.com/images/property-2.jpg\",\n            \"secureUrl\": \"https://example.com/images/property-2.jpg\"\n        },\n        {\n            \"assetId\": \"3c2f6b4e-85d4-47f2-a8d3-94f7c5b8b8e1\",\n            \"width\": 1920,\n            \"height\": 1080,\n            \"format\": \"jpeg\",\n            \"url\": \"http://example.com/images/property-3.jpeg\",\n            \"secureUrl\": \"https://example.com/images/property-3.jpeg\"\n        },\n        {\n            \"assetId\": \"e7a4d5c9-1f26-4d59-bd8d-2d7c5d8a9f61\",\n            \"width\": 800,\n            \"height\": 600,\n            \"format\": \"webp\",\n            \"url\": \"http://example.com/images/property-4.webp\",\n            \"secureUrl\": \"https://example.com/images/property-4.webp\"\n        },\n        {\n            \"assetId\": \"5b9f6d0a-c9e2-4a5b-8f0f-3b7d1c9e2f44\",\n            \"width\": 1024,\n            \"height\": 768,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-5.png\",\n            \"secureUrl\": \"https://example.com/images/property-5.png\"\n        }\n    ],\n    \"fmi\": \"060-1234571\",\n    \"predialNumber\": \"130010101000000123456000000005\",\n    \"propertyName\": \"Propiedad en los caracoles\",\n    \"propertyDescription\": \"Este es una propiedad ubicada en los caracoles con 2 cuartos, 1 baño, etc...\"\n  }",
+									"raw": "  {\n    \"propertyType\": \"RESIDENTIAL\",\n    \"propertyOccupationType\": \"VACANT\",\n    \"direction\": {\n      \"latitute\": 10.4365,\n      \"longitud\": -75.5123,\n      \"department\": \"Bolivar\",\n      \"city\": \"Cartagena\",\n      \"neighborhood\": \"La Boquilla\",\n      \"typeStreet\": \"STREET\",\n      \"numberStreet\": 5,\n      \"complement\": \"Al lado del mar\"\n    },\n    \"fmi\": \"060-1234572\",\n    \"predialNumber\": \"130010101000000123456000000004\",\n    \"propertyName\": \"Propiedad en los caracoles\",\n    \"propertyDescription\": \"Este es una propiedad ubicada en los caracoles con 2 cuartos, 1 baño, etc...\",\n    \"structurePropertyInfo\": {\n        \"bedrooms\": 2,\n        \"bathrooms\": 2,\n        \"floors\": 1,\n        \"parkingSpaces\": 0,\n        \"area\": 24.50,\n        \"lotArea\": 35,\n        \"constructionYear\": 2011\n    },\n    \"economicPropertyInfo\": {\n        \"monthlyRent\": 7000000,\n        \"depositAmount\": 300000,\n        \"currency\": \"COP\",\n        \"utilitiesIncluded\": false\n    },\n    \"resourcesImages\": [\n        {\n            \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n            \"width\": 70,\n            \"height\": 35,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-1.png\",\n            \"secureUrl\": \"https://example.com/images/property-1.png\"\n        },\n        {\n            \"assetId\": \"a1d8f1d9-9f8c-4d18-9d90-5b8c9e8d12a4\",\n            \"width\": 1280,\n            \"height\": 720,\n            \"format\": \"jpg\",\n            \"url\": \"http://example.com/images/property-2.jpg\",\n            \"secureUrl\": \"https://example.com/images/property-2.jpg\"\n        },\n        {\n            \"assetId\": \"3c2f6b4e-85d4-47f2-a8d3-94f7c5b8b8e1\",\n            \"width\": 1920,\n            \"height\": 1080,\n            \"format\": \"jpeg\",\n            \"url\": \"http://example.com/images/property-3.jpeg\",\n            \"secureUrl\": \"https://example.com/images/property-3.jpeg\"\n        },\n        {\n            \"assetId\": \"e7a4d5c9-1f26-4d59-bd8d-2d7c5d8a9f61\",\n            \"width\": 800,\n            \"height\": 600,\n            \"format\": \"webp\",\n            \"url\": \"http://example.com/images/property-4.webp\",\n            \"secureUrl\": \"https://example.com/images/property-4.webp\"\n        },\n        {\n            \"assetId\": \"5b9f6d0a-c9e2-4a5b-8f0f-3b7d1c9e2f44\",\n            \"width\": 1024,\n            \"height\": 768,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-5.png\",\n            \"secureUrl\": \"https://example.com/images/property-5.png\"\n        }\n    ]\n  }",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -363,7 +400,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/rent-financial/property/e570be2b-a162-4f50-91c7-3ef2665359ba",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property/37d22037-8b1f-4fad-bdb9-355e0772b763",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -372,9 +409,8 @@
 									],
 									"path": [
 										"rent-financial",
-										"rent-financial",
 										"property",
-										"e570be2b-a162-4f50-91c7-3ef2665359ba"
+										"37d22037-8b1f-4fad-bdb9-355e0772b763"
 									]
 								}
 							},
@@ -397,7 +433,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"id\": \"f4b3bf91-4149-4c89-ba60-c6b0b3dc6b8a\",\n    \"propertyName\": \"Apartamento frente al mar\",\n    \"propertyType\": \"COMMERCIAL\",\n    \"propertyOccupationType\": \"VACANT\",\n    \"resourcesImages\": [\n        {\n        \"assetId\": \"e3d8d8f0-8c53-4b8a-9d5f-0b7e3d2f1a11\",\n        \"width\": 1280,\n        \"height\": 720,\n        \"format\": \"jpg\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-1.jpg\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-1.jpg\"\n        },\n        {\n        \"assetId\": \"8f4e2a10-9b35-4f4e-91f2-4c9d6a1d9b22\",\n        \"width\": 1920,\n        \"height\": 1080,\n        \"format\": \"png\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-2.png\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-2.png\"\n        },\n        {\n        \"assetId\": \"1b7c6f4d-3e92-4c86-8a5e-6d7f9a3b4c33\",\n        \"width\": 1024,\n        \"height\": 768,\n        \"format\": \"webp\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-3.webp\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-3.webp\"\n        }\n    ]\n}",
+									"raw": "{\n    \"propertyName\": \"Apartamento frente al mar\",\n    \"propertyType\": \"COMMERCIAL\",\n    \"propertyOccupationType\": \"VACANT\",\n    \"resourcesImages\": [\n        {\n        \"assetId\": \"e3d8d8f0-8c53-4b8a-9d5f-0b7e3d2f1a11\",\n        \"width\": 1280,\n        \"height\": 720,\n        \"format\": \"jpg\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-1.jpg\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-1.jpg\"\n        },\n        {\n        \"assetId\": \"8f4e2a10-9b35-4f4e-91f2-4c9d6a1d9b22\",\n        \"width\": 1920,\n        \"height\": 1080,\n        \"format\": \"png\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-2.png\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-2.png\"\n        },\n        {\n        \"assetId\": \"1b7c6f4d-3e92-4c86-8a5e-6d7f9a3b4c33\",\n        \"width\": 1024,\n        \"height\": 768,\n        \"format\": \"webp\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-3.webp\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-3.webp\"\n        }\n    ]\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -405,7 +441,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property/f4b3bf91-4149-4c89-ba60-c6b0b3dc6b8a",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -414,7 +450,8 @@
 									],
 									"path": [
 										"rent-financial",
-										"property"
+										"property",
+										"f4b3bf91-4149-4c89-ba60-c6b0b3dc6b8a"
 									]
 								}
 							},
@@ -486,7 +523,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"\",\n    \"propertyActorRole\": \"\"\n}",
+									"raw": "{\n    \"userId\": \"4c9919b4-4d5c-4824-b8c2-589c8bcf76c4\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"propertyId\": \"a743c7a2-46a7-4b69-8b9c-d5b90c1fb062\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -494,7 +531,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property/invite-property-member",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/invite-property-member",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -503,8 +540,117 @@
 									],
 									"path": [
 										"rent-financial",
-										"property",
+										"property-member",
 										"invite-property-member"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Accept Invitation Property Member",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-process-public/accept-invitation?token=FUb6GREIa1rYU8AdaFVX",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"property-process-public",
+										"accept-invitation"
+									],
+									"query": [
+										{
+											"key": "token",
+											"value": "FUb6GREIa1rYU8AdaFVX"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Property Members",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member?status=IN_PROCESS",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"property-member"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "IN_PROCESS"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Assignment Rols To Property Members",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"propertyId\": \"c2100df1-d53f-4fae-9efe-9552f4d76438\",\n    \"roles\": [\"ARRENDADO\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/{{MEMBER_ID}}",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"property-member",
+										"{{MEMBER_ID}}"
 									]
 								}
 							},
@@ -586,6 +732,44 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Get All Contracts",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/?page=0",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"contract",
+										""
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				}
@@ -597,11 +781,14 @@
 				{
 					"name": "Get Microservice Jwt",
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"clientId\": \"rent-financial\",\n    \"clientSecret\": \"<YOUR_CLIENT_SECRET>\"\n}",
+							"raw": "{\n    \"clientId\": \"rent-financial\",\n    \"clientSecret\": \"ee31d461300344a6aac6ac4283877162\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -636,7 +823,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{DEFAULT_PATH}}/microservice-identification/user?email=diazpachecobrayan@gmail.com",
+							"raw": "{{DEFAULT_PATH}}/microservice-identification/user?email=juan.perez@gmail.com",
 							"host": [
 								"{{DEFAULT_PATH}}"
 							],
@@ -647,8 +834,45 @@
 							"query": [
 								{
 									"key": "email",
-									"value": "diazpachecobrayan@gmail.com"
+									"value": "juan.perez@gmail.com"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{MICROSERVICE_JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"usersIds\": [\"a2b70fb0-8fbf-4dc6-a1cc-ee75e2bd9d8e\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{DEFAULT_PATH}}/microservice-identification/users",
+							"host": [
+								"{{DEFAULT_PATH}}"
+							],
+							"path": [
+								"microservice-identification",
+								"users"
 							]
 						}
 					},
