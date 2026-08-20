@@ -51,6 +51,16 @@ export class PropertyMemberController {
     );
   }
 
+  //invitaciones de property Members
+  @UsePipes(new ZodValidation(InvitePropertyMemberDtoRequest))
+  @Post('invite-property-member')
+  async invitePropertyMembers(@Body() invitationReq: InvitePropertyMemberType) {
+    const { id, invitedEmailTo, message } =
+      await this.propertyMemberService.invitePropertyMembers(invitationReq);
+
+    return { id, invitedEmailTo, message };
+  }
+
   //controlador para asignar una lista de roles al usuario
   @Post(':propertyMemberId')
   async assignmentRolesToMember(
@@ -65,15 +75,5 @@ export class PropertyMemberController {
       body.propertyId,
       body.roles,
     );
-  }
-
-  //invitaciones de property Members
-  @UsePipes(new ZodValidation(InvitePropertyMemberDtoRequest))
-  @Post('invite-property-member')
-  async invitePropertyMembers(@Body() invitationReq: InvitePropertyMemberType) {
-    const { id, invitedEmailTo, message } =
-      await this.propertyMemberService.invitePropertyMembers(invitationReq);
-
-    return { id, invitedEmailTo, message };
   }
 }
