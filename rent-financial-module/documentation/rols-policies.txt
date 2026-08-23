@@ -1,0 +1,62 @@
+RENT ROLS
+
+| DESCRIPCION |
+
+En este apartado se enlazaran politicas a los distintos roles dentro del sistema
+asi ocasionando un correcto enlazamientos de role - policies con la posibilidad que
+el role mas alto de importancia pueda desactivar o activar politicas dentro de dichos
+roles.
+
+| ROLES | 
+
+  //roles de administracion
+  ADMINISTRADOR
+  AGENTE_INMOBILIARIO
+  GESTOR_INMOBILIARIO
+
+  //roles de permanencia o residencia
+  MIEMBRO
+  RESIDENTE
+  FAMILIAR
+  OCUPANTE_AUTORIZADO
+  INVITADO
+
+  // roles de operacion o mantenimiento
+  SOPORTE_OPERATIVO
+  PERSONAL_MANTENIMIENTO
+  TECNICO
+  ELECTRICISTA
+  PLOMERO
+  PERSONAL_LIMPIEZA
+  JARDINERO
+  SEGURIDAD
+  CONSERJE
+
+  //roles de arrendados
+  ARRENDADO [HECHO]
+  COARRENDATARIO
+  FIADOR
+  CODEUDOR
+  AVALISTA
+
+  //roles de propiedad
+  PROPIETARIO
+  COPROPIETARIO
+  USUFRUCTUARIO
+
+
+| ROLE - POLICIES | 
+
+//roles de arrendados
+
+ARRENDADO --
+    ++INFORMACION DEL INMUEBLE++ [1]
+    ++CONTRATOS++ [1] [8] [9]
+    ++SERVICIOS PUBLICOS++ [1] [5] [9] [12] [15] [16]
+
+PROPIETARIO
+    TODOS LOS ROLES EN EL SISTEMA
+
+MIEMBRO --
+    ++INFORMACION DEL INMUEBLE++ [1]
+

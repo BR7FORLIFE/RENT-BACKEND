@@ -146,7 +146,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"be2f3e85-69a9-4d78-b9e4-0643e98de703\",\n    \"refreshToken\": \"zBFnUroOisNc0gVG9eKWMOs5BmsgvQU_QfcSwCKkr5Q\"\n}",
+							"raw": "{\n    \"userId\": \"f1fdefd2-7270-43ba-af33-bc55f6ae18e8\",\n    \"refreshToken\": \"c11W3StRMILOKylqae9g_gPDNOEWqqREUHP5qjnOm4Q\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -766,6 +766,56 @@
 											"key": "page",
 											"value": "0"
 										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Property Members (IN_PROCESS / ACTIVE)",
+					"item": [
+						{
+							"name": "Get All Properties (PROPERTY MEMBER)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/properties",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"property-member",
+										"properties"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Property By ID (PROPERTY MEMBER)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/properties/{{propertyId}}",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"property-member",
+										"properties",
+										"{{propertyId}}"
 									]
 								}
 							},

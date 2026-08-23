@@ -1,0 +1,97 @@
+RENT POLICIES
+
+
+| DESCRIPCION | 
+
+En este apartado se describirá de manera correcta la gestion de politicas
+para cada rol en el sistema, esto permitira un correcto desarrollo de los
+permisos que tendra cada miembro y asi efectuar seguridad e integridad 
+en el ciclo de vida del inmueble.
+
+Cada seccion importante en la aplicacion se desglosará una ciertas politicas
+por recurso el cual se dividira en los siguientes conjuntos: 
+
+- Informacion del inmueble
+- Contratos
+- servicios publicos
+- informaciones legales
+- Servicios prestados dentro del inmueble
+- Invitaciones de miembros en las propiedades
+- finanzas
+- documentos
+- notificaciones
+
+| POLITICAS | 
+
+**Informacion del inmueble**
+VER_INMUEBLE [1]
+EDITAR_INMUEBLE [2]
+ELIMINAR_INMUEBLE [3]
+VER_DOCUMENTOS_INMUEBLE [4]
+SUBIR_DOCUMENTOS_INMUEBLE [5]
+
+**Contratos**
+
+VER_CONTRATOS	Consultar contratos del inmueble [1]
+REGISTRAR_CONTRATOS	Crear/registrar un nuevo contrato [2]
+EDITAR_CONTRATOS	Modificar información de un contrato [3]
+ELIMINAR_CONTRATOS	Eliminar/anular un contrato [4]
+RENOVAR_CONTRATOS	Renovar un contrato existente [5]
+FINALIZAR_CONTRATOS	Dar por terminado un contrato [6]
+SUSPENDER_CONTRATOS	Suspender temporalmente un contrato [7]
+DESCARGAR_CONTRATOS	Descargar documentos del contrato [8]
+VER_DOCUMENTOS_CONTRATO	Consultar documentos asociados [9]
+SUBIR_DOCUMENTOS_CONTRATO	Adjuntar documentos [10]
+ELIMINAR_DOCUMENTOS_CONTRATO	Eliminar documentos [11]
+VER_HISTORIAL_CONTRATO	Consultar modificaciones e historial [12]
+
+**Servicios Publicos**
+
+CONSULTAR_SERVICIOS_PUBLICOS [1]
+REGISTRAR_SERVICIO_PUBLICO [2]
+EDITAR_SERVICIO_PUBLICO [3]
+ELIMINAR_SERVICIO_PUBLICO [4]
+
+CONSULTAR_FACTURAS_SERVICIOS_PUBLICOS [5]
+REGISTRAR_FACTURA_SERVICIO_PUBLICO [6]
+EDITAR_FACTURA_SERVICIO_PUBLICO [7]
+ELIMINAR_FACTURA_SERVICIO_PUBLICO [8]
+
+CONSULTAR_CONSUMOS_SERVICIOS_PUBLICOS [9]
+REGISTRAR_LECTURA_SERVICIO_PUBLICO [10]
+EDITAR_LECTURA_SERVICIO_PUBLICO [11]
+
+CONSULTAR_PAGOS_SERVICIOS_PUBLICOS [12]
+REGISTRAR_PAGO_SERVICIO_PUBLICO [13]
+EDITAR_PAGO_SERVICIO_PUBLICO [14]
+
+DESCARGAR_FACTURAS_SERVICIOS_PUBLICOS [15]
+VER_HISTORIAL_SERVICIOS_PUBLICOS [16]
+
+**Informaciones Legales**
+
+CONSULTAR_INFORMACION_LEGAL [1]
+REGISTRAR_INFORMACION_LEGAL [2]
+EDITAR_INFORMACION_LEGAL [3]
+ELIMINAR_INFORMACION_LEGAL [4]
+CONSULTAR_DOCUMENTOS_LEGALES [5]
+SUBIR_DOCUMENTOS_LEGALES [6]
+DESCARGAR_DOCUMENTOS_LEGALES [7]
+ELIMINAR_DOCUMENTOS_LEGALES [8]
+CONSULTAR_HISTORIAL_LEGAL [9]
+
+**Servicios prestados dentro del inmueble**
+
+
+**Invitaciones de miembros**
+
+CONSULTAR_INVITACIONES_MIEMBROS [1]
+ENVIAR_INVITACION_MIEMBRO [2]
+REENVIAR_INVITACION_MIEMBRO [3]
+CANCELAR_INVITACION_MIEMBRO [4]
+
+**Finanzas**
+
+**Documentos**
+
+**Notificaciones**
