@@ -74,8 +74,9 @@ model PropertyActorRole{
   id String @id
   name String @unique
   description String?
-
+ 
   propertyMemberRoles PropertyMemberRole[]
+  propertyActorRolePolicyStatements PropertyActorRolePolicyStatements[]
 }
 
 //refleja el tipo de servicio publico dentro del inmueble
@@ -288,6 +289,7 @@ model PropertyMember{
   propertyServiceAssignment PropertyServiceAssignment[]
   landlordContracts Contract[] @relation("LandlordContract")
   tenantContracts Contract[] @relation("TenantContract")
+  propertyMemberPoliciesOverride PropertyMemberPoliciesOverride[]
 }
 
 //refleja una tabla intermedia con su respectiva accion dentro del inmueble
@@ -387,4 +389,42 @@ model InvitationLinked{
   expirationTime DateTime @map("expiration_time")
   createAt DateTime @default(now()) @map("create_at")
   updateAt DateTime @updatedAt @map("update_at")
+}
+
+//politicas RENT por cada rol
+
+//modelamiento de una politica
+model PolicyStatement{
+  id String @id @default(uuid())
+  policyName String @map("policy_name")
+  description String 
+  createAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+  propertyActorRolePolicyStatements PropertyActorRolePolicyStatements[]
+  propertyMemberPoliciesOverride PropertyMemberPoliciesOverride[]
+}
+
+//permite vincular cada rol a un conjunto de politicas
+model PropertyActorRolePolicyStatements{
+  id String @id @default(uuid())
+  propertyActorRoleId String @map("property_actor_role_id")
+  policy_statement_id String @map("policy_statement_id")
+  createAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+  propertyActorRole PropertyActorRole @relation(fields: [propertyActorRoleId], references: [id], onDelete: Cascade)
+  policyStatement PolicyStatement @relation(fields: [policy_statement_id], references: [id], onDelete: Cascade)
+}
+
+///permite desactivar o activar politicas si por el caso no quiere que dicho rol tenga todos 
+// los permisos
+model PropertyMemberPoliciesOverride {
+  id String @id @default(uuid())
+  propertyMemberId String @map("property_member_id")
+  policyStatementId String @map("policy_statement_id")
+  active Boolean 
+
+  propertyMember PropertyMember @relation(fields: [propertyMemberId], references: [id], onDelete: Cascade)
+  policyStatement PolicyStatement @relation(fields: [policyStatementId], references: [id], onDelete: Cascade)
 }
