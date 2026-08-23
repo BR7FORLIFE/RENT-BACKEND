@@ -81,9 +81,17 @@ export const getMembersQuerySchema = z.object({
   status: z.enum(['ACTIVE', 'DESACTIVE', 'IN_PROCESS']),
 }); //validar en los param de la peticion
 
+export const propertyMemberStatusFilter = z.object({
+  status: z.enum(['ACTIVE', 'IN_PROCESS']),
+}); //validar en los param de la peticion
+
 export type GetMembersQuery = {
   status: PropertyMemberStatus;
 };
+
+export type PropertyMemberStatusFilter = z.infer<
+  typeof propertyMemberStatusFilter
+>;
 
 //Property members
 export type PropertyMemberType = z.infer<typeof PropertyMemberSchema>;

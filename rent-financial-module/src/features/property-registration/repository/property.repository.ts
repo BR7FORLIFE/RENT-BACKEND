@@ -13,7 +13,10 @@ import type {
   CreateEconomicPropertyInfoType,
   CreateStructurePropertyInfo,
 } from '../dtos/request-dto.js';
-import type { PropertyInfoPersistence } from './repository-types.js';
+import type {
+  PropertyInfoPersistence,
+  PropertyNameAndDescriptionPersistance,
+} from './repository-types.js';
 
 @Injectable()
 export class PropertyRepository {
@@ -207,6 +210,78 @@ export class PropertyRepository {
     };
 
     return transformData;
+  }
+
+  async findAllPartialPropertyInfoByPropertyMemberId(
+    userId: string,
+    status: 'ACTIVE' | 'IN_PROCESS',
+    paginationDto: PaginationType,
+    db: Prisma.TransactionClient = this.prisma,
+  ): Promise<PaginationResponse<PropertyNameAndDescriptionPersistance>> {
+    const { page, limit } = paginationDto;
+    const skip = (paginationDto.page - 1) * paginationDto.limit;
+
+    const [data, total] = await db.$transaction([
+      db.property.findMany({
+        where: {
+          propertyMembers: {
+            some: {
+              userId,
+              status,
+            },
+          },
+        },
+        skip,
+        take: limit,
+        select: {
+          propertyName: true,
+          propertyDescription: true,
+        },
+      }),
+
+      db.property.count({
+        where: {
+          propertyMembers: {
+            some: {
+              userId,
+            },
+          },
+        },
+      }),
+    ]);
+
+    return {
+      data,
+      metadata: {
+        limit: limit,
+        page,
+        hasNextPage: page * limit < total,
+        hasPreviousPage: page > 1,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findPartialPropertyInfoByPropertyMemberId(
+    userId: string,
+    propertyId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.property.findFirst({
+      where: {
+        id: propertyId,
+        propertyMembers: {
+          some: {
+            userId,
+          },
+        },
+      },
+      select: {
+        propertyName: true,
+        propertyDescription: true,
+      },
+    });
   }
 
   async findAssetsResourcesByPropertyId(

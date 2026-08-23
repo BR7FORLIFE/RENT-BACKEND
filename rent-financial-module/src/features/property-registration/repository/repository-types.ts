@@ -63,3 +63,8 @@ export interface PropertyInfoPersistence {
   economicInfoResponse: EconomicInfoPersistence | null;
   structureInfoResponse: StructureInfoPersistence | null;
 }
+
+export interface PropertyNameAndDescriptionPersistance {
+  propertyName: string;
+  propertyDescription: string;
+}
