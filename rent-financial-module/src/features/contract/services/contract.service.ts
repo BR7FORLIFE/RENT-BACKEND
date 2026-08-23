@@ -9,7 +9,6 @@ import {
 import type { ContractType } from '../schemas/contract.schema.js';
 import { GlobalRepository } from '../../global/repository-global.js';
 import { PropertyHelper } from '../../property-registration/services/helpers.service.js';
-import type { PropertyActorRoleType } from '../../property-registration/types.js';
 import {
   contractNotFound,
   propertyWithContractAvalibityException,
@@ -19,7 +18,7 @@ import type {
   PropertyMemberType,
 } from '../../property-registration/schemas/property-registration.schema.js';
 import { PrismaService } from '../../../core/database/prisma.service.js';
-import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../../types/global-types.js';
+import { TYPE_TENANT_ACTOR_ROLES_UUIDS } from '../../../types/global-types.js';
 import type { ContractInfoResponse } from '../dtos/response-dto.js';
 import { PropertyMemberRepository } from '../../property-registration/repository/property-member.repository.js';
 import type { PaginationType } from '../../../shared/pagination/pagination-schemas.js';
@@ -78,31 +77,6 @@ export class ContractService {
       throw new PropertyMemberNotFound(contract.landlordMemberId);
     }
 
-    //verificamos que el propietario o el usuario que registro la vivienda
-    //sea propietario activo del inmueble
-    const actorRoleByLandord = (
-      await this.propertyMemberRepository.findActorRoleByUserId(
-        contract.landlordMemberId,
-      )
-    ).map((role) => role.name as PropertyActorRoleType);
-
-    //esto lanzara una excepcion sino cumple con el actor role
-    this.propertyHelperService.IsActorRole('PROPIETARIO', actorRoleByLandord);
-
-    //verificamos que el arrendatario no tenga el actor role de tenant
-    // pq para cada vivienda hay una sola persona a quien se le hace el contrato
-    const actorRoleByTenant = (
-      await this.propertyMemberRepository.findActorRoleByUserId(
-        contract.tenantMemberId,
-      )
-    ).map((role) => role.name as PropertyActorRoleType);
-
-    this.propertyHelperService.IsActorRole(
-      'ARRENDADO',
-      actorRoleByTenant,
-      false,
-    ); //no puede haber ese rol
-
     const result = await this.prismaClient.$transaction(async (tx) => {
       //registramos el usuario como tenant en la vivienda
       const propertyMember: PropertyMemberType = {
@@ -120,7 +94,7 @@ export class ContractService {
 
       const propertyTenantMemberRole: PropertyMemberRoleType = {
         propertyMemberId: tenantPropertyMemberId,
-        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ARRENDADO,
+        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO,
       };
 
       await this.propertyMemberRepository.savePropertyMemberRole(

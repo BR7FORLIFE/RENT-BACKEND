@@ -4,6 +4,7 @@ import type {
   createInvitationPropertyMemberType,
   PropertyMemberRoleType,
   PropertyMemberStatus,
+  PropertyMemberStatusFilter,
   PropertyMemberType,
 } from '../schemas/property-registration.schema.js';
 import { PropertyRepository } from '../repository/property.repository.js';
@@ -283,5 +284,34 @@ export class PropertyMemberService {
       message:
         'el rol(es) han sido asignados correctamente al miembro de la propiedad',
     };
+  }
+
+  //este metodo permite a todos los miembros obtener sus respectivas propiedades
+  // alas que estan vinculadas en estado ACTIVO o IN_PROCESS pero con informacion
+  //limitada de la propiedad (nombre y descripcion)
+  async getAllPropertiesByPropertyMemberId(
+    userId: string,
+    filter: PropertyMemberStatusFilter,
+    paginationDto: PaginationType,
+  ) {
+    return await this.propertyRepository.findAllPartialPropertyInfoByPropertyMemberId(
+      userId,
+      filter.status,
+      paginationDto,
+    );
+  }
+
+  async getPropertyByPropertyMemberId(userId: string, propertyId: string) {
+    const result =
+      await this.propertyRepository.findPartialPropertyInfoByPropertyMemberId(
+        userId,
+        propertyId,
+      );
+
+    if (!result) {
+      throw new PropertyNotFoundException();
+    }
+
+    return result;
   }
 }

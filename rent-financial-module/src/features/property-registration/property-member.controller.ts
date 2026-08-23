@@ -13,7 +13,9 @@ import { JwtAuthGuard } from '../../core/auth/auth.guard.js';
 import type { AuthRequest } from '../../types/global-types.js';
 import {
   getMembersQuerySchema,
+  propertyMemberStatusFilter,
   type GetMembersQuery,
+  type PropertyMemberStatusFilter,
 } from './schemas/property-registration.schema.js';
 import {
   paginationSchema,
@@ -74,6 +76,37 @@ export class PropertyMemberController {
       propertyMemberId,
       body.propertyId,
       body.roles,
+    );
+  }
+
+  //estos endpoint son importantes ya que sin importar si el miembro
+  // este activo o en proceso pues puede obtener informacion de aquellas
+  //propiedades donde es parte o pretende ser parte, ya que gracias al sistema
+  // de politicas de RENT los mimebros podrán hacer ciertas acciones dentro de
+  // la app
+  @Get('properties')
+  async getAllPropertiesByPropertyMember(
+    @Req() req: AuthRequest,
+    @Query(new ZodValidation(propertyMemberStatusFilter))
+    filter: PropertyMemberStatusFilter,
+    @Query(new ZodValidation(paginationSchema))
+    paginationDto: PaginationType,
+  ) {
+    return await this.propertyMemberService.getAllPropertiesByPropertyMemberId(
+      req.user.userId,
+      filter,
+      paginationDto,
+    );
+  }
+
+  @Get('properties/:propertyId')
+  async getPropertyByPropertyMember(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+  ) {
+    return await this.propertyMemberService.getPropertyByPropertyMemberId(
+      req.user.userId,
+      propertyId,
     );
   }
 }

@@ -25,7 +25,7 @@ import type { Prisma } from '../../../../generated/prisma/client.js';
 import type { PropertyOccupationType, TypePropertyType } from '../types.js';
 import { GlobalRepository } from '../../global/repository-global.js';
 import {
-  TYPE_PROPERTY_ACTOR_ROLE_UUIDS,
+  TYPE_LANDORD_ACTOR_ROLES_UUIDS,
   TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS,
   TYPE_PROPERTY_UUIDS,
 } from '../../../types/global-types.js';
@@ -120,7 +120,7 @@ export class PropertyService {
       //guardamos la informacion del usuario con rol en propertyMemberRole
       const propertyMemberRole: PropertyMemberRoleType = {
         propertyMemberId,
-        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.PROPIETARIO,
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
       };
 
       await this.propertyMemberRepository.savePropertyMemberRole(
