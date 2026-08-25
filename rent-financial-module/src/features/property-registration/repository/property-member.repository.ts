@@ -110,26 +110,6 @@ export class PropertyMemberRepository {
     });
   }
 
-  async findActorRoleByUserId(
-    userId: string,
-    db: Prisma.TransactionClient = this.prisma,
-  ) {
-    return db.propertyActorRole.findMany({
-      where: {
-        propertyMemberRoles: {
-          some: {
-            propertyMember: {
-              userId,
-            },
-          },
-        },
-      },
-      select: {
-        name: true,
-      },
-    });
-  }
-
   //saves
   async savePropertyMember(
     propertyMember: PropertyMemberType,

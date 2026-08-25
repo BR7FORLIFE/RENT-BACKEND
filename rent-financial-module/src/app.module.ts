@@ -6,6 +6,7 @@ import { PrismaModule } from './core/database/prisma.module.js';
 import { ContractModule } from './features/contract/contract.module.js';
 import { GlobalModule } from './features/global/global.module.js';
 import { MicroserviceAuthModule } from './features/microservice-auth/auth-microservice.module.js';
+import { SytemPropertyRoleModule } from './features/system-property-role/system-property-role.module.js';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { MicroserviceAuthModule } from './features/microservice-auth/auth-micros
     ContractModule,
     GlobalModule,
     MicroserviceAuthModule,
+    SytemPropertyRoleModule,
   ],
   providers: [JwtPassport, JwtAuthGuard],
 })

@@ -241,7 +241,11 @@ export class PropertyMemberService {
       throw new PropertyMemberNotFound(propertyMemberId);
     }
 
-    if (optPropertyMember.status != 'IN_PROCESS') {
+    //no se puede añadir un rol a un estado de miembro desactivado
+    if (
+      optPropertyMember.status != 'IN_PROCESS' &&
+      optPropertyMember.status != 'ACTIVE'
+    ) {
       throw new NotAllowedStatusByPropertyMemberException();
     }
 
@@ -271,14 +275,16 @@ export class PropertyMemberService {
         rolesUuids,
         tx,
       );
+    });
 
+    //si el usuario esta el proceso de activacion pues lo activamos de lo contrario no lo hacemos
+    if (optPropertyMember.status === 'IN_PROCESS') {
       //guardamos en la base de datos
       await this.propertyMemberRepository.updatePropertyMemberStatus(
         propertyMember.id,
         'ACTIVE',
-        tx,
       );
-    });
+    }
 
     return {
       message:
