@@ -137,3 +137,16 @@ export const POLICIES_STATEMENTS = {
 
   //politicas referentes a notificaciones
 } as const;
+
+export const POLICIES_STATEMENTS_NAMES = Object.keys(
+  POLICIES_STATEMENTS,
+).reduce(
+  (acc, key) => {
+    acc[key] = key;
+    return acc;
+  },
+  {} as Record<
+    keyof typeof POLICIES_STATEMENTS,
+    keyof typeof POLICIES_STATEMENTS
+  >,
+);

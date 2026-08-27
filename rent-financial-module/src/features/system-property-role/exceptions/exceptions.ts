@@ -22,7 +22,7 @@ export class PropertyActorRoleNotFoundException extends AppException {
 export class NotAllowedStatusByPropertyMemberException extends AppException {
   constructor() {
     super(
-      'El miembro actual necesita estar en un proceso para poder realizar ciertas acciones en la app',
+      'El miembro actual necesita estar en un estado activo para poder realizar ciertas acciones en la app',
       406,
       'NOT_ACCEPTABLE',
     );

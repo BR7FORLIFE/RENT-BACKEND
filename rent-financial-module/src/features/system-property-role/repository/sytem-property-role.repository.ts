@@ -51,6 +51,7 @@ export class SystemPropertyRoleRepository {
     const relations = await db.propertyMemberPoliciesOverride.findMany({
       where: {
         propertyMemberId,
+        active: false,
       },
       select: {
         policyStatement: true,
