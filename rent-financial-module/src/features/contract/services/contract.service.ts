@@ -2,10 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { ContractRepository } from '../repository/contract.repository.js';
 import { PropertyRepository } from '../../property-registration/repository/property.repository.js';
 import type { CreateContractType } from '../dtos/request-dto.js';
-import {
-  PropertyMemberNotFound,
-  PropertyNotFoundException,
-} from '../../property-registration/exceptions/exceptions.js';
 import type { ContractType } from '../schemas/contract.schema.js';
 import { GlobalRepository } from '../../global/repository-global.js';
 import { PropertyHelper } from '../../property-registration/services/helpers.service.js';
@@ -22,6 +18,8 @@ import { TYPE_TENANT_ACTOR_ROLES_UUIDS } from '../../../types/global-types.js';
 import type { ContractInfoResponse } from '../dtos/response-dto.js';
 import { PropertyMemberRepository } from '../../property-registration/repository/property-member.repository.js';
 import type { PaginationType } from '../../../shared/pagination/pagination-schemas.js';
+import { PropertyNotFoundException } from '../../property-registration/exceptions/exceptions.js';
+import { PropertyMemberNotFound } from '../../system-property-role/exceptions/exceptions.js';
 
 // estos dos actores importantes en los contratos son miembros activos
 //dentro de la propiedad

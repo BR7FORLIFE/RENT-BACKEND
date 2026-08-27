@@ -9,10 +9,7 @@ import type {
 } from '../schemas/property-registration.schema.js';
 import { PropertyRepository } from '../repository/property.repository.js';
 import {
-  AssingnmentStatusNotAllowedException,
   InvitationLinkedNotFoundException,
-  NotAllowedStatusByPropertyMemberException,
-  PropertyMemberNotFound,
   PropertyNotFoundException,
 } from '../exceptions/exceptions.js';
 import type {
@@ -31,6 +28,11 @@ import {
 import { GlobalRepository } from '../../global/repository-global.js';
 import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../../types/global-types.js';
 import type { PropertyActorRoleType } from '../types.js';
+import {
+  AssingnmentStatusNotAllowedException,
+  NotAllowedStatusByPropertyMemberException,
+  PropertyMemberNotFound,
+} from '../../system-property-role/exceptions/exceptions.js';
 
 /**
  * De que se encargara este servicio?
