@@ -109,4 +109,15 @@ export class PropertyMemberController {
       propertyId,
     );
   }
+
+  @Get(':propertyId/me')
+  async propertyMemberMe(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+  ) {
+    return this.propertyMemberService.propertyMemberMe(
+      propertyId,
+      req.user.userId,
+    );
+  }
 }

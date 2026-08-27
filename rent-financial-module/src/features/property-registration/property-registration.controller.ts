@@ -122,4 +122,17 @@ export class PropertyRegistrationController {
     const suggestion = await CreateSuggestionByPropertyField(propertyField);
     return suggestion;
   }
+
+  @Get(':propertyId/documentation')
+  async getAllPropertyDocumentation(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+    @Query(new ZodValidation(paginationSchema)) paginationDto: PaginationType,
+  ) {
+    return this.propertyService.getAllDocuments(
+      propertyId,
+      req.user.userId,
+      paginationDto,
+    );
+  }
 }
