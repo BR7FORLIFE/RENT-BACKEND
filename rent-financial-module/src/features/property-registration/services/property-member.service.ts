@@ -27,12 +27,14 @@ import {
 } from './invitation-generation.service.js';
 import { GlobalRepository } from '../../global/repository-global.js';
 import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../../types/global-types.js';
-import type { PropertyActorRoleType } from '../types.js';
+import type { PropertyActorRoleType, PropertyMemberMe } from '../types.js';
 import {
   AssingnmentStatusNotAllowedException,
   NotAllowedStatusByPropertyMemberException,
   PropertyMemberNotFound,
 } from '../../system-property-role/exceptions/exceptions.js';
+import { SystemPropertyRoleRepository } from '../../system-property-role/repository/sytem-property-role.repository.js';
+import { cleanPolicies } from '../../system-property-role/services/system-property.service.js';
 
 /**
  * De que se encargara este servicio?
@@ -61,6 +63,7 @@ export class PropertyMemberService {
 
     private propertyMemberRepository: PropertyMemberRepository,
     private propertyRepository: PropertyRepository,
+    private systemPropertyRepository: SystemPropertyRoleRepository,
     private globalRepository: GlobalRepository,
   ) {}
 
@@ -234,7 +237,7 @@ export class PropertyMemberService {
 
     //existe el miembro en dicha propiedad
     const optPropertyMember =
-      await this.propertyMemberRepository.findPropertyMemberByPropertyMemberIdAndPropertyId(
+      await this.propertyMemberRepository.findPropertyMemberWithRolesByPropertyMemberIdAndPropertyId(
         propertyMemberId,
         propertyId,
       );
@@ -321,5 +324,49 @@ export class PropertyMemberService {
     }
 
     return result;
+  }
+
+  async propertyMemberMe(
+    propertyId: string,
+    userId: string,
+  ): Promise<PropertyMemberMe> {
+    //buscamos si existe un property member vincullado a dicho user Id
+    const optPropertyMember =
+      await this.propertyMemberRepository.findPropertyMemberByUserIdAndPropertyId(
+        userId,
+        propertyId,
+      );
+
+    if (!optPropertyMember) {
+      throw new PropertyMemberNotFound(userId);
+    }
+
+    const result = await this.prismaClient.$transaction(async (tx) => {
+      const policies =
+        await this.systemPropertyRepository.findAllPoliciesByPropertyMemberId(
+          optPropertyMember.id,
+          tx,
+        );
+      const roles =
+        await this.systemPropertyRepository.findActorRolesByPropertyMemberId(
+          optPropertyMember.id,
+          tx,
+        );
+      const overrides =
+        await this.systemPropertyRepository.findOverridePolicyByPropertyMemberId(
+          optPropertyMember.id,
+          tx,
+        );
+
+      return { policies, roles, overrides };
+    });
+
+    return {
+      info: optPropertyMember,
+      roles: result.roles,
+      policies: result.policies
+        ? cleanPolicies(result.policies, result.overrides)
+        : [],
+    };
   }
 }

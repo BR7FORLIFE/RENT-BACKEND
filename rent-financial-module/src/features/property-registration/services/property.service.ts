@@ -28,11 +28,14 @@ import {
   TYPE_LANDORD_ACTOR_ROLES_UUIDS,
   TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS,
   TYPE_PROPERTY_UUIDS,
+  POLICIES_STATEMENTS_NAMES,
 } from '../../../types/global-types.js';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import { PropertyMemberRepository } from '../repository/property-member.repository.js';
 import type { Property } from '../dtos/response-dto.js';
 import { PropertyServiceMapper } from '../repository/mappers/property-mapper.service.js';
+import { PropertyMemberNotFound } from '../../system-property-role/exceptions/exceptions.js';
+import { SystemPropertyService } from '../../system-property-role/services/system-property.service.js';
 
 @Injectable()
 export class PropertyService {
@@ -42,6 +45,7 @@ export class PropertyService {
     private readonly propertyRepository: PropertyRepository,
     private readonly propertyMemberRepository: PropertyMemberRepository,
     private readonly propertyMapper: PropertyServiceMapper,
+    private readonly systemRole: SystemPropertyService,
     private readonly globalRepository: GlobalRepository,
   ) {}
 
@@ -274,4 +278,33 @@ export class PropertyService {
 
   //cambiar el propietario de la vivienda
   //async changeOwnerProperty(oldOwner: string, newOwner: string) {}
+
+  //ver todos los documentos de la propiedad
+  async getAllDocuments(
+    propertyId: string,
+    userId: string,
+    paginationDto: PaginationType,
+  ) {
+    //primero buscamos el property member asociado al userId
+    const optPropertyMember =
+      await this.propertyMemberRepository.findPropertyMemberByUserIdAndPropertyId(
+        userId,
+        propertyId,
+      );
+
+    if (!optPropertyMember) {
+      throw new PropertyMemberNotFound(userId);
+    }
+
+    //para permitir leer documentos del inmueble debe cumplir con una politica en especifico
+    //VER_DOCUMENTOS_INMUEBLE
+    await this.systemRole.CheckPolicies(optPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.VER_DOCUMENTOS_INMUEBLE,
+    ]);
+
+    return this.propertyRepository.findAllAssetsResourcesByPropertyId(
+      propertyId,
+      paginationDto,
+    );
+  }
 }
