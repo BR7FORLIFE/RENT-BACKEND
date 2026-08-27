@@ -1,5 +1,6 @@
 import z from 'zod';
 import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../types/global-types.js';
+import type { PropertyMemberType } from './schemas/property-registration.schema.js';
 
 export const TypeProperty = z.enum([
   'RESIDENCIAL',
@@ -33,4 +34,10 @@ export type PropertyField = 'PropertyName' | 'PropertyDescription';
 export interface IASuggestionPropertyFields {
   name: keyof PropertyField;
   description: string;
+}
+
+export interface PropertyMemberMe {
+  info: PropertyMemberType;
+  roles: string[];
+  policies: string[];
 }

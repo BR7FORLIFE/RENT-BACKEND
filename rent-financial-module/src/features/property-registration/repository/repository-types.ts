@@ -2,7 +2,7 @@ import { Prisma } from '../../../../generated/prisma/client.js';
 import type { TypeStreet } from '../types.js';
 import type { CurrencyType } from '../schemas/property-registration.schema.js';
 
-interface ResourceImagePersistence {
+export interface ResourceImagePersistence {
   id: string;
   assetId: string | null;
   width: number | null;
@@ -65,6 +65,7 @@ export interface PropertyInfoPersistence {
 }
 
 export interface PropertyNameAndDescriptionPersistance {
+  id: string;
   propertyName: string;
   propertyDescription: string;
 }
