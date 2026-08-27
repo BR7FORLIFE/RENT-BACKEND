@@ -16,16 +16,6 @@ export class PropertyNotFoundException extends AppException {
   }
 }
 
-export class PropertyMemberNotFound extends AppException {
-  constructor(memberID: string) {
-    super(
-      `El usuario con ID ${memberID} no se encuentra vinculado al inmueble!`,
-      406,
-      'NOT_ACCEPTABLE',
-    );
-  }
-}
-
 export class PropertyOccupationTypeNotFoundException extends AppException {
   constructor() {
     super(
@@ -43,12 +33,6 @@ export class TypePropertyNotFoundException extends AppException {
       404,
       'NOT_FOUND',
     );
-  }
-}
-
-export class PropertyActorRoleNotFoundException extends AppException {
-  constructor() {
-    super('El rol no se encuentra registrado!', 404, 'NOT_FOUND');
   }
 }
 
@@ -73,27 +57,6 @@ export class InvitationLinkedExpiredException extends AppException {
   constructor() {
     super(
       'La invitacion actual esta expirada, intenta generar uno nuevo',
-      406,
-      'NOT_ACCEPTABLE',
-    );
-  }
-}
-
-//Error de estado de property Member
-
-export class NotAllowedStatusByPropertyMemberException extends AppException {
-  constructor() {
-    super(
-      'El miembro actual necesita estar en un proceso para poder realizar ciertas acciones en la app',
-      406,
-      'NOT_ACCEPTABLE',
-    );
-  }
-}
-export class AssingnmentStatusNotAllowedException extends AppException {
-  constructor() {
-    super(
-      'No se permite asignar los estados actuales dado que el miembro ya los posee',
       406,
       'NOT_ACCEPTABLE',
     );
