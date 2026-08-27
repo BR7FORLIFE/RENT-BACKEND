@@ -16,6 +16,7 @@ import type {
 import type {
   PropertyInfoPersistence,
   PropertyNameAndDescriptionPersistance,
+  ResourceImagePersistence,
 } from './repository-types.js';
 
 @Injectable()
@@ -234,6 +235,7 @@ export class PropertyRepository {
         skip,
         take: limit,
         select: {
+          id: true,
           propertyName: true,
           propertyDescription: true,
         },
@@ -282,6 +284,46 @@ export class PropertyRepository {
         propertyDescription: true,
       },
     });
+  }
+
+  async findAllAssetsResourcesByPropertyId(
+    propertyId: string,
+    paginationDto: PaginationType,
+    db: Prisma.TransactionClient = this.prisma,
+  ): Promise<PaginationResponse<ResourceImagePersistence>> {
+    const { page, limit } = paginationDto;
+    const skip = paginationDto.page - 1 * paginationDto.limit;
+
+    const [data, total] = await db.$transaction([
+      db.propertyResources.findMany({
+        where: {
+          propertyId,
+        },
+        select: {
+          resourcesImage: true,
+        },
+        skip,
+        take: limit,
+      }),
+
+      db.propertyResources.count({
+        where: {
+          propertyId,
+        },
+      }),
+    ]);
+
+    return {
+      data: data.map((data) => data.resourcesImage),
+      metadata: {
+        limit,
+        page,
+        hasNextPage: page * limit < total,
+        hasPreviousPage: page > 1,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findAssetsResourcesByPropertyId(

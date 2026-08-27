@@ -64,6 +64,17 @@ export class PropertyMemberRepository {
     };
   }
 
+  async findPropertyMemberByPropertyMemberId(
+    propertyMemberId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.propertyMember.findFirst({
+      where: {
+        id: propertyMemberId,
+      },
+    });
+  }
+
   async findPropertyMemberByUserIdAndPropertyId(
     userId: string,
     propertyId: string,
@@ -77,7 +88,7 @@ export class PropertyMemberRepository {
     });
   }
 
-  async findPropertyMemberByPropertyMemberIdAndPropertyId(
+  async findPropertyMemberWithRolesByPropertyMemberIdAndPropertyId(
     propertyMemberId: string,
     propertyId: string,
     db: Prisma.TransactionClient = this.prisma,
