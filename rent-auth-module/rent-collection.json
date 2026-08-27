@@ -146,7 +146,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"be2f3e85-69a9-4d78-b9e4-0643e98de703\",\n    \"refreshToken\": \"zBFnUroOisNc0gVG9eKWMOs5BmsgvQU_QfcSwCKkr5Q\"\n}",
+							"raw": "{\n    \"userId\": \"f1fdefd2-7270-43ba-af33-bc55f6ae18e8\",\n    \"refreshToken\": \"c11W3StRMILOKylqae9g_gPDNOEWqqREUHP5qjnOm4Q\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -330,7 +330,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "  {\n    \"propertyType\": \"RESIDENTIAL\",\n    \"propertyOccupationType\": \"VACANT\",\n    \"direction\": {\n      \"latitute\": 10.4365,\n      \"longitud\": -75.5123,\n      \"department\": \"Bolivar\",\n      \"city\": \"Cartagena\",\n      \"neighborhood\": \"La Boquilla\",\n      \"typeStreet\": \"STREET\",\n      \"numberStreet\": 5,\n      \"complement\": \"Al lado del mar\"\n    },\n    \"fmi\": \"060-1234572\",\n    \"predialNumber\": \"130010101000000123456000000004\",\n    \"propertyName\": \"Propiedad en los caracoles\",\n    \"propertyDescription\": \"Este es una propiedad ubicada en los caracoles con 2 cuartos, 1 baño, etc...\",\n    \"structurePropertyInfo\": {\n        \"bedrooms\": 2,\n        \"bathrooms\": 2,\n        \"floors\": 1,\n        \"parkingSpaces\": 0,\n        \"area\": 24.50,\n        \"lotArea\": 35,\n        \"constructionYear\": 2011\n    },\n    \"economicPropertyInfo\": {\n        \"monthlyRent\": 7000000,\n        \"depositAmount\": 300000,\n        \"currency\": \"COP\",\n        \"utilitiesIncluded\": false\n    },\n    \"resourcesImages\": [\n        {\n            \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n            \"width\": 70,\n            \"height\": 35,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-1.png\",\n            \"secureUrl\": \"https://example.com/images/property-1.png\"\n        },\n        {\n            \"assetId\": \"a1d8f1d9-9f8c-4d18-9d90-5b8c9e8d12a4\",\n            \"width\": 1280,\n            \"height\": 720,\n            \"format\": \"jpg\",\n            \"url\": \"http://example.com/images/property-2.jpg\",\n            \"secureUrl\": \"https://example.com/images/property-2.jpg\"\n        },\n        {\n            \"assetId\": \"3c2f6b4e-85d4-47f2-a8d3-94f7c5b8b8e1\",\n            \"width\": 1920,\n            \"height\": 1080,\n            \"format\": \"jpeg\",\n            \"url\": \"http://example.com/images/property-3.jpeg\",\n            \"secureUrl\": \"https://example.com/images/property-3.jpeg\"\n        },\n        {\n            \"assetId\": \"e7a4d5c9-1f26-4d59-bd8d-2d7c5d8a9f61\",\n            \"width\": 800,\n            \"height\": 600,\n            \"format\": \"webp\",\n            \"url\": \"http://example.com/images/property-4.webp\",\n            \"secureUrl\": \"https://example.com/images/property-4.webp\"\n        },\n        {\n            \"assetId\": \"5b9f6d0a-c9e2-4a5b-8f0f-3b7d1c9e2f44\",\n            \"width\": 1024,\n            \"height\": 768,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-5.png\",\n            \"secureUrl\": \"https://example.com/images/property-5.png\"\n        }\n    ]\n  }",
+									"raw": "  {\n    \"propertyType\": \"RESIDENCIAL\",\n    \"propertyOccupationType\": \"DESOCUPADO\",\n    \"direction\": {\n      \"latitute\": 10.4365,\n      \"longitud\": -75.5123,\n      \"department\": \"Bolivar\",\n      \"city\": \"Cartagena\",\n      \"neighborhood\": \"La Boquilla\",\n      \"typeStreet\": \"CALLE\",\n      \"numberStreet\": 5,\n      \"complement\": \"Al lado del mar\"\n    },\n    \"fmi\": \"060-1234572\",\n    \"predialNumber\": \"130010101000000123456000000004\",\n    \"propertyName\": \"Propiedad en los caracoles\",\n    \"propertyDescription\": \"Este es una propiedad ubicada en los caracoles con 2 cuartos, 1 baño, etc...\",\n    \"structurePropertyInfo\": {\n        \"bedrooms\": 2,\n        \"bathrooms\": 2,\n        \"floors\": 1,\n        \"parkingSpaces\": 0,\n        \"area\": 24.50,\n        \"lotArea\": 35,\n        \"constructionYear\": 2011\n    },\n    \"economicPropertyInfo\": {\n        \"monthlyRent\": 7000000,\n        \"depositAmount\": 300000,\n        \"currency\": \"COP\",\n        \"utilitiesIncluded\": false\n    },\n    \"resourcesImages\": [\n        {\n            \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n            \"width\": 70,\n            \"height\": 35,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-1.png\",\n            \"secureUrl\": \"https://example.com/images/property-1.png\"\n        },\n        {\n            \"assetId\": \"a1d8f1d9-9f8c-4d18-9d90-5b8c9e8d12a4\",\n            \"width\": 1280,\n            \"height\": 720,\n            \"format\": \"jpg\",\n            \"url\": \"http://example.com/images/property-2.jpg\",\n            \"secureUrl\": \"https://example.com/images/property-2.jpg\"\n        },\n        {\n            \"assetId\": \"3c2f6b4e-85d4-47f2-a8d3-94f7c5b8b8e1\",\n            \"width\": 1920,\n            \"height\": 1080,\n            \"format\": \"jpeg\",\n            \"url\": \"http://example.com/images/property-3.jpeg\",\n            \"secureUrl\": \"https://example.com/images/property-3.jpeg\"\n        },\n        {\n            \"assetId\": \"e7a4d5c9-1f26-4d59-bd8d-2d7c5d8a9f61\",\n            \"width\": 800,\n            \"height\": 600,\n            \"format\": \"webp\",\n            \"url\": \"http://example.com/images/property-4.webp\",\n            \"secureUrl\": \"https://example.com/images/property-4.webp\"\n        },\n        {\n            \"assetId\": \"5b9f6d0a-c9e2-4a5b-8f0f-3b7d1c9e2f44\",\n            \"width\": 1024,\n            \"height\": 768,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-5.png\",\n            \"secureUrl\": \"https://example.com/images/property-5.png\"\n        }\n    ]\n  }",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -523,7 +523,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"userId\": \"4c9919b4-4d5c-4824-b8c2-589c8bcf76c4\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"propertyId\": \"a743c7a2-46a7-4b69-8b9c-d5b90c1fb062\"\n}",
+									"raw": "{\n    \"userId\": \"41eba6c8-954c-443a-973e-0b9991c45f56\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"propertyId\": \"d283be3e-b22e-42f5-b56d-f26e18813cff\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -766,6 +766,138 @@
 											"key": "page",
 											"value": "0"
 										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Property Members (IN_PROCESS / ACTIVE)",
+					"item": [
+						{
+							"name": "Get All Properties (PROPERTY MEMBER)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/properties?status=IN_PROCESS",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"property-member",
+										"properties"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "IN_PROCESS"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Property By ID (PROPERTY MEMBER)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/properties/{{propertyId}}",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"property-member",
+										"properties",
+										"{{propertyId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Property Documents By Property ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property/{{propertyId}}/documentation",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"property",
+										"{{propertyId}}",
+										"documentation"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Property Member /ME",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/{{propertyId}}/me",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"property-member",
+										"{{propertyId}}",
+										"me"
 									]
 								}
 							},
