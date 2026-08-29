@@ -24,16 +24,16 @@ por recurso el cual se dividira en los siguientes conjuntos:
 | POLITICAS | 
 
 **Informacion del inmueble**
-VER_INMUEBLE [1]
-EDITAR_INMUEBLE [2]
-ELIMINAR_INMUEBLE [3]
-VER_DOCUMENTOS_INMUEBLE [4]
-SUBIR_DOCUMENTOS_INMUEBLE [5]
+VER_INMUEBLE [1] [HECHO]
+EDITAR_INMUEBLE [2] [HECHO]
+ELIMINAR_INMUEBLE [3] 
+VER_DOCUMENTOS_INMUEBLE [4] [HECHO]
+SUBIR_DOCUMENTOS_INMUEBLE [5] [HECHO]
 
 **Contratos**
 
-VER_CONTRATOS	Consultar contratos del inmueble [1]
-REGISTRAR_CONTRATOS	Crear/registrar un nuevo contrato [2]
+VER_CONTRATOS	Consultar contratos del inmueble [1] [HECHO]
+REGISTRAR_CONTRATOS	Crear/registrar un nuevo contrato [2] [HECHO]
 EDITAR_CONTRATOS	Modificar información de un contrato [3]
 ELIMINAR_CONTRATOS	Eliminar/anular un contrato [4]
 RENOVAR_CONTRATOS	Renovar un contrato existente [5]
