@@ -140,7 +140,12 @@ async function main() {
         description:
           'Persona que respalda las obligaciones económicas o contractuales asumidas por otro actor.',
       },
-
+      {
+        id: TYPE_TENANT_ACTOR_ROLES_UUIDS.PRELIMINARY_TENANT,
+        name: 'ARRENDADO_PRELIMINAR',
+        description:
+          'Persona que aun no ha firmado contrato de arrendamiento y esta a la espera de firmar o por su parte rechazar el inmueble',
+      },
       {
         id: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
         name: 'PROPIETARIO',
@@ -573,6 +578,15 @@ async function main() {
           POLICIES_STATEMENTS.VER_HISTORIAL_SERVICIOS_PUBLICOS,
       },
 
+      //politicas para el rol ARRENDADO_PRELIMINAR
+      {
+        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.PRELIMINARY_TENANT,
+        policy_statement_id: POLICIES_STATEMENTS.VER_INMUEBLE,
+      },
+      {
+        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.PRELIMINARY_TENANT,
+        policy_statement_id: POLICIES_STATEMENTS.VER_CONTRATOS,
+      },
       //politicas para el rol MIEMBRO (las personas que se invitan y aceptan)
       // y estan a la espera de un en especifico
       {
