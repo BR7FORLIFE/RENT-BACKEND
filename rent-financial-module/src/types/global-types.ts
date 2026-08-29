@@ -57,6 +57,7 @@ export const TYPE_TENANT_ACTOR_ROLES_UUIDS = {
   FIADOR: 'b62d9f15-84a3-4c71-a058-e7f326d9145b',
   CODEUDOR: 'd48f7a26-1c93-4e05-b682-9a51f3c7048d',
   AVALISTA: 'f35c8e72-6a14-4b90-957d-c21e6843a0f6',
+  PRELIMINARY_TENANT: '6345e9bb-b371-4e41-a808-b14c1bd870bf',
 } as const;
 
 //roles importantes de dueños de propiedades

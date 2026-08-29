@@ -101,4 +101,19 @@ export class SystemPropertyService {
       throw new NotAllowedStatusByPropertyMemberException();
     }
   }
+
+  async verifyPropertyMemberInPropertyId(userId: string, propertyId: string) {
+    const optPropertyMember = await this.prisma.propertyMember.findFirst({
+      where: {
+        userId,
+        propertyId,
+      },
+    });
+
+    if (!optPropertyMember) {
+      throw new PropertyMemberNotFound(userId);
+    }
+
+    return optPropertyMember;
+  }
 }
