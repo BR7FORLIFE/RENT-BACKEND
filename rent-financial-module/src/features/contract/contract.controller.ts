@@ -46,9 +46,17 @@ export class ContractController {
     };
   }
 
-  @Get(':id')
-  async findContractById(@Req() req: AuthRequest, @Param('id') id: string) {
-    const data = this.service.getContractbyId(req.user.userId, id);
+  @Get(':contractId/property/:propertyId')
+  async findContractById(
+    @Req() req: AuthRequest,
+    @Param('contractId') contractId: string,
+    @Param('propertyId') propertyId: string,
+  ) {
+    const data = this.service.getContractbyId(
+      req.user.userId,
+      propertyId,
+      contractId,
+    );
     return data;
   }
 

@@ -9,17 +9,17 @@ import {
   contractNotFound,
   propertyWithContractAvalibityException,
 } from '../exceptions/exceptions.js';
-import type {
-  PropertyMemberRoleType,
-  PropertyMemberType,
-} from '../../property-registration/schemas/property-registration.schema.js';
+import type { PropertyMemberRoleType } from '../../property-registration/schemas/property-registration.schema.js';
 import { PrismaService } from '../../../core/database/prisma.service.js';
-import { TYPE_TENANT_ACTOR_ROLES_UUIDS } from '../../../types/global-types.js';
+import {
+  POLICIES_STATEMENTS_NAMES,
+  TYPE_TENANT_ACTOR_ROLES_UUIDS,
+} from '../../../types/global-types.js';
 import type { ContractInfoResponse } from '../dtos/response-dto.js';
 import { PropertyMemberRepository } from '../../property-registration/repository/property-member.repository.js';
 import type { PaginationType } from '../../../shared/pagination/pagination-schemas.js';
 import { PropertyNotFoundException } from '../../property-registration/exceptions/exceptions.js';
-import { PropertyMemberNotFound } from '../../system-property-role/exceptions/exceptions.js';
+import type { SystemPropertyService } from '../../system-property-role/services/system-property.service.js';
 
 // estos dos actores importantes en los contratos son miembros activos
 //dentro de la propiedad
@@ -35,6 +35,7 @@ export class ContractService {
     private readonly propertyRepository: PropertyRepository,
     private readonly propertyMemberRepository: PropertyMemberRepository,
     private readonly propertyHelperService: PropertyHelper,
+    private readonly systemRole: SystemPropertyService,
     private readonly globalRepository: GlobalRepository,
   ) {}
 
@@ -66,33 +67,23 @@ export class ContractService {
     //validamos si los miembros pertenecen a dicho inmueble menos la persona interesada en la casa
     // ya que hará parte del inmueble si esta en un estado PENDING o EXECUTION
     const landordPropertyMember =
-      await this.propertyMemberRepository.findPropertyMemberByUserIdAndPropertyId(
+      await this.systemRole.verifyPropertyMemberInPropertyId(
         contract.landlordMemberId,
         optProperty.id,
       );
 
-    if (!landordPropertyMember) {
-      throw new PropertyMemberNotFound(contract.landlordMemberId);
-    }
+    const tenantPropertyMember =
+      await this.systemRole.verifyPropertyMemberInPropertyId(
+        contract.tenantMemberId,
+        optProperty.id,
+      );
 
     const result = await this.prismaClient.$transaction(async (tx) => {
-      //registramos el usuario como tenant en la vivienda
-      const propertyMember: PropertyMemberType = {
-        userId: contract.tenantMemberId,
-        assignedBy: userId,
-        propertyId: contract.propertyId,
-        status: 'ACTIVE',
-      };
-
-      const { id: tenantPropertyMemberId } =
-        await this.propertyMemberRepository.savePropertyMember(
-          propertyMember,
-          tx,
-        );
-
+      //asignamos el rol ARRENDADO al arrendado y asi obtener ciertas acciones dentro de
+      //dicha propiedad
       const propertyTenantMemberRole: PropertyMemberRoleType = {
-        propertyMemberId: tenantPropertyMemberId,
-        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO,
+        propertyMemberId: tenantPropertyMember.id,
+        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.PRELIMINARY_TENANT,
       };
 
       await this.propertyMemberRepository.savePropertyMemberRole(
@@ -111,7 +102,7 @@ export class ContractService {
         startDate: contract.startDate,
         status: 'DRAFT',
         // si cambia el estado a PENDING o EXECUTION puede ser miembro activo del inmueble
-        tenantMemberId: tenantPropertyMemberId,
+        tenantMemberId: tenantPropertyMember.id,
       };
 
       const { id: contractId } = await this.contractRepository.saveContract(
@@ -130,11 +121,25 @@ export class ContractService {
   }
 
   async getContractbyId(
-    propertyMemberId: string,
+    userId: string,
+    propertyId: string,
     contractId: string,
   ): Promise<ContractInfoResponse> {
-    const data = await this.contractRepository.findContractById(
-      propertyMemberId,
+    //vemos si la persona actual es miembro de la propiedad
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberInPropertyId(
+        userId,
+        propertyId,
+      );
+
+    //verificamos que dicho miembro tenga la politica de VER_CONTRATOS para
+    // asi tener la informacion del contrato que quiere revisar
+    await this.systemRole.CheckPolicies(optPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.VER_CONTRATOS,
+    ]);
+
+    const data = await this.contractRepository.findContractByIdAndPropertyId(
+      propertyId,
       contractId,
     );
 
@@ -150,19 +155,25 @@ export class ContractService {
     propertyId: string,
     paginationDto: PaginationType,
   ) {
-    //validamos que dicho usuario es el dueño de la propiedad
-    const optProperty = await this.propertyRepository.findPropertyById(
-      userId,
-      propertyId,
-    );
+    //validamos si es miembro de la propiedad actual
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberInPropertyId(
+        userId,
+        propertyId,
+      );
 
-    if (!optProperty) {
-      throw new PropertyNotFoundException();
-    }
+    //validamos que tenga las politicas de ver contratos
+    await this.systemRole.CheckPolicies(optPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.VER_CONTRATOS,
+    ]);
 
     return await this.contractRepository.findAllContractByPropertyId(
       propertyId,
       paginationDto,
     );
   }
+
+  // async editContract(userId: string, contractId: string) {}
+
+  async generateIAContractContent() {}
 }
