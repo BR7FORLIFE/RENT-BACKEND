@@ -247,10 +247,7 @@ export class PropertyMemberService {
     }
 
     //no se puede añadir un rol a un estado de miembro desactivado
-    if (
-      optPropertyMember.status != 'IN_PROCESS' &&
-      optPropertyMember.status != 'ACTIVE'
-    ) {
+    if (!['IN_PROCESS', 'ACTIVE'].includes(optPropertyMember.status)) {
       throw new NotAllowedStatusByPropertyMemberException();
     }
 

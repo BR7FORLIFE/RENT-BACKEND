@@ -429,4 +429,32 @@ export class PropertyRepository {
       }
     });
   }
+
+  async saveAssetsResourcesByPropertyId(
+    propertyId: string,
+    resources: ResourceImageType[],
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    const createdResources = await Promise.all(
+      resources.map((resource) =>
+        db.resourceImages.create({
+          data: {
+            assetId: resource.assetId,
+            url: resource.url,
+            width: resource.width,
+            height: resource.height,
+            format: resource.format,
+            secureUrl: resource.secureUrl,
+          },
+        }),
+      ),
+    );
+
+    await db.propertyResources.createMany({
+      data: createdResources.map((resource) => ({
+        propertyId,
+        resourceId: resource.id,
+      })),
+    });
+  }
 }

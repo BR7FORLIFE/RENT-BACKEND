@@ -307,4 +307,36 @@ export class PropertyService {
       paginationDto,
     );
   }
+
+  async loadDocuments(
+    propertyId: string,
+    userId: string,
+    documents: createResourceImageType[],
+  ): Promise<{ propertyId: string; message: string }> {
+    const optPropertyMember =
+      await this.propertyMemberRepository.findPropertyMemberByUserIdAndPropertyId(
+        userId,
+        propertyId,
+      );
+
+    if (!optPropertyMember) {
+      throw new PropertyMemberNotFound(userId);
+    }
+
+    //checkeamos que el miembro actual tenga las politicas de subir documento
+    await this.systemRole.CheckPolicies(optPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.SUBIR_DOCUMENTOS_CONTRATO,
+    ]);
+
+    //guardamos los recursos para la propiedad
+    await this.propertyRepository.saveAssetsResourcesByPropertyId(
+      propertyId,
+      documents,
+    );
+
+    return {
+      propertyId: optPropertyMember.propertyId,
+      message: 'recursos cargados exitosamente!',
+    };
+  }
 }
