@@ -213,6 +213,62 @@ export class PropertyRepository {
     return transformData;
   }
 
+  async findPropertyByIdAndPropertyMemberId(
+    propertyMemberId: string,
+    id: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    const data = await db.propertyMember.findFirst({
+      where: { id: propertyMemberId, propertyId: id },
+      select: {
+        property: {
+          select: {
+            id: true,
+            createAt: true,
+            fmi: true,
+            predialNumber: true,
+            isPublished: true,
+            propertyName: true,
+            propertyDescription: true,
+            typeProperty: true,
+            propertyOccupationType: true,
+            propertyResources: {
+              select: {
+                resourcesImage: true,
+              },
+            },
+            economicPropertyInformation: true,
+            propertyStructureDescription: true,
+
+            direction: true,
+          },
+        },
+      },
+    });
+
+    if (!data) return null;
+
+    const transformData: PropertyInfoPersistence = {
+      id: data.property.id,
+      createAt: data.property.createAt,
+      fmi: data.property.fmi,
+      predialNumber: data.property.predialNumber,
+      isPublished: data.property.isPublished,
+      propertyName: data.property.propertyName,
+      propertyDescription: data.property.propertyDescription,
+      direction: data.property.direction,
+      typeProperty: data.property.typeProperty.name,
+      propertyOccupationType: data.property.propertyOccupationType.name,
+      resourceImages: data.property.propertyResources.map(
+        (resources) => resources.resourcesImage,
+      ),
+      economicInfoResponse: data.property.economicPropertyInformation,
+      structureInfoResponse: data.property.propertyStructureDescription,
+    };
+
+    return transformData;
+  }
+
   async findAllPartialPropertyInfoByPropertyMemberId(
     userId: string,
     status: 'ACTIVE' | 'IN_PROCESS',
@@ -393,14 +449,12 @@ export class PropertyRepository {
   //update functions
   async updateProperty(
     id: string,
-    userId: string,
     data: Prisma.PropertyUpdateInput,
     db: Prisma.TransactionClient = this.prisma,
   ) {
     return await db.property.update({
       where: {
         id,
-        userId,
       },
       data,
     });

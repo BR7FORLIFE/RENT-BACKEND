@@ -23,6 +23,7 @@ export class PropertyMemberRepository {
     paginationDto: PaginationType,
   ): Promise<
     PaginationResponse<{
+      id: string;
       userId: string;
       status: PropertyMemberStatus;
       assignedAt: Date;
@@ -40,6 +41,7 @@ export class PropertyMemberRepository {
         skip,
         take: limit,
         select: {
+          id: true,
           userId: true,
           status: true,
           assignedAt: true,
