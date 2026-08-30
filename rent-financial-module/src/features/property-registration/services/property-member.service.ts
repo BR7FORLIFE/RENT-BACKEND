@@ -84,7 +84,7 @@ export class PropertyMemberService {
     status: PropertyMemberStatus,
     paginationDto: PaginationType,
   ): Promise<PaginationResponse<GetAllUserData>> {
-    //verificamos que dicho inmueble sea de dicho propitario
+    //verificamos que dicho inmueble sea de dicho propietario
     const optOwnerProperty = await this.propertyRepository.findPropertyById(
       ownerUserPropertyId,
       propertyId,

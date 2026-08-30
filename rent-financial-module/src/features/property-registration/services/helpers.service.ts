@@ -99,6 +99,7 @@ export function validateInvitationLinked(
 //union user info (AUTH RENT / FINANCIAL RENT)
 export function unionInfoUser(
   part1: {
+    id: string;
     userId: string;
     status: PropertyMemberStatus;
     assignedAt: Date;
