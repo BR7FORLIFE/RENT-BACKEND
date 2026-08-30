@@ -1,6 +1,14 @@
 import { Prisma } from '../../../../generated/prisma/client.js';
 
-type StatusContractType = 'DRAFT' | 'PENDING' | 'EXECUTION' | 'DEFEATED';
+type StatusContractType =
+  | 'DRAFT'
+  | 'PENDING_ACCEPTANCE'
+  | 'PENDING_DOCUMENTATION'
+  | 'ACTIVE'
+  | 'REJECTED'
+  | 'CANCELLED'
+  | 'SUSPENDED'
+  | 'FINISHED';
 
 export interface ContractInfoResponse {
   id: string;

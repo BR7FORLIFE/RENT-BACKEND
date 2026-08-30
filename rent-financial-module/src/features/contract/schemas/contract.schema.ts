@@ -1,10 +1,14 @@
 import z from 'zod';
 
 export const StatusContractEnum = z.enum([
-  'DRAFT', // borrador (fase de creación de contrato)
-  'PENDING', //pendiente (el documento esta a la espera de firma)
-  'EXECUTION', // ejecucion (el contrato sigue vigente y activo)
-  'DEFEATED', // vencido (el contrato llega a su finalizacion)
+  'DRAFT',
+  'PENDING_ACCEPTANCE',
+  'PENDING_DOCUMENTATION',
+  'ACTIVE',
+  'REJECTED',
+  'CANCELLED',
+  'SUSPENDED',
+  'FINISHED',
 ]);
 
 export type StatusContractType = z.infer<typeof StatusContractEnum>;

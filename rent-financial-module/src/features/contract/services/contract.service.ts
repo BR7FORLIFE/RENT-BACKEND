@@ -11,6 +11,7 @@ import {
 } from '../exceptions/exceptions.js';
 import type { PropertyMemberRoleType } from '../../property-registration/schemas/property-registration.schema.js';
 import { PrismaService } from '../../../core/database/prisma.service.js';
+import { SystemPropertyService } from '../../system-property-role/services/system-property.service.js';
 import {
   POLICIES_STATEMENTS_NAMES,
   TYPE_TENANT_ACTOR_ROLES_UUIDS,
@@ -19,7 +20,7 @@ import type { ContractInfoResponse } from '../dtos/response-dto.js';
 import { PropertyMemberRepository } from '../../property-registration/repository/property-member.repository.js';
 import type { PaginationType } from '../../../shared/pagination/pagination-schemas.js';
 import { PropertyNotFoundException } from '../../property-registration/exceptions/exceptions.js';
-import type { SystemPropertyService } from '../../system-property-role/services/system-property.service.js';
+import type { NotificationType } from '../../global/global.schema.js';
 
 // estos dos actores importantes en los contratos son miembros activos
 //dentro de la propiedad
@@ -43,11 +44,24 @@ export class ContractService {
     userId: string,
     contract: CreateContractType,
   ): Promise<{ id: string; message: string }> {
-    //verficamos que la propiedad exista! por el creador o propietario
-    const optProperty = await this.propertyRepository.findPropertyById(
-      userId,
-      contract.propertyId,
-    );
+    //buscamos el property member quien quiere realizar la accion de crear el contrato
+    const optLandordPropertyMember =
+      await this.systemRole.verifyPropertyMemberInPropertyId(
+        userId,
+        contract.propertyId,
+      );
+
+    //verificamos que la persona quien vaya a crear el contrato tenga la politica para crearlo
+    await this.systemRole.CheckPolicies(optLandordPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.REGISTRAR_CONTRATOS,
+    ]);
+
+    //verficamos que la propiedad exista!
+    const optProperty =
+      await this.propertyRepository.findPropertyByIdAndPropertyMemberId(
+        contract.propertyId,
+        optLandordPropertyMember.id,
+      );
 
     if (!optProperty) {
       throw new PropertyNotFoundException();
@@ -55,7 +69,7 @@ export class ContractService {
     //verificamos que no tenga un contrato activo de arrendamiento la vivienda
     const iscurrentContract =
       await this.contractRepository.findContractByStatusContractAndPropertyId(
-        'EXECUTION',
+        'ACTIVE',
         optProperty.id,
       );
 
@@ -64,14 +78,7 @@ export class ContractService {
       throw new propertyWithContractAvalibityException();
     }
 
-    //validamos si los miembros pertenecen a dicho inmueble menos la persona interesada en la casa
-    // ya que hará parte del inmueble si esta en un estado PENDING o EXECUTION
-    const landordPropertyMember =
-      await this.systemRole.verifyPropertyMemberInPropertyId(
-        contract.landlordMemberId,
-        optProperty.id,
-      );
-
+    //validamos si el posible arrendado pertenecen a dicho inmueble
     const tenantPropertyMember =
       await this.systemRole.verifyPropertyMemberInPropertyId(
         contract.tenantMemberId,
@@ -96,7 +103,7 @@ export class ContractService {
         createByUserId: userId,
         depositAmount: contract.depositAmount,
         endDate: contract.endDate,
-        landlordMemberId: landordPropertyMember.id,
+        landlordMemberId: optLandordPropertyMember.id,
         monthlyRent: contract.monthlyRent,
         propertyId: optProperty.id,
         startDate: contract.startDate,
@@ -110,6 +117,20 @@ export class ContractService {
         contract.resourcesImage,
         tx,
       );
+      //enviamos la notificacion al posible arrendado para que se entere y decida
+      // si rechazar o aceptar que se continue el proceso de contratamiento
+
+      const notificationTenantInfo: NotificationType = {
+        content:
+          'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
+        name: 'CREACIÓN DE CONTRATO EN VIGENCIA!',
+        transmitterId: userId,
+        receiverId: optLandordPropertyMember.id,
+        source: 'CONTRACT_SERVICE',
+        type: 'INFO',
+      };
+
+      await this.globalRepository.saveNotification(notificationTenantInfo, tx);
 
       return { contractId };
     });
