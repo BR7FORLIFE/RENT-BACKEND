@@ -34,7 +34,6 @@ import { PrismaService } from '../../../core/database/prisma.service.js';
 import { PropertyMemberRepository } from '../repository/property-member.repository.js';
 import type { Property } from '../dtos/response-dto.js';
 import { PropertyServiceMapper } from '../repository/mappers/property-mapper.service.js';
-import { PropertyMemberNotFound } from '../../system-property-role/exceptions/exceptions.js';
 import { SystemPropertyService } from '../../system-property-role/services/system-property.service.js';
 
 @Injectable()
@@ -171,11 +170,24 @@ export class PropertyService {
     propertyId: string,
     partialProperty: EditingPropertyType,
   ): Promise<{ id: string; message: string }> {
+    //buscamos el property member para saber si esta vinculado a dicha propiedad
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberInPropertyId(
+        userId,
+        propertyId,
+      );
+
+    //verifcamos si tiene la politica para editar el inmueble
+    await this.systemRole.CheckPolicies(optPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.EDITAR_INMUEBLE,
+    ]);
+
     //verificamos que exista dicha propiedad
-    const property = await this.propertyRepository.findPropertyById(
-      userId,
-      propertyId,
-    );
+    const property =
+      await this.propertyRepository.findPropertyByIdAndPropertyMemberId(
+        optPropertyMember.id,
+        propertyId,
+      );
 
     if (!property) {
       throw new PropertyNotFoundException();
@@ -269,7 +281,6 @@ export class PropertyService {
 
     const result = await this.propertyRepository.updateProperty(
       propertyId,
-      userId,
       data,
     );
 
@@ -287,14 +298,10 @@ export class PropertyService {
   ) {
     //primero buscamos el property member asociado al userId
     const optPropertyMember =
-      await this.propertyMemberRepository.findPropertyMemberByUserIdAndPropertyId(
+      await this.systemRole.verifyPropertyMemberInPropertyId(
         userId,
         propertyId,
       );
-
-    if (!optPropertyMember) {
-      throw new PropertyMemberNotFound(userId);
-    }
 
     //para permitir leer documentos del inmueble debe cumplir con una politica en especifico
     //VER_DOCUMENTOS_INMUEBLE
@@ -314,14 +321,10 @@ export class PropertyService {
     documents: createResourceImageType[],
   ): Promise<{ propertyId: string; message: string }> {
     const optPropertyMember =
-      await this.propertyMemberRepository.findPropertyMemberByUserIdAndPropertyId(
+      await this.systemRole.verifyPropertyMemberInPropertyId(
         userId,
         propertyId,
       );
-
-    if (!optPropertyMember) {
-      throw new PropertyMemberNotFound(userId);
-    }
 
     //checkeamos que el miembro actual tenga las politicas de subir documento
     await this.systemRole.CheckPolicies(optPropertyMember.id, [
