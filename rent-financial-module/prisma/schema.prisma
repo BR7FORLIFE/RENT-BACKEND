@@ -12,11 +12,22 @@ datasource db {
   provider = "postgresql"
 }
 
+enum NotificationType{
+  WARNING 
+  INFO 
+  ERROR 
+  DEBUG
+}
+
 enum StatusContract{
   DRAFT // borrador (fase de creación de contrato) 
-  PENDING // pendiente (el documento esta a la espera de firma)
-  EXECUTION // ejecucion (el contrato sigue vigente y activo)
-  DEFEATED // vencido (el contrato llega a su finalizacion)
+  PENDING_ACCEPTANCE // este estado permite que el posible arrendador acepte o no los terminos del borrador del contrato
+  PENDING_DOCUMENTATION // si acepta dicho usuario quedará pendiente la documentacion de dicho contrato
+  ACTIVE // contrato esta activo y vigente
+  REJECTED // el posible arrendado rechazo la solicitud de contrato
+  CANCELLED //cualquier otro proceso que el arrendador o arrendatario haya rechazado entonces el contrato no tiene validez
+  SUSPENDED // contrato en estado de suspension, solo el arrendador puede asignar este estado
+  FINISHED //contrato ya expirado o cumplido
 }
 
 enum TypeStreet{
@@ -427,4 +438,20 @@ model PropertyMemberPoliciesOverride {
 
   propertyMember PropertyMember @relation(fields: [propertyMemberId], references: [id], onDelete: Cascade)
   policyStatement PolicyStatement @relation(fields: [policyStatementId], references: [id], onDelete: Cascade)
+}
+
+//tabla de notificaciones
+//esto permitira añadir un sistemas de notificaciones global dentro de la aplicacion para enviar
+//cualquier informacion relevante dentro del sistema
+model Notifications {
+  id String @id @default(uuid())
+  transmitterId String @map("transmitter_id") //quien emitio el mensaje o el emisor de la notificacion
+  receiverId String @map("receiver_map") //el receptor del mensaje
+  source String //que servicio dentro de la aplicacion emitió dicha notificacion (Contract-service), (property-registration)
+  type NotificationType @default(INFO) //tipo de notificacion que se envia
+  name String //nombre o titulo de la notificacion
+  content String //contenido de la notificacion
+  readAt DateTime? @map("read_at") //fecha la cual el receptor leyó la notificacion
+  createAt DateTime @map("create_at") @default(now())
+  updateAt DateTime @updatedAt @map("update_at")
 }
