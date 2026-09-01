@@ -58,7 +58,7 @@ export interface Property {
   direction: Direction | null;
   typeProperty: string;
   propertyOccupationType: string;
-  resourcesImages: ResourcesImages[];
+  resources: ResourcesImages[];
   economicInfoResponse: Economic | null;
   structureInfoResponse: Structure | null;
 }

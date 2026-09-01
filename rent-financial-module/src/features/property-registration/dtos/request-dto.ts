@@ -2,20 +2,7 @@ import z from 'zod';
 import { PropertyOccupation, Street, TypeProperty } from '../types.js';
 import { currencyStatus } from '../schemas/property-registration.schema.js';
 import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../../types/global-types.js';
-
-//resources images dtos
-export const createResourceImageDtoRequest = z.object({
-  assetId: z.string().optional(),
-  width: z.int().optional(),
-  height: z.int().optional(),
-  format: z.string().optional(),
-  url: z.string(),
-  secureUrl: z.string().optional(),
-});
-
-export type createResourceImageType = z.infer<
-  typeof createResourceImageDtoRequest
->;
+import { createResourceImageDtoRequest } from '../../global/global.schema-dtos.js';
 
 //direction dto
 export const createDirectionDtoRequest = z.object({
@@ -67,7 +54,7 @@ export const createPropertyDtoRequest = z.object({
   propertyDescription: z.string(),
   fmi: z.string(),
   predialNumber: z.string(),
-  resourcesImages: z.array(createResourceImageDtoRequest),
+  resources: z.array(createResourceImageDtoRequest),
 
   structurePropertyInfo: createStructurePropertyInfo,
   economicPropertyInfo: createEconomicPropertyInfo,
@@ -82,7 +69,7 @@ export const EditingPropertyDtoRequest = z.object({
   propertyOccupationType: PropertyOccupation.optional(),
   propertyDescription: z.string().optional(),
   direction: createDirectionDtoRequest.optional(),
-  resourcesImages: z.array(createResourceImageDtoRequest).optional(),
+  resources: z.array(createResourceImageDtoRequest).optional(),
 });
 
 export type EditingPropertyType = z.infer<typeof EditingPropertyDtoRequest>;
@@ -127,4 +114,12 @@ export const assignmentRolesToMember = z.object({
 
 export type assignmentRolesToMemberType = z.infer<
   typeof assignmentRolesToMember
+>;
+
+export const loadPropertyDocumentsDtoRequest = z.object({
+  resources: z.array(createResourceImageDtoRequest),
+});
+
+export type LoadPropertyDocumentsType = z.infer<
+  typeof loadPropertyDocumentsDtoRequest
 >;

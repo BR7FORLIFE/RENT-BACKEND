@@ -25,9 +25,11 @@ import {
   createPropertyDtoRequest,
   EditingPropertyDtoRequest,
   GetAISuggestion,
+  loadPropertyDocumentsDtoRequest,
   //type ChangeOwnerType,
   type CreatePropertyType,
   type EditingPropertyType,
+  type LoadPropertyDocumentsType,
 } from './dtos/request-dto.js';
 import { CreateSuggestionByPropertyField } from './services/helpers.service.js';
 import type { PropertyField } from './types.js';
@@ -133,6 +135,21 @@ export class PropertyRegistrationController {
       propertyId,
       req.user.userId,
       paginationDto,
+    );
+  }
+
+  //cargar documentos a una propiedad
+  @Post(':propertyId/documents')
+  async loadDocuments(
+    @Param('propertyId') propertyId: string,
+    @Req() req: AuthRequest,
+    @Body(new ZodValidation(loadPropertyDocumentsDtoRequest))
+    body: LoadPropertyDocumentsType,
+  ) {
+    return await this.propertyService.loadDocuments(
+      propertyId,
+      req.user.userId,
+      body.resources,
     );
   }
 }

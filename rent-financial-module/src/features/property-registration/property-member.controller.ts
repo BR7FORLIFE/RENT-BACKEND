@@ -37,10 +37,10 @@ import {
 export class PropertyMemberController {
   constructor(private propertyMemberService: PropertyMemberService) {}
 
-  @Get()
+  @Get(':propertyId')
   async getAllPropertyMembersByPropertyId(
     @Req() req: AuthRequest,
-    @Param() propertyId: string,
+    @Param('propertyId') propertyId: string,
     @Query(new ZodValidation(getMembersQuerySchema))
     queryStatus: GetMembersQuery,
     @Query(new ZodValidation(paginationSchema)) paginationDto: PaginationType,
