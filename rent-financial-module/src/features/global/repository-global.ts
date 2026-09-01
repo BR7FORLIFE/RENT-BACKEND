@@ -3,10 +3,9 @@ import { PrismaService } from '../../core/database/prisma.service.js';
 import type {
   createInvitationPropertyMemberType,
   DirectionType,
-  ResourceImageType,
 } from '../property-registration/schemas/property-registration.schema.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
-import type { NotificationType } from './global.schema.js';
+import type { NotificationType, ResourceImageType } from './global.schema.js';
 
 /*
  *Repositorio global para utilizacion entre las distintas features sin repetir codigo
