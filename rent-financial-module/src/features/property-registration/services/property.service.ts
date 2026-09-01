@@ -18,7 +18,6 @@ import type {
 import { PropertyHelper } from './helpers.service.js';
 import type {
   CreatePropertyType,
-  createResourceImageType,
   EditingPropertyType,
 } from '../dtos/request-dto.js';
 import type { Prisma } from '../../../../generated/prisma/client.js';
@@ -35,6 +34,7 @@ import { PropertyMemberRepository } from '../repository/property-member.reposito
 import type { Property } from '../dtos/response-dto.js';
 import { PropertyServiceMapper } from '../repository/mappers/property-mapper.service.js';
 import { SystemPropertyService } from '../../system-property-role/services/system-property.service.js';
+import type { createResourceImageType } from '../../global/global.schema-dtos.js';
 
 @Injectable()
 export class PropertyService {
@@ -95,7 +95,7 @@ export class PropertyService {
       //guardar la correspondiente propiedad
       const { id: propertyId } = await this.propertyRepository.saveProperty(
         newProperty,
-        propertyDto.resourcesImages,
+        propertyDto.resources,
         propertyDto.economicPropertyInfo,
         propertyDto.structurePropertyInfo,
         tx,
@@ -328,7 +328,7 @@ export class PropertyService {
 
     //checkeamos que el miembro actual tenga las politicas de subir documento
     await this.systemRole.CheckPolicies(optPropertyMember.id, [
-      POLICIES_STATEMENTS_NAMES.SUBIR_DOCUMENTOS_CONTRATO,
+      POLICIES_STATEMENTS_NAMES.SUBIR_DOCUMENTOS_INMUEBLE,
     ]);
 
     //guardamos los recursos para la propiedad
