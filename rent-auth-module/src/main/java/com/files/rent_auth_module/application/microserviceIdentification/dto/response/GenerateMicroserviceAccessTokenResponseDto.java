@@ -1,5 +1,5 @@
 package com.files.rent_auth_module.application.microserviceIdentification.dto.response;
 
-public record GenerateMicroserviceAccessTokenResponseDto(String jwt) {
+public record GenerateMicroserviceAccessTokenResponseDto(String jwt, Integer expiredTimeSeconds) {
 
 }

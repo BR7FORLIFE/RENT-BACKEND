@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.files.rent_auth_module.application.global.JwtServicePort;
+import com.files.rent_auth_module.application.microserviceIdentification.dto.response.JwtMicroserviceAccessTokenResponseDto;
 import com.files.rent_auth_module.application.microserviceIdentification.exceptions.MicroserviceIdentificationClientSecretException;
 import com.files.rent_auth_module.application.microserviceIdentification.exceptions.MicroserviceIdentificationNotFoundException;
 import com.files.rent_auth_module.application.microserviceIdentification.ports.MicroserviceIdentificationPort;
@@ -28,7 +29,7 @@ public class MicroserviceIdentificationUseCaseImp implements MicroserviceIdentif
     }
 
     @Override
-    public Mono<String> generateMicroserviceJwt(String clientId, String ClientSecret) {
+    public Mono<JwtMicroserviceAccessTokenResponseDto> generateMicroserviceJwt(String clientId, String ClientSecret) {
         return microserviceIdentificationPort.findByClientId(clientId)
                 .switchIfEmpty(Mono.error(new MicroserviceIdentificationNotFoundException()))
                 .flatMap(microID -> {

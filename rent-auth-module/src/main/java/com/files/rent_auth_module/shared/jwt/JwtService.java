@@ -5,6 +5,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.files.rent_auth_module.application.global.JwtServicePort;
+import com.files.rent_auth_module.application.microserviceIdentification.dto.response.JwtMicroserviceAccessTokenResponseDto;
 import com.files.rent_auth_module.domain.auth.UserModel;
 import com.files.rent_auth_module.infra.security.CustomUserDetails;
 import com.files.rent_auth_module.infra.zGlobalAdviceException.exceptions.JwtExceptions;
@@ -54,8 +56,9 @@ public class JwtService implements JwtServicePort {
     }
 
     @Override
-    public Mono<String> obtainMicroserviceAccessToken(String microserviceName) {
-        return this.generateMicroserviceAccessToken(microserviceName);
+    public Mono<JwtMicroserviceAccessTokenResponseDto> obtainMicroserviceAccessToken(String microserviceName) {
+        return this.generateMicroserviceAccessToken(microserviceName)
+                .map(token -> new JwtMicroserviceAccessTokenResponseDto(token, this.accessTokenExpiredTime));
     }
 
     private Mono<String> generateMicroserviceAccessToken(String microserviceName) {

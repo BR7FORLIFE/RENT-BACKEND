@@ -23,4 +23,11 @@ public class MicroserviceIdentificationRepositoryAdapter implements Microservice
         return microserviceIdentificationRepository.findByClientId(clientId)
                 .map(MicroserviceIdentificationMapper::toDomain);
     }
+
+    @Override
+    public Mono<Void> saveMicroserviceIdentification(String microserviceName, String clientId, String clientSecret) {
+        MicroserviceIdentificationModel model = MicroserviceIdentificationModel.createDraft(microserviceName, clientId,
+                clientSecret);
+        return microserviceIdentificationRepository.save(MicroserviceIdentificationMapper.toEntity(model)).then();
+    }
 }
