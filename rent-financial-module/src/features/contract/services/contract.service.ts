@@ -7,6 +7,7 @@ import { GlobalRepository } from '../../global/repository-global.js';
 import { PropertyHelper } from '../../property-registration/services/helpers.service.js';
 import {
   contractNotFound,
+  deniedTransitionedStatusContract,
   propertyWithContractAvalibityException,
 } from '../exceptions/exceptions.js';
 import type { PropertyMemberRoleType } from '../../property-registration/schemas/property-registration.schema.js';
@@ -21,6 +22,7 @@ import { PropertyMemberRepository } from '../../property-registration/repository
 import type { PaginationType } from '../../../shared/pagination/pagination-schemas.js';
 import { PropertyNotFoundException } from '../../property-registration/exceptions/exceptions.js';
 import type { NotificationType } from '../../global/global.schema.js';
+import type { createResourceImageType } from '../../global/global.schema-dtos.js';
 
 // estos dos actores importantes en los contratos son miembros activos
 //dentro de la propiedad
@@ -107,14 +109,14 @@ export class ContractService {
         monthlyRent: contract.monthlyRent,
         propertyId: optProperty.id,
         startDate: contract.startDate,
-        status: 'DRAFT',
+        status: 'PENDING_ACCEPTANCE',
         // si cambia el estado a PENDING o EXECUTION puede ser miembro activo del inmueble
         tenantMemberId: tenantPropertyMember.id,
       };
 
       const { id: contractId } = await this.contractRepository.saveContract(
         newContract,
-        contract.resourcesImage,
+        contract.resources,
         tx,
       );
       //enviamos la notificacion al posible arrendado para que se entere y decida
@@ -140,6 +142,108 @@ export class ContractService {
       message: 'contrato creado satisfactoriamente!',
     };
   }
+
+  async AcceptedOrRejectedContractByTenant(
+    contractId: string,
+    propertyId: string,
+    tenantId: string,
+    status: 'ACCEPTED' | 'REJECTED',
+  ): Promise<{ contractId: string; message: string }> {
+    //verificamos que sea un miembro activo en la propiedad
+    const tenantPropertyMember =
+      await this.systemRole.verifyPropertyMemberInPropertyId(
+        tenantId,
+        propertyId,
+      );
+
+    //verificamos si existe dicho contrato
+    const optContract =
+      await this.contractRepository.findContractByIdAndTenantMemberId(
+        contractId,
+        tenantId,
+      );
+
+    if (!optContract) {
+      throw new contractNotFound();
+    }
+
+    //verificamos que el contrato no este RECHAZADO, CANCELADO, SUSPENDIDO
+    // FINALIZADO porque no queremos modificar el estado del contrato si cuenta
+    // con estos estados previos
+    if (!['PENDING_ACCEPTANCE'].includes(optContract.status)) {
+      throw new deniedTransitionedStatusContract();
+    }
+
+    if (status === 'ACCEPTED') {
+      //actualizamos el estado del contrato pendiente
+      await this.contractRepository.updateStatusContract(
+        contractId,
+        tenantPropertyMember.id,
+        'PENDING_DOCUMENTATION',
+      );
+
+      return {
+        contractId: optContract.id,
+        message: 'Contrato aceptado exitosamente!',
+      };
+    } else {
+      await this.contractRepository.updateStatusContract(
+        contractId,
+        tenantPropertyMember.id,
+        'REJECTED',
+      );
+    }
+
+    return {
+      contractId: optContract.id,
+      message: 'Contrato rechazado correctamente',
+    };
+  }
+
+  async loadContractDocumentation(
+    userId: string,
+    propertyId: string,
+    contractId: string,
+    contractResources: createResourceImageType[],
+  ): Promise<{ contractId: string; message: string }> {
+    //primero validamos que sea un property member
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberInPropertyId(
+        userId,
+        propertyId,
+      );
+
+    //verificamos que tengan las policiticas necesarias para subir documentos
+    //referentes a los contratos
+    await this.systemRole.CheckPolicies(optPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.SUBIR_DOCUMENTOS_CONTRATO,
+    ]);
+
+    //verificamos que exista dicho contrato
+    const optContract =
+      await this.contractRepository.findContractByIdAndPropertyId(
+        propertyId,
+        contractId,
+      );
+
+    if (!optContract) {
+      throw new contractNotFound();
+    }
+
+    //cargamos los documentos enlazando con la id de contrato
+    await this.contractRepository.saveContractResourcesByContractId(
+      optContract.id,
+      contractResources,
+    );
+
+    return {
+      contractId,
+      message: 'Documentos cargados exitosamente en el contrato',
+    };
+  }
+
+  //este metodo nos permitira cambiar de estado un contrato
+  async handleContractStatus() {}
 
   async getContractbyId(
     userId: string,
