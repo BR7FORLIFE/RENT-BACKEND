@@ -1,5 +1,5 @@
 import z from 'zod';
-import { createResourceImageDtoRequest } from '../../property-registration/dtos/request-dto.js';
+import { createResourceImageDtoRequest } from '../../global/global.schema-dtos.js';
 
 export const createContractDtoRequest = z.object({
   propertyId: z.uuid(),
@@ -9,7 +9,28 @@ export const createContractDtoRequest = z.object({
   depositAmount: z.coerce.number(),
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
-  resourcesImage: z.array(createResourceImageDtoRequest),
+  resources: z.array(createResourceImageDtoRequest),
 });
 
 export type CreateContractType = z.infer<typeof createContractDtoRequest>;
+
+//aceptar o rechazar un contrato por parte del arrendado
+export const AcceptedOrRejectedContractDtoRequest = z.object({
+  contractId: z.uuid(),
+  propertyId: z.uuid(),
+  status: z.enum(['ACCEPTED', 'REJECTED']),
+});
+
+export type AcceptedOrRejectedContractType = z.infer<
+  typeof AcceptedOrRejectedContractDtoRequest
+>;
+
+//cargar documentos en un contrato
+export const LoadDocumentInContractDtoRequest = z.object({
+  propertyId: z.uuid(),
+  resources: z.array(createResourceImageDtoRequest),
+});
+
+export type LoadDocumentInContractType = z.infer<
+  typeof LoadDocumentInContractDtoRequest
+>;

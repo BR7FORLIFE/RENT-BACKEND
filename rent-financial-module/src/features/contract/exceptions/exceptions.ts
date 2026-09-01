@@ -11,3 +11,13 @@ export class contractNotFound extends AppException {
     super('Contrato no encontrado!', 404, 'NOT_FOUND');
   }
 }
+
+export class deniedTransitionedStatusContract extends AppException {
+  constructor() {
+    super(
+      'No se puede transicionar el contrato al nuevo estado verifique la accion o un estado valido',
+      406,
+      'NOT_ACCEPTABLE',
+    );
+  }
+}
