@@ -30,13 +30,6 @@ export const contractSchema = z.object({
 
 export type ContractType = z.infer<typeof contractSchema>;
 
-export const ContractResourceSchema = z.object({
-  contractId: z.uuid(),
-  resourceId: z.uuid(),
-});
-
-export type ContractResourceType = z.infer<typeof ContractResourceSchema>;
-
 /*REGLAS DE NEGOCIO PARA LOS CONTRATOS*
  *
  * REGLA IMPORTANTISIMA

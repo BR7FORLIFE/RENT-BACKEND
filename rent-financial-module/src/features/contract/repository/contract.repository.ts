@@ -5,7 +5,7 @@ import type {
   StatusContractType,
 } from '../schemas/contract.schema.js';
 import type { Prisma } from '../../../../generated/prisma/client.js';
-import type { ResourceImageType } from '../../property-registration/schemas/property-registration.schema.js';
+import type { ResourceImageType } from '../../global/global.schema.js';
 import type {
   PaginationResponse,
   PaginationType,
@@ -60,12 +60,26 @@ export class ContractRepository {
     });
   }
 
-  async findContractByIdAndPropertyId(propertyId: string, contractId: string) {
-    return await this.prisma.contract.findFirst({
+  async findContractByIdAndPropertyId(
+    propertyId: string,
+    contractId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.contract.findFirst({
       where: {
         id: contractId,
         propertyId,
       },
+    });
+  }
+
+  async findContractByIdAndTenantMemberId(
+    contractId: string,
+    tenantMemberId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.contract.findFirst({
+      where: { id: contractId, tenantMemberId },
     });
   }
 
@@ -92,6 +106,52 @@ export class ContractRepository {
             },
           })),
         },
+      },
+    });
+  }
+
+  async saveContractResourcesByContractId(
+    contractId: string,
+    resources: ResourceImageType[],
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    const createdResources = await Promise.all(
+      resources.map((resource) =>
+        db.resourceImages.create({
+          data: {
+            assetId: resource.assetId,
+            url: resource.url,
+            width: resource.width,
+            height: resource.height,
+            format: resource.format,
+            secureUrl: resource.secureUrl,
+          },
+        }),
+      ),
+    );
+
+    await db.contractResources.createMany({
+      data: createdResources.map((resource) => ({
+        contractId,
+        resourceId: resource.id,
+      })),
+    });
+  }
+
+  //updates
+  async updateStatusContract(
+    contractId: string,
+    tenantMemberId: string,
+    status: StatusContractType,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    await db.contract.update({
+      where: {
+        id: contractId,
+        tenantMemberId,
+      },
+      data: {
+        status,
       },
     });
   }
