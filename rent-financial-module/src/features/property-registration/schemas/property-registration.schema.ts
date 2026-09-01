@@ -29,23 +29,7 @@ export const PropertyResourcesSchema = z.object({
 
 export type PropertyResourceType = z.infer<typeof PropertyResourcesSchema>;
 
-//resources images
-export const ResourceImageSchema = z.object({
-  id: z.uuid().optional(),
-  assetId: z.string().optional(),
-  width: z.int().optional(),
-  height: z.int().optional(),
-  format: z.string().optional(),
-  url: z.string(),
-  secureUrl: z.string().optional(),
-  createAt: z.date().optional(),
-  updateAt: z.date().optional(),
-});
-
-export type ResourceImageType = z.infer<typeof ResourceImageSchema>;
-
 //properties
-
 export const propertySchema = z.object({
   id: z.uuid().optional(),
   userId: z.uuid(),

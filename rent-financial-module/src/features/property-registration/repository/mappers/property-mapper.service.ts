@@ -39,7 +39,7 @@ export class PropertyServiceMapper {
             lotArea: structureInfoResponse.area.toNumber(),
           }
         : null,
-      resourcesImages: resourceImages.map((resource) => ({
+      resources: resourceImages.map((resource) => ({
         ...resource,
         createAt: resource.createAt.toString(),
         updateAt: resource.updateAt.toString(),

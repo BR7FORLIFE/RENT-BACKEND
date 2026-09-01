@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/database/prisma.service.js';
-import type {
-  PropertyType,
-  ResourceImageType,
-} from '../schemas/property-registration.schema.js';
+import type { PropertyType } from '../schemas/property-registration.schema.js';
 import type {
   PaginationResponse,
   PaginationType,
@@ -18,6 +15,7 @@ import type {
   PropertyNameAndDescriptionPersistance,
   ResourceImagePersistence,
 } from './repository-types.js';
+import type { ResourceImageType } from '../../global/global.schema.js';
 
 @Injectable()
 export class PropertyRepository {
