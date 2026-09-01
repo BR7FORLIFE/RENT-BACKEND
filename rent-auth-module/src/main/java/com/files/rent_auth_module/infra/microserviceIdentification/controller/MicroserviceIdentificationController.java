@@ -37,7 +37,8 @@ public class MicroserviceIdentificationController {
             @RequestBody GenerateMicroserviceAccessTokenRequestDto requestDto) {
         return microserviceIdentificationUseCase
                 .generateMicroserviceJwt(requestDto.clientId(), requestDto.clientSecret())
-                .map(jwt -> ResponseEntity.ok().body(new GenerateMicroserviceAccessTokenResponseDto(jwt)));
+                .map(res -> ResponseEntity.ok()
+                        .body(new GenerateMicroserviceAccessTokenResponseDto(res.jwt(), res.expiredTimeSeconds())));
     }
 
     // obtener un usuario por su email (MICROSERVICE GRANTED)

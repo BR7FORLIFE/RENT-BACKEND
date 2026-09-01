@@ -6,4 +6,6 @@ import reactor.core.publisher.Mono;
 
 public interface MicroserviceIdentificationPort {
     Mono<MicroserviceIdentificationModel> findByClientId(String clientId);
+
+    Mono<Void> saveMicroserviceIdentification(String microserviceName, String clientId, String clientSecret);
 }
