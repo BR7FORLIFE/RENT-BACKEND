@@ -54,6 +54,8 @@ export interface GetAllUserData {
   email: string;
   cellphone: string;
   fullname: string;
+  roles?: string[];
+  policies?: string[];
 }
 
 @Injectable()
@@ -106,11 +108,20 @@ export class PropertyMemberService {
       return { data, metadata };
     });
 
+    //antes de unir la informacion del miembro de la propiedad con la informacion
+    // personal de la person hay que limpiar las politicas de estos usuarios
+    const propertyMemberCleanData = result.data.map((propertyMember) => ({
+      ...propertyMember,
+      policies: cleanPolicies(
+        propertyMember.policies,
+        propertyMember.overrides,
+      ),
+    }));
     //obtenemos la informacion completa dentro del otro microservicio
     // de autenticacion
     const userData = await getAllUsers(result.data.map((user) => user.userId));
 
-    const unionInfo = unionInfoUser(result.data, userData);
+    const unionInfo = unionInfoUser(propertyMemberCleanData, userData);
 
     return { data: unionInfo, metadata: result.metadata };
   }

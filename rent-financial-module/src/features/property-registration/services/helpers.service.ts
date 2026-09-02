@@ -103,6 +103,8 @@ export function unionInfoUser(
     userId: string;
     status: PropertyMemberStatus;
     assignedAt: Date;
+    roles: string[];
+    policies: string[];
   }[],
   part2: UserData[],
 ) {
