@@ -1,6 +1,9 @@
 import { Prisma } from '../../../../generated/prisma/client.js';
 import type { TypeStreet } from '../types.js';
-import type { CurrencyType } from '../schemas/property-registration.schema.js';
+import type {
+  CurrencyType,
+  PropertyMemberStatus,
+} from '../schemas/property-registration.schema.js';
 
 export interface ResourceImagePersistence {
   id: string;
@@ -68,4 +71,15 @@ export interface PropertyNameAndDescriptionPersistance {
   id: string;
   propertyName: string;
   propertyDescription: string;
+}
+
+export interface FindAllPropertyMembers {
+  id: string;
+  userId: string;
+  status: PropertyMemberStatus;
+  assignedAt: Date;
+  roles: string[];
+  // se refiere a la lista de politicas para cada rol
+  policies: string[];
+  overrides: string[];
 }

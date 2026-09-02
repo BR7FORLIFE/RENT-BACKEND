@@ -10,6 +10,7 @@ import type {
   PaginationResponse,
   PaginationType,
 } from '../../../shared/pagination/pagination-schemas.js';
+import type { FindAllPropertyMembers } from './repository-types.js';
 
 @Injectable()
 export class PropertyMemberRepository {
@@ -21,14 +22,7 @@ export class PropertyMemberRepository {
     propertyId: string,
     status: PropertyMemberStatus,
     paginationDto: PaginationType,
-  ): Promise<
-    PaginationResponse<{
-      id: string;
-      userId: string;
-      status: PropertyMemberStatus;
-      assignedAt: Date;
-    }>
-  > {
+  ): Promise<PaginationResponse<FindAllPropertyMembers>> {
     const { page, limit } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 
@@ -46,6 +40,27 @@ export class PropertyMemberRepository {
           status: true,
           assignedAt: true,
           propertyId: true,
+
+          //tenemos las politicas desactivadas por el dueño de la propiedad
+          propertyMemberPoliciesOverride: {
+            select: {
+              policyStatement: true,
+            },
+          },
+
+          propertyMemberRole: {
+            select: {
+              propertyActorRole: {
+                include: {
+                  propertyActorRolePolicyStatements: {
+                    select: {
+                      policyStatement: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       }),
       db.propertyMember.count({
@@ -53,8 +68,31 @@ export class PropertyMemberRepository {
       }),
     ]);
 
+    const parserData: FindAllPropertyMembers[] = data.map(
+      (propertyMemberInfo) => {
+        return {
+          id: propertyMemberInfo.id,
+          status: propertyMemberInfo.status,
+          userId: propertyMemberInfo.userId,
+          assignedAt: propertyMemberInfo.assignedAt,
+          roles: propertyMemberInfo.propertyMemberRole.map(
+            (role) => role.propertyActorRole.name,
+          ),
+          overrides: propertyMemberInfo.propertyMemberPoliciesOverride.map(
+            (override) => override.policyStatement.policyName,
+          ),
+          policies: propertyMemberInfo.propertyMemberRole.flatMap(
+            (memberRole) =>
+              memberRole.propertyActorRole.propertyActorRolePolicyStatements.map(
+                (policies) => policies.policyStatement.policyName,
+              ),
+          ),
+        };
+      },
+    );
+
     return {
-      data,
+      data: parserData,
       metadata: {
         limit,
         page,
