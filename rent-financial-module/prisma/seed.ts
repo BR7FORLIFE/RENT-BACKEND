@@ -141,7 +141,7 @@ async function main() {
           'Persona que respalda las obligaciones económicas o contractuales asumidas por otro actor.',
       },
       {
-        id: TYPE_TENANT_ACTOR_ROLES_UUIDS.PRELIMINARY_TENANT,
+        id: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO_PRELIMINAR,
         name: 'ARRENDADO_PRELIMINAR',
         description:
           'Persona que aun no ha firmado contrato de arrendamiento y esta a la espera de firmar o por su parte rechazar el inmueble',
@@ -531,6 +531,214 @@ async function main() {
   //definimos las politicas para cada rol
   await prisma.propertyActorRolePolicyStatements.createMany({
     data: [
+      //politicas para el rol de propietario
+
+      //inmuebles
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.VER_INMUEBLE,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.EDITAR_INMUEBLE,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.ELIMINAR_INMUEBLE,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.VER_DOCUMENTOS_INMUEBLE,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.SUBIR_DOCUMENTOS_INMUEBLE,
+      },
+
+      //contratos
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.VER_CONTRATOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.REGISTRAR_CONTRATOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.EDITAR_CONTRATOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.ELIMINAR_CONTRATOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.RENOVAR_CONTRATOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.FINALIZAR_CONTRATOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.SUSPENDER_CONTRATOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.DESCARGAR_CONTRATOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.VER_DOCUMENTOS_CONTRATO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.SUBIR_DOCUMENTOS_CONTRATO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.ELIMINAR_DOCUMENTOS_CONTRATO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.VER_HISTORIAL_CONTRATO,
+      },
+
+      //servicios publicos
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.CONSULTAR_SERVICIOS_PUBLICOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.REGISTRAR_SERVICIO_PUBLICO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.EDITAR_SERVICIO_PUBLICO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.ELIMINAR_SERVICIO_PUBLICO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.CONSULTAR_FACTURAS_SERVICIOS_PUBLICOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.REGISTRAR_FACTURA_SERVICIO_PUBLICO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.EDITAR_FACTURA_SERVICIO_PUBLICO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.ELIMINAR_FACTURA_SERVICIO_PUBLICO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.CONSULTAR_CONSUMOS_SERVICIOS_PUBLICOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.REGISTRAR_LECTURA_SERVICIO_PUBLICO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.EDITAR_LECTURA_SERVICIO_PUBLICO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.CONSULTAR_PAGOS_SERVICIOS_PUBLICOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.REGISTRAR_PAGO_SERVICIO_PUBLICO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.EDITAR_PAGO_SERVICIO_PUBLICO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.DESCARGAR_FACTURAS_SERVICIOS_PUBLICOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.VER_HISTORIAL_SERVICIOS_PUBLICOS,
+      },
+
+      //informacion legal
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.CONSULTAR_INFORMACION_LEGAL,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.REGISTRAR_INFORMACION_LEGAL,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.EDITAR_INFORMACION_LEGAL,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.ELIMINAR_INFORMACION_LEGAL,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.CONSULTAR_DOCUMENTOS_LEGALES,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.SUBIR_DOCUMENTOS_LEGALES,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.DESCARGAR_DOCUMENTOS_LEGALES,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.ELIMINAR_DOCUMENTOS_LEGALES,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.CONSULTAR_HISTORIAL_LEGAL,
+      },
+
+      //miembros en la propiedad
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.CONSULTAR_INVITACIONES_MIEMBROS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.ENVIAR_INVITACION_MIEMBRO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.REENVIAR_INVITACION_MIEMBRO,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.CANCELAR_INVITACION_MIEMBRO,
+      },
+
       //politicas para el rol ARRENDADO
       {
         propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO,
@@ -580,11 +788,11 @@ async function main() {
 
       //politicas para el rol ARRENDADO_PRELIMINAR
       {
-        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.PRELIMINARY_TENANT,
+        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO_PRELIMINAR,
         policy_statement_id: POLICIES_STATEMENTS.VER_INMUEBLE,
       },
       {
-        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.PRELIMINARY_TENANT,
+        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO_PRELIMINAR,
         policy_statement_id: POLICIES_STATEMENTS.VER_CONTRATOS,
       },
       //politicas para el rol MIEMBRO (las personas que se invitan y aceptan)
