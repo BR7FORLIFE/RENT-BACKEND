@@ -172,7 +172,7 @@ export class PropertyService {
   ): Promise<{ id: string; message: string }> {
     //buscamos el property member para saber si esta vinculado a dicha propiedad
     const optPropertyMember =
-      await this.systemRole.verifyPropertyMemberInPropertyId(
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
         userId,
         propertyId,
       );
@@ -298,7 +298,7 @@ export class PropertyService {
   ) {
     //primero buscamos el property member asociado al userId
     const optPropertyMember =
-      await this.systemRole.verifyPropertyMemberInPropertyId(
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
         userId,
         propertyId,
       );
@@ -321,7 +321,7 @@ export class PropertyService {
     documents: createResourceImageType[],
   ): Promise<{ propertyId: string; message: string }> {
     const optPropertyMember =
-      await this.systemRole.verifyPropertyMemberInPropertyId(
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
         userId,
         propertyId,
       );
