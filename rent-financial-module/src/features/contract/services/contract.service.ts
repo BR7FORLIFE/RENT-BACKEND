@@ -4,7 +4,6 @@ import { PropertyRepository } from '../../property-registration/repository/prope
 import type { CreateContractType } from '../dtos/request-dto.js';
 import type { ContractType } from '../schemas/contract.schema.js';
 import { GlobalRepository } from '../../global/repository-global.js';
-import { PropertyHelper } from '../../property-registration/services/helpers.service.js';
 import {
   contractNotFound,
   deniedTransitionedStatusContract,
@@ -13,6 +12,7 @@ import {
 import type { PropertyMemberRoleType } from '../../property-registration/schemas/property-registration.schema.js';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import { SystemPropertyService } from '../../system-property-role/services/system-property.service.js';
+import { SystemPropertyRoleRepository } from '../../system-property-role/repository/sytem-property-role.repository.js';
 import {
   POLICIES_STATEMENTS_NAMES,
   TYPE_TENANT_ACTOR_ROLES_UUIDS,
@@ -37,8 +37,8 @@ export class ContractService {
     private readonly contractRepository: ContractRepository,
     private readonly propertyRepository: PropertyRepository,
     private readonly propertyMemberRepository: PropertyMemberRepository,
-    private readonly propertyHelperService: PropertyHelper,
     private readonly systemRole: SystemPropertyService,
+    private readonly systemRoleRepository: SystemPropertyRoleRepository,
     private readonly globalRepository: GlobalRepository,
   ) {}
 
@@ -48,7 +48,7 @@ export class ContractService {
   ): Promise<{ id: string; message: string }> {
     //buscamos el property member quien quiere realizar la accion de crear el contrato
     const optLandordPropertyMember =
-      await this.systemRole.verifyPropertyMemberInPropertyId(
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
         userId,
         contract.propertyId,
       );
@@ -61,8 +61,8 @@ export class ContractService {
     //verficamos que la propiedad exista!
     const optProperty =
       await this.propertyRepository.findPropertyByIdAndPropertyMemberId(
-        contract.propertyId,
         optLandordPropertyMember.id,
+        contract.propertyId,
       );
 
     if (!optProperty) {
@@ -82,7 +82,7 @@ export class ContractService {
 
     //validamos si el posible arrendado pertenecen a dicho inmueble
     const tenantPropertyMember =
-      await this.systemRole.verifyPropertyMemberInPropertyId(
+      await this.systemRole.verifyPropertyMemberByIdAndPropertyId(
         contract.tenantMemberId,
         optProperty.id,
       );
@@ -92,7 +92,7 @@ export class ContractService {
       //dicha propiedad
       const propertyTenantMemberRole: PropertyMemberRoleType = {
         propertyMemberId: tenantPropertyMember.id,
-        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.PRELIMINARY_TENANT,
+        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO_PRELIMINAR,
       };
 
       await this.propertyMemberRepository.savePropertyMemberRole(
@@ -151,7 +151,7 @@ export class ContractService {
   ): Promise<{ contractId: string; message: string }> {
     //verificamos que sea un miembro activo en la propiedad
     const tenantPropertyMember =
-      await this.systemRole.verifyPropertyMemberInPropertyId(
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
         tenantId,
         propertyId,
       );
@@ -175,19 +175,29 @@ export class ContractService {
     }
 
     if (status === 'ACCEPTED') {
-      //actualizamos el estado del contrato pendiente
-      await this.contractRepository.updateStatusContract(
-        contractId,
-        tenantPropertyMember.id,
-        'PENDING_DOCUMENTATION',
-      );
+      await this.prismaClient.$transaction(async (tx) => {
+        //actualizamos el estado del contrato pendiente
+        await this.contractRepository.updateStatusContractByTenantId(
+          contractId,
+          tenantPropertyMember.id,
+          'PENDING_DOCUMENTATION',
+          tx,
+        );
+
+        //y ademas muy importante pasamos su rol a ARRENDADO
+        await this.systemRoleRepository.updatePropertyActorRole(
+          tenantPropertyMember.id,
+          TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO_PRELIMINAR,
+          TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO,
+        );
+      });
 
       return {
         contractId: optContract.id,
         message: 'Contrato aceptado exitosamente!',
       };
     } else {
-      await this.contractRepository.updateStatusContract(
+      await this.contractRepository.updateStatusContractByTenantId(
         contractId,
         tenantPropertyMember.id,
         'REJECTED',
@@ -208,7 +218,7 @@ export class ContractService {
   ): Promise<{ contractId: string; message: string }> {
     //primero validamos que sea un property member
     const optPropertyMember =
-      await this.systemRole.verifyPropertyMemberInPropertyId(
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
         userId,
         propertyId,
       );
@@ -230,11 +240,28 @@ export class ContractService {
       throw new contractNotFound();
     }
 
-    //cargamos los documentos enlazando con la id de contrato
-    await this.contractRepository.saveContractResourcesByContractId(
-      optContract.id,
-      contractResources,
-    );
+    //verificamos que el contrato este en un estado de PENDING_DOCUMENTATION
+    //para poder realizar la operacion correctamente, caso contrario no será
+    //permitido ya que indica que el arrendado no aceptó el contrato
+    if (optContract.status !== 'PENDING_DOCUMENTATION') {
+      throw new deniedTransitionedStatusContract();
+    }
+
+    await this.prismaClient.$transaction(async (tx) => {
+      //cargamos los documentos enlazando con la id de contrato
+      await this.contractRepository.saveContractResourcesByContractId(
+        optContract.id,
+        contractResources,
+        tx,
+      );
+
+      //actualizamos el esatdo del contrato a ACTIVE
+      await this.contractRepository.updateStatusContractById(
+        optContract.id,
+        'ACTIVE',
+        tx,
+      );
+    });
 
     return {
       contractId,
@@ -252,7 +279,7 @@ export class ContractService {
   ): Promise<ContractInfoResponse> {
     //vemos si la persona actual es miembro de la propiedad
     const optPropertyMember =
-      await this.systemRole.verifyPropertyMemberInPropertyId(
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
         userId,
         propertyId,
       );
@@ -282,7 +309,7 @@ export class ContractService {
   ) {
     //validamos si es miembro de la propiedad actual
     const optPropertyMember =
-      await this.systemRole.verifyPropertyMemberInPropertyId(
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
         userId,
         propertyId,
       );

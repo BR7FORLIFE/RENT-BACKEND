@@ -139,7 +139,7 @@ export class ContractRepository {
   }
 
   //updates
-  async updateStatusContract(
+  async updateStatusContractByTenantId(
     contractId: string,
     tenantMemberId: string,
     status: StatusContractType,
@@ -149,6 +149,21 @@ export class ContractRepository {
       where: {
         id: contractId,
         tenantMemberId,
+      },
+      data: {
+        status,
+      },
+    });
+  }
+
+  async updateStatusContractById(
+    contractId: string,
+    status: StatusContractType,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    await db.contract.update({
+      where: {
+        id: contractId,
       },
       data: {
         status,
