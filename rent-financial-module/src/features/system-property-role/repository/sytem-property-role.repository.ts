@@ -93,4 +93,26 @@ export class SystemPropertyRoleRepository {
       ),
     );
   }
+
+  //updates
+
+  //este metodo permitirá sobrescribir el rol del usuario hacia otro
+  async updatePropertyActorRole(
+    propertyMemberId: string,
+    oldActorRoleId: string,
+    newActorRoleId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.propertyMemberRole.update({
+      where: {
+        propertyActorRoleId_propertyMemberId: {
+          propertyMemberId: propertyMemberId,
+          propertyActorRoleId: oldActorRoleId,
+        },
+      },
+      data: {
+        propertyActorRoleId: newActorRoleId,
+      },
+    });
+  }
 }

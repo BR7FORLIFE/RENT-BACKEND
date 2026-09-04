@@ -11,6 +11,16 @@ export class PropertyMemberNotFound extends AppException {
   }
 }
 
+export class PropertyMemberNotFoundById extends AppException {
+  constructor(propertyMemberId: string) {
+    super(
+      `El usuario con ID de miembro de propiedad ${propertyMemberId} no se encuentra vinculado al inmueble!`,
+      406,
+      'NOT_ACCEPTABLE',
+    );
+  }
+}
+
 //roles que no se encuentra dentro de la app
 export class PropertyActorRoleNotFoundException extends AppException {
   constructor() {

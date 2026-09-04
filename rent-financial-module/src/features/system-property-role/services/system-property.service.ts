@@ -5,6 +5,7 @@ import {
   PoliciesAuthorizationNotAllowed,
   PoliciesNotFoundException,
   PropertyMemberNotFound,
+  PropertyMemberNotFoundById,
 } from '../exceptions/exceptions.js';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 
@@ -102,7 +103,10 @@ export class SystemPropertyService {
     }
   }
 
-  async verifyPropertyMemberInPropertyId(userId: string, propertyId: string) {
+  async verifyPropertyMemberByUserIdInPropertyId(
+    userId: string,
+    propertyId: string,
+  ) {
     const optPropertyMember = await this.prisma.propertyMember.findFirst({
       where: {
         userId,
@@ -112,6 +116,24 @@ export class SystemPropertyService {
 
     if (!optPropertyMember) {
       throw new PropertyMemberNotFound(userId);
+    }
+
+    return optPropertyMember;
+  }
+
+  async verifyPropertyMemberByIdAndPropertyId(
+    propertyMemberId: string,
+    propertyId: string,
+  ) {
+    const optPropertyMember = await this.prisma.propertyMember.findFirst({
+      where: {
+        id: propertyMemberId,
+        propertyId,
+      },
+    });
+
+    if (!optPropertyMember) {
+      throw new PropertyMemberNotFoundById(propertyMemberId);
     }
 
     return optPropertyMember;
