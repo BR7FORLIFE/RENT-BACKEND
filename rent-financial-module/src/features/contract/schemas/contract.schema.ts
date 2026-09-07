@@ -6,7 +6,6 @@ export const StatusContractEnum = z.enum([
   'PENDING_DOCUMENTATION',
   'ACTIVE',
   'REJECTED',
-  'CANCELLED',
   'SUSPENDED',
   'FINISHED',
 ]);
@@ -29,6 +28,28 @@ export const contractSchema = z.object({
 });
 
 export type ContractType = z.infer<typeof contractSchema>;
+
+//borradores de contratos
+export const contractDraftSchema = z.object({
+  id: z.uuid().optional(),
+  content: z.string(),
+  version: z.coerce.number().nonnegative(),
+  landlordAgreed: z.boolean(),
+  tenantAgreed: z.boolean(),
+  createdByPropertyMemberId: z.uuid(),
+  createdAt: z.date().optional(),
+  updateAt: z.date().optional(),
+
+  propertyId: z.uuid(),
+  landlordMemberId: z.uuid(),
+  tenantMemberId: z.uuid(),
+  monthlyRent: z.coerce.number().nonnegative(),
+  depositAmount: z.coerce.number().nonnegative(),
+  startDate: z.date(),
+  endDate: z.date(),
+});
+
+export type ContractDraftType = z.infer<typeof contractDraftSchema>;
 
 /*REGLAS DE NEGOCIO PARA LOS CONTRATOS*
  *

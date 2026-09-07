@@ -34,3 +34,34 @@ export const LoadDocumentInContractDtoRequest = z.object({
 export type LoadDocumentInContractType = z.infer<
   typeof LoadDocumentInContractDtoRequest
 >;
+
+//cambiar el estado de un contrato
+export const changeContractStatusDtoRequest = z.object({
+  status: z.enum(['SUSPENDED', 'FINISHED']),
+});
+
+export type changeContractStatusType = z.infer<
+  typeof changeContractStatusDtoRequest
+>;
+
+//generar contenido de contrato con IA
+export const generateIAContentContractDtoRequest = z.object({});
+
+//generar borradores de contratos
+export const generateContractDraftDtoRequest = z.object({
+  //borrador de contrato
+  content: z.string(),
+
+  //parametros parciales de propiedades
+  propertyId: z.uuid(),
+  landlordMemberId: z.uuid(),
+  tenantMemberId: z.uuid(),
+  monthlyRent: z.coerce.number().nonnegative(),
+  depositAmount: z.coerce.number().nonnegative(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+});
+
+export type GenerateContractDraftType = z.infer<
+  typeof generateContractDraftDtoRequest
+>;
