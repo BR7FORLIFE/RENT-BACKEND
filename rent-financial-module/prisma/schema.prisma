@@ -25,7 +25,6 @@ enum StatusContract{
   PENDING_DOCUMENTATION // si acepta dicho usuario quedará pendiente la documentacion de dicho contrato
   ACTIVE // contrato esta activo y vigente
   REJECTED // el posible arrendado rechazo la solicitud de contrato
-  CANCELLED //cualquier otro proceso que el arrendador o arrendatario haya rechazado entonces el contrato no tiene validez
   SUSPENDED // contrato en estado de suspension, solo el arrendador puede asignar este estado
   FINISHED //contrato ya expirado o cumplido
 }
@@ -256,6 +255,39 @@ model ContractResources {
   resourcesImage ResourceImages @relation(fields: [resourceId], references: [id])
 
   @@id([contractId, resourceId])
+}
+
+//contractDraft
+
+/*
+La idea es la siguiente, es crear una tabla donde se crearan borradores de contratos
+donde el arrendador y arrendado pueden acordar dichos terminos, y con la ayuda de la IA
+crear el draft del contrato, una vez ambas partes han acordado el acuerdo de aceptar 
+el borrador del contrato procederá con la generacion de contrato de manera juridica ahora si
+*/
+
+model ContractDraft{
+  //parametros del borrador
+  id String @id @default(uuid())
+  content String // este parametro es todo el texto del borrador del contrato
+  version Int @default(1) //version del borrador para que ambas partes puedan ver las distintas version del borrador
+  landlordAgreed Boolean @default(false) @map("landlord_agree") //si acepta el borrador el arrendador
+  tenantAgreed Boolean @default(false) @map("tenant_agree") //si acepta el borrador el arrendado
+  createdByPropertyMemberId String @map("created_by_property_member_id") //la id del miembro que creó el borrador
+  createdAt DateTime @default(now()) @map("created_at") //fecha de creacion del borrador
+  updateAt DateTime @updatedAt @map("update_at") //fecha de actualizacion del borrador
+
+  //parametros de contrato juridico, es necesaro ya que debemos mantener sincronizados ambos
+  //modelos sino el arrendador puede acordar algo muy diferente al borrador y seria un gran problema
+  propertyId String @map("property_id")
+  landlordMemberId String @map("landlord_member_id")
+  tenantMemberId String @map("tenant_member_id")
+  monthlyRent Decimal @map("monthly_rent")
+  depositAmount Decimal @map("deposit_amount")
+  startDate DateTime @map("start_date")
+  endDate DateTime @map("end_date")
+
+  @@unique([propertyId, version]) //estos campos deben ser unicos para no tener irrelevancias
 }
 
 /**
