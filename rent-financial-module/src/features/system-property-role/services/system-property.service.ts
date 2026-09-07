@@ -118,6 +118,10 @@ export class SystemPropertyService {
       throw new PropertyMemberNotFound(userId);
     }
 
+    if (optPropertyMember.status !== 'ACTIVE') {
+      throw new NotAllowedStatusByPropertyMemberException();
+    }
+
     return optPropertyMember;
   }
 
@@ -134,6 +138,10 @@ export class SystemPropertyService {
 
     if (!optPropertyMember) {
       throw new PropertyMemberNotFoundById(propertyMemberId);
+    }
+
+    if (optPropertyMember.status !== 'ACTIVE') {
+      throw new NotAllowedStatusByPropertyMemberException();
     }
 
     return optPropertyMember;
