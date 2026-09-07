@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import type {
+  ContractDraftType,
   ContractType,
   StatusContractType,
 } from '../schemas/contract.schema.js';
@@ -10,7 +11,10 @@ import type {
   PaginationResponse,
   PaginationType,
 } from '../../../shared/pagination/pagination-schemas.js';
-import type { ContractInfoResponse } from '../dtos/response-dto.js';
+import type {
+  ContractDraftInfoResponse,
+  ContractInfoResponse,
+} from '../dtos/response-dto.js';
 
 @Injectable()
 export class ContractRepository {
@@ -47,6 +51,46 @@ export class ContractRepository {
     };
   }
 
+  async findAllContractDraftByPropertyId(
+    propertyId: string,
+    paginationDto: PaginationType,
+    db: Prisma.TransactionClient = this.prisma,
+  ): Promise<PaginationResponse<ContractDraftInfoResponse>> {
+    const { limit, page } = paginationDto;
+    const skip = (paginationDto.page - 1) * paginationDto.limit;
+
+    const [data, total] = await db.$transaction([
+      db.contractDraft.findMany({
+        where: { propertyId },
+        skip,
+        take: limit,
+      }),
+      db.contractDraft.count({ where: { propertyId } }),
+    ]);
+
+    return {
+      data,
+      metadata: {
+        limit: limit,
+        page,
+        hasNextPage: page * limit < total,
+        hasPreviousPage: page > 1,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findContractDraftByIdAndPropertyId(
+    contractDraftId: string,
+    propertyId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.contractDraft.findFirst({
+      where: { id: contractDraftId, propertyId },
+    });
+  }
+
   async findContractByStatusContractAndPropertyId(
     statusContract: StatusContractType,
     propertyId: string,
@@ -61,8 +105,8 @@ export class ContractRepository {
   }
 
   async findContractByIdAndPropertyId(
-    propertyId: string,
     contractId: string,
+    propertyId: string,
     db: Prisma.TransactionClient = this.prisma,
   ) {
     return await db.contract.findFirst({
@@ -81,6 +125,27 @@ export class ContractRepository {
     return await db.contract.findFirst({
       where: { id: contractId, tenantMemberId },
     });
+  }
+
+  //encontrar la ultima version del borrador de contratp
+  async findLastVersionInContractDraft(
+    propertyId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    const lastContractDraft = await db.contractDraft.findFirst({
+      where: {
+        propertyId,
+      },
+      orderBy: {
+        version: 'desc',
+      },
+      select: {
+        version: true,
+      },
+    });
+    const version = (lastContractDraft?.version ?? 0) + 1;
+
+    return version;
   }
 
   //saves
@@ -107,6 +172,15 @@ export class ContractRepository {
           })),
         },
       },
+    });
+  }
+
+  async saveContractDraft(
+    data: ContractDraftType,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.contractDraft.create({
+      data,
     });
   }
 

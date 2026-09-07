@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ContractRepository } from '../repository/contract.repository.js';
 import { PropertyRepository } from '../../property-registration/repository/property.repository.js';
-import type { CreateContractType } from '../dtos/request-dto.js';
+import type {
+  changeContractStatusType,
+  CreateContractType,
+  GenerateContractDraftType,
+} from '../dtos/request-dto.js';
 import type { ContractType } from '../schemas/contract.schema.js';
 import { GlobalRepository } from '../../global/repository-global.js';
 import {
+  contractDraftNotFound,
   contractNotFound,
   deniedTransitionedStatusContract,
   propertyWithContractAvalibityException,
@@ -23,6 +28,7 @@ import type { PaginationType } from '../../../shared/pagination/pagination-schem
 import { PropertyNotFoundException } from '../../property-registration/exceptions/exceptions.js';
 import type { NotificationType } from '../../global/global.schema.js';
 import type { createResourceImageType } from '../../global/global.schema-dtos.js';
+//import type { GenerateIAContractFields } from './helper.service.js';
 
 // estos dos actores importantes en los contratos son miembros activos
 //dentro de la propiedad
@@ -42,6 +48,168 @@ export class ContractService {
     private readonly globalRepository: GlobalRepository,
   ) {}
 
+  //contract drafts
+  // async generateIAContractContent() {
+  //   const promptData: GenerateIAContractFields = {};
+  // }
+
+  //este metodo permitira crear borradores de contratos para sugerir al miembro con
+  //la politica de generacion de contratos que puede editar modificar para enviar y asi
+  // el interesado en la vivienda pueda aceptarlo o rechazarlo
+  async generateContractDraft(
+    userId: string,
+    contractDraft: GenerateContractDraftType,
+  ): Promise<{
+    id: string;
+    version: number;
+    message: string;
+    createAt: string;
+  }> {
+    //verficamos que sea un miembro activo en la app
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
+        userId,
+        contractDraft.propertyId,
+      );
+
+    //verificamos que tambien tenga las politicas de registros de contratos
+    await this.systemRole.CheckPolicies(optPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.REGISTRAR_CONTRATOS,
+    ]);
+
+    //verificamos que exista la propiedad con el landlord ID
+    const optProperty =
+      await this.propertyRepository.findPropertyByIdAndPropertyMemberId(
+        optPropertyMember.id,
+        contractDraft.propertyId,
+      );
+
+    if (!optProperty) {
+      throw new PropertyNotFoundException();
+    }
+
+    //verificamos que el arrendado sea un miembro activo en la propiedad
+    const optTenantPropertyMember =
+      await this.systemRole.verifyPropertyMemberByIdAndPropertyId(
+        contractDraft.tenantMemberId,
+        optProperty.id,
+      );
+
+    //encontramos la ultima version del borrador del contrato
+    const version =
+      await this.contractRepository.findLastVersionInContractDraft(
+        optProperty.id,
+      );
+
+    //creamos el borrador de contrato
+    const savedDraft = await this.contractRepository.saveContractDraft({
+      content: contractDraft.content,
+      version,
+      landlordAgreed: false,
+      tenantAgreed: false,
+      createdByPropertyMemberId: optPropertyMember.id,
+      propertyId: optProperty.id,
+      landlordMemberId: contractDraft.landlordMemberId,
+      tenantMemberId: optTenantPropertyMember.id,
+      monthlyRent: contractDraft.monthlyRent,
+      depositAmount: contractDraft.depositAmount,
+      startDate: contractDraft.startDate,
+      endDate: contractDraft.endDate,
+    });
+
+    //notificamos a los actores dentro del contrato para que se enteren de la
+    //nueva version o borrador del contrato
+    const landlordNotification: NotificationType = {
+      content: `Un nuevo borrador de contrato para la vivienda ${optProperty.propertyName} ha sido generado!`,
+      name: 'Borrador de contrato',
+      receiverId: contractDraft.landlordMemberId,
+      source: 'CONTRACT_SERVICE',
+      transmitterId: optPropertyMember.id,
+      type: 'INFO',
+    };
+
+    const tenantNotification: NotificationType = {
+      content: `Un nuevo borrador de contrato para la vivienda ${optProperty.propertyName} ha sido generado!`,
+      name: 'Borrador de contrato',
+      receiverId: contractDraft.tenantMemberId,
+      source: 'CONTRACT_SERVICE',
+      transmitterId: optPropertyMember.id,
+      type: 'INFO',
+    };
+
+    //guardamos las respectivas notificaciones
+    await this.prismaClient.$transaction(async (tx) => {
+      await this.globalRepository.saveNotification(landlordNotification, tx);
+      await this.globalRepository.saveNotification(tenantNotification, tx);
+    });
+
+    return {
+      id: savedDraft.id,
+      version: savedDraft.version,
+      message: 'borrador generado correctamente!',
+      createAt: Date.toString(),
+    };
+  }
+
+  async getAllContractDraft(
+    userId: string,
+    propertyId: string,
+    paginationDto: PaginationType,
+  ) {
+    //verificamos que sea un miembro valido en la propiedad
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
+        userId,
+        propertyId,
+      );
+
+    //verificamos que tenga la politica para leer contratos
+    await this.systemRole.CheckPolicies(optPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.VER_CONTRATOS,
+    ]);
+
+    return await this.contractRepository.findAllContractDraftByPropertyId(
+      propertyId,
+      paginationDto,
+    );
+  }
+
+  async getContractDraftById(
+    userId: string,
+    contractDraftId: string,
+    propertyId: string,
+  ) {
+    //primero verificamos que el mimebro pertenezca en el inmueble
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
+        userId,
+        propertyId,
+      );
+
+    //verificamos politicas
+    await this.systemRole.CheckPolicies(optPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.VER_CONTRATOS,
+    ]);
+
+    //retornamos el draft del contrato
+    const optContractDraft =
+      await this.contractRepository.findContractDraftByIdAndPropertyId(
+        contractDraftId,
+        propertyId,
+      );
+
+    if (!optContractDraft) {
+      throw new contractDraftNotFound();
+    }
+
+    return optContractDraft;
+  }
+
+  //metodo para que ambas partes en el contrato esten de acuerdo en el borrador para proceder con el
+  //juridico
+  async agreeContractDraft() {}
+
+  //contracts
   async createContract(
     userId: string,
     contract: CreateContractType,
@@ -232,8 +400,8 @@ export class ContractService {
     //verificamos que exista dicho contrato
     const optContract =
       await this.contractRepository.findContractByIdAndPropertyId(
-        propertyId,
         contractId,
+        propertyId,
       );
 
     if (!optContract) {
@@ -270,7 +438,62 @@ export class ContractService {
   }
 
   //este metodo nos permitira cambiar de estado un contrato
-  async handleContractStatus() {}
+  async handleContractStatus(
+    userId: string,
+    contractId: string,
+    contractStatus: changeContractStatusType,
+    propertyId: string,
+  ): Promise<{ contractId: string; message: string }> {
+    //verificamos que sea un miembro de la propiedad
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
+        userId,
+        propertyId,
+      );
+
+    const optContract =
+      await this.contractRepository.findContractByIdAndPropertyId(
+        contractId,
+        propertyId,
+      );
+
+    if (!optContract) {
+      throw new contractNotFound();
+    }
+
+    //tenemos que verificar si el miembro actual tiene permisos para
+    //cambiar el estado del contrato segun el tipo, ya que no basta con que cumpla
+    //algunas de las politicas sino que debe permitir lo necesario para cada contract status
+    switch (contractStatus.status) {
+      case 'FINISHED':
+        await this.systemRole.CheckPolicies(optPropertyMember.id, [
+          POLICIES_STATEMENTS_NAMES.FINALIZAR_CONTRATOS,
+        ]);
+
+        //actualizamos el estado del contrato a FINALIZADO
+        await this.contractRepository.updateStatusContractById(
+          contractId,
+          'FINISHED',
+        );
+        break;
+
+      case 'SUSPENDED':
+        await this.systemRole.CheckPolicies(optPropertyMember.id, [
+          POLICIES_STATEMENTS_NAMES.SUSPENDER_CONTRATOS,
+        ]);
+
+        await this.contractRepository.updateStatusContractById(
+          contractId,
+          'SUSPENDED',
+        );
+        break;
+    }
+
+    return {
+      contractId: optContract.id,
+      message: 'estado del contrato cambiado exitosamente!',
+    };
+  }
 
   async getContractbyId(
     userId: string,
@@ -291,8 +514,8 @@ export class ContractService {
     ]);
 
     const data = await this.contractRepository.findContractByIdAndPropertyId(
-      propertyId,
       contractId,
+      propertyId,
     );
 
     if (!data) {
@@ -326,6 +549,4 @@ export class ContractService {
   }
 
   // async editContract(userId: string, contractId: string) {}
-
-  async generateIAContractContent() {}
 }
