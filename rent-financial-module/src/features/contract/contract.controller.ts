@@ -15,10 +15,14 @@ import { ZodValidation } from '../../core/pipes/zod-validation.pipe.js';
 import type { AuthRequest } from '../../types/global-types.js';
 import {
   AcceptedOrRejectedContractDtoRequest,
+  changeContractStatusDtoRequest,
   createContractDtoRequest,
+  generateContractDraftDtoRequest,
   LoadDocumentInContractDtoRequest,
   type AcceptedOrRejectedContractType,
+  type changeContractStatusType,
   type CreateContractType,
+  type GenerateContractDraftType,
   type LoadDocumentInContractType,
 } from './dtos/request-dto.js';
 import {
@@ -64,7 +68,7 @@ export class ContractController {
     return data;
   }
 
-  @Get(':propertyId')
+  @Get('/property/:propertyId')
   async findAllContractByPropertyId(
     @Req() req: AuthRequest,
     @Param('propertyId') propertyId: string,
@@ -104,6 +108,62 @@ export class ContractController {
       body.propertyId,
       contractId,
       body.resources,
+    );
+  }
+
+  @Post(':contractId/property/:propertyId/status')
+  async handleChangeContractStatus(
+    @Req() req: AuthRequest,
+    @Param('contractId') contractId: string,
+    @Param('propertyId') propertyId: string,
+    @Body(new ZodValidation(changeContractStatusDtoRequest))
+    body: changeContractStatusType,
+  ) {
+    return await this.service.handleContractStatus(
+      req.user.userId,
+      contractId,
+      body,
+      propertyId,
+    );
+  }
+
+  // //generar un borrador de contrato con IA
+  // @Post('generateIA')
+  // async generateSuggestionDraftContractWithIA(@Req() req: AuthRequest) {}
+
+  //crear un borrador de contrato
+  @Post('draft')
+  async generateContractDraft(
+    @Req() req: AuthRequest,
+    @Body(new ZodValidation(generateContractDraftDtoRequest))
+    body: GenerateContractDraftType,
+  ) {
+    return await this.service.generateContractDraft(req.user.userId, body);
+  }
+
+  @Post('draft/property/:propertyId')
+  async findAllContractDraft(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+    @Query(new ZodValidation(paginationSchema)) paginationDto: PaginationType,
+  ) {
+    return await this.service.getAllContractDraft(
+      req.user.userId,
+      propertyId,
+      paginationDto,
+    );
+  }
+
+  @Post('draft/:contractDraftId/property/:propertyId')
+  async findContractDraftById(
+    @Req() req: AuthRequest,
+    @Param('contractDraftId') contractDraftId: string,
+    @Param('propertyId') propertyId: string,
+  ) {
+    return await this.service.getContractDraftById(
+      req.user.userId,
+      contractDraftId,
+      propertyId,
     );
   }
 }
