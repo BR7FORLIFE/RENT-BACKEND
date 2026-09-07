@@ -114,12 +114,27 @@
 				},
 				{
 					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.globals.set(\"JWT\", response.accessToken);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"password\": \"123456\"\n} ",
+							"raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"123456\"\n} ",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -146,7 +161,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"f1fdefd2-7270-43ba-af33-bc55f6ae18e8\",\n    \"refreshToken\": \"c11W3StRMILOKylqae9g_gPDNOEWqqREUHP5qjnOm4Q\"\n}",
+							"raw": "{\n    \"userId\": \"52b710a6-6232-4724-8463-4f8d34157ded\",\n    \"refreshToken\": \"Ha8HhId5RcSfOXzOQ_HKfeyFvPntFhC72wbIEW_fWQ8\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -523,7 +538,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"userId\": \"41eba6c8-954c-443a-973e-0b9991c45f56\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"propertyId\": \"d283be3e-b22e-42f5-b56d-f26e18813cff\"\n}",
+									"raw": "{\n    \"userId\": \"d34a772f-04f1-491a-ab23-92db0d20f197\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"propertyId\": \"a3ff51f6-01d7-4afa-b3fd-56e6dfab8ca1\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -594,7 +609,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/{{propertyId}}?status=IN_PROCESS",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/property/{{propertyId}}/getall?status=IN_PROCESS",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -604,7 +619,9 @@
 									"path": [
 										"rent-financial",
 										"property-member",
-										"{{propertyId}}"
+										"property",
+										"{{propertyId}}",
+										"getall"
 									],
 									"query": [
 										{
@@ -679,7 +696,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"propertyId\": \"3f8faf7b-95b1-4ff7-bf44-89d35188d799\",\n    \"landlordMemberId\": \"ffe0f39b-a3ca-43c0-a688-b0449fc13bff\",\n    \"tenantMemberId\": \"f1bcc5d1-8ed7-4e03-9862-62608871b962\",\n    \"monthlyRent\": 8000,\n    \"depositAmount\": 5000,\n    \"startDate\": \"2026-07-20\",\n    \"endDate\": \"2026-09-13\",\n    \"resources\": [\n        {\n            \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n            \"width\": 70,\n            \"height\": 35,\n            \"format\": \"pdf\",\n            \"url\": \"http\",\n            \"secureUrl\": \"https\"\n        }\n    ]\n}",
+									"raw": "{\n    \"propertyId\": \"085714f8-1e7b-4a5e-9ab7-4b249e2d8a3c\",\n    \"landlordMemberId\": \"6e8b296a-2e3a-40cf-9998-43243e6868f2\",\n    \"tenantMemberId\": \"17a16d55-7a41-4833-a579-c4758b6ae297\",\n    \"monthlyRent\": 8000,\n    \"depositAmount\": 5000,\n    \"startDate\": \"2026-07-20\",\n    \"endDate\": \"2026-09-13\",\n    \"resources\": [\n        {\n            \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n            \"width\": 70,\n            \"height\": 35,\n            \"format\": \"pdf\",\n            \"url\": \"http\",\n            \"secureUrl\": \"https\"\n        }\n    ]\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -752,7 +769,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/?page=0",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/property/{{propertyId}}",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -762,13 +779,8 @@
 									"path": [
 										"rent-financial",
 										"contract",
-										""
-									],
-									"query": [
-										{
-											"key": "page",
-											"value": "0"
-										}
+										"property",
+										"{{propertyId}}"
 									]
 								}
 							},
@@ -856,6 +868,192 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Change contract status",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": \"SUSPENDED\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/{{contractId}}/property/{{propertyId}}/status",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"contract",
+										"{{contractId}}",
+										"property",
+										"{{propertyId}}",
+										"status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Generate contract draft with IA",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/generateIA",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"contract",
+										"generateIA"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create contract draft",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"content\": \"CONTRATO DE ARRENDAMIENTO DE VIVIENDA\\n\\nEl presente documento establece las condiciones del contrato de arrendamiento celebrado entre el arrendador y el arrendatario respecto del inmueble objeto del contrato.\\n\\nPRIMERA. OBJETO: El arrendador entrega al arrendatario el inmueble identificado dentro de la plataforma RENT.\\n\\nSEGUNDA. CANON: El arrendatario pagará un canon mensual de $900.000 COP.\\n\\nTERCERA. DEPÓSITO: Se establece un depósito de $500.000 COP como garantía de las obligaciones acordadas entre las partes.\\n\\nCUARTA. DURACIÓN: El contrato tendrá una duración de doce meses, iniciando el 1 de octubre de 2026 y finalizando el 1 de octubre de 2027.\\n\\nQUINTA. ACEPTACIÓN: Las partes declaran conocer y aceptar las condiciones establecidas en el presente borrador, sujeto a su aprobación definitiva.\",\n  \"propertyId\": \"a3ff51f6-01d7-4afa-b3fd-56e6dfab8ca1\",\n  \"landlordMemberId\": \"416255b0-9cbb-41ad-8ca2-840c0b455761\",\n  \"tenantMemberId\": \"cc21bebd-ce11-4f8b-865b-cbce231dda41\",\n  \"monthlyRent\": 900000,\n  \"depositAmount\": 500000,\n  \"startDate\": \"2026-10-01T00:00:00.000Z\",\n  \"endDate\": \"2027-10-01T00:00:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/draft",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"contract",
+										"draft"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get all contract draft by property id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/draft/property/{{propertyId}}",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"contract",
+										"draft",
+										"property",
+										"{{propertyId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get contract draft by contract id and property id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/draft/{{contractDraftId}}/property/{{propertyId}}",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"contract",
+										"draft",
+										"{{contractDraftId}}",
+										"property",
+										"{{propertyId}}"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -906,7 +1104,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/properties/{{propertyId}}",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/property/{{propertyId}}",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -916,7 +1114,7 @@
 									"path": [
 										"rent-financial",
 										"property-member",
-										"properties",
+										"property",
 										"{{propertyId}}"
 									]
 								}
