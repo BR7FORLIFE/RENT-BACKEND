@@ -146,4 +146,24 @@ export class SystemPropertyService {
 
     return optPropertyMember;
   }
+
+  //este metodo permite verificar un property member sin la necesidad
+  //del estado del miembro actual
+  async verifyPropertyMemberByIdAndPropertyIdWithoutStatus(
+    propertyMemberId: string,
+    propertyId: string,
+  ) {
+    const optPropertyMember = await this.prisma.propertyMember.findFirst({
+      where: {
+        id: propertyMemberId,
+        propertyId,
+      },
+    });
+
+    if (!optPropertyMember) {
+      throw new PropertyMemberNotFoundById(propertyMemberId);
+    }
+
+    return optPropertyMember;
+  }
 }

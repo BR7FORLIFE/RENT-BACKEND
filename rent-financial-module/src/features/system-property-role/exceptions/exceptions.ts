@@ -1,4 +1,5 @@
 import { AppException } from '../../../core/global-exception.js';
+import type { PropertyMemberStatus } from '../../property-registration/schemas/property-registration.schema.js';
 
 //miembro de la propiedad no encontrado
 export class PropertyMemberNotFound extends AppException {
@@ -67,6 +68,16 @@ export class PoliciesAuthorizationNotAllowed extends AppException {
       'Acceso denegado!, no cuenta con las politicas necesario para realizar la acción',
       401,
       'Unauthorized',
+    );
+  }
+}
+
+export class ChangeStatusPropertyMemberException extends AppException {
+  constructor(status: PropertyMemberStatus) {
+    super(
+      `El miembro actual ya posee dicho estado ${status}, coloque un estado valido para cambiar.`,
+      406,
+      'NOT_ACCEPTABLE',
     );
   }
 }
