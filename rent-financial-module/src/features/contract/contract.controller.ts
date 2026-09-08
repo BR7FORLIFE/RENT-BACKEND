@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -54,6 +55,20 @@ export class ContractController {
     };
   }
 
+  @Get('property/:propertyId')
+  async findAllContractByPropertyId(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+    @Query(new ZodValidation(paginationSchema))
+    paginationDto: PaginationType,
+  ) {
+    return await this.service.getAllContracts(
+      req.user.userId,
+      propertyId,
+      paginationDto,
+    );
+  }
+
   @Get(':contractId/property/:propertyId')
   async findContractById(
     @Req() req: AuthRequest,
@@ -65,23 +80,10 @@ export class ContractController {
       propertyId,
       contractId,
     );
+
     return data;
   }
 
-  @Get('/property/:propertyId')
-  async findAllContractByPropertyId(
-    @Req() req: AuthRequest,
-    @Param('propertyId') propertyId: string,
-    @Query(new ZodValidation(paginationSchema)) paginationDto: PaginationType,
-  ) {
-    return await this.service.getAllContracts(
-      req.user.userId,
-      propertyId,
-      paginationDto,
-    );
-  }
-
-  //aceptar o rechazar un contrato por parte del arrendado
   @Post('acceptedOrRejected')
   async AcceptedOrRejectedContractByTenantId(
     @Req() req: AuthRequest,
@@ -96,7 +98,43 @@ export class ContractController {
     );
   }
 
-  @Post(':contracId/documents')
+  @Post('draft')
+  async generateContractDraft(
+    @Req() req: AuthRequest,
+    @Body(new ZodValidation(generateContractDraftDtoRequest))
+    body: GenerateContractDraftType,
+  ) {
+    return await this.service.generateContractDraft(req.user.userId, body);
+  }
+
+  @Get('draft/property/:propertyId/getall')
+  async findAllContractDraft(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+    @Query(new ZodValidation(paginationSchema))
+    paginationDto: PaginationType,
+  ) {
+    return await this.service.getAllContractDraft(
+      req.user.userId,
+      propertyId,
+      paginationDto,
+    );
+  }
+
+  @Get('draft/:contractDraftId/property/:propertyId')
+  async findContractDraftById(
+    @Req() req: AuthRequest,
+    @Param('contractDraftId') contractDraftId: string,
+    @Param('propertyId') propertyId: string,
+  ) {
+    return await this.service.getContractDraftById(
+      req.user.userId,
+      contractDraftId,
+      propertyId,
+    );
+  }
+
+  @Post(':contractId/documents')
   async loadContractDocuments(
     @Param('contractId') contractId: string,
     @Req() req: AuthRequest,
@@ -111,7 +149,7 @@ export class ContractController {
     );
   }
 
-  @Post(':contractId/property/:propertyId/status')
+  @Patch(':contractId/property/:propertyId/status')
   async handleChangeContractStatus(
     @Req() req: AuthRequest,
     @Param('contractId') contractId: string,
@@ -123,46 +161,6 @@ export class ContractController {
       req.user.userId,
       contractId,
       body,
-      propertyId,
-    );
-  }
-
-  // //generar un borrador de contrato con IA
-  // @Post('generateIA')
-  // async generateSuggestionDraftContractWithIA(@Req() req: AuthRequest) {}
-
-  //crear un borrador de contrato
-  @Post('draft')
-  async generateContractDraft(
-    @Req() req: AuthRequest,
-    @Body(new ZodValidation(generateContractDraftDtoRequest))
-    body: GenerateContractDraftType,
-  ) {
-    return await this.service.generateContractDraft(req.user.userId, body);
-  }
-
-  @Post('draft/property/:propertyId')
-  async findAllContractDraft(
-    @Req() req: AuthRequest,
-    @Param('propertyId') propertyId: string,
-    @Query(new ZodValidation(paginationSchema)) paginationDto: PaginationType,
-  ) {
-    return await this.service.getAllContractDraft(
-      req.user.userId,
-      propertyId,
-      paginationDto,
-    );
-  }
-
-  @Post('draft/:contractDraftId/property/:propertyId')
-  async findContractDraftById(
-    @Req() req: AuthRequest,
-    @Param('contractDraftId') contractDraftId: string,
-    @Param('propertyId') propertyId: string,
-  ) {
-    return await this.service.getContractDraftById(
-      req.user.userId,
-      contractDraftId,
       propertyId,
     );
   }

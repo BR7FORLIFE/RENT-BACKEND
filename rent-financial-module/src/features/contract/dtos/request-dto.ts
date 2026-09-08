@@ -5,11 +5,6 @@ export const createContractDtoRequest = z.object({
   propertyId: z.uuid(),
   landlordMemberId: z.uuid(),
   tenantMemberId: z.uuid(),
-  monthlyRent: z.coerce.number(),
-  depositAmount: z.coerce.number(),
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date(),
-  resources: z.array(createResourceImageDtoRequest),
 });
 
 export type CreateContractType = z.infer<typeof createContractDtoRequest>;
