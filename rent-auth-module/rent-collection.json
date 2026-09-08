@@ -609,7 +609,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/property/{{propertyId}}/getall?status=IN_PROCESS",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/property/{{propertyId}}/getall?status=ACTIVE",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -626,7 +626,7 @@
 									"query": [
 										{
 											"key": "status",
-											"value": "IN_PROCESS"
+											"value": "ACTIVE"
 										}
 									]
 								}
@@ -673,6 +673,48 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Change status in property member id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{JWT}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"propertyId\": \"{{propertyId}}\",\n    \"status\": \"ACTIVE\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/{{propertyMemberId}}/status",
+									"protocol": "https",
+									"host": [
+										"judiciary-dingo-alias",
+										"ngrok-free",
+										"dev"
+									],
+									"path": [
+										"rent-financial",
+										"property-member",
+										"{{propertyMemberId}}",
+										"status"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -696,7 +738,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"propertyId\": \"085714f8-1e7b-4a5e-9ab7-4b249e2d8a3c\",\n    \"landlordMemberId\": \"6e8b296a-2e3a-40cf-9998-43243e6868f2\",\n    \"tenantMemberId\": \"17a16d55-7a41-4833-a579-c4758b6ae297\",\n    \"monthlyRent\": 8000,\n    \"depositAmount\": 5000,\n    \"startDate\": \"2026-07-20\",\n    \"endDate\": \"2026-09-13\",\n    \"resources\": [\n        {\n            \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n            \"width\": 70,\n            \"height\": 35,\n            \"format\": \"pdf\",\n            \"url\": \"http\",\n            \"secureUrl\": \"https\"\n        }\n    ]\n}",
+									"raw": "{\n    \"propertyId\": \"085714f8-1e7b-4a5e-9ab7-4b249e2d8a3c\",\n    \"landlordMemberId\": {{landlordMemberId}},\n    \"tenantMemberId\": {{tenantMemberId}}\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -882,7 +924,7 @@
 										}
 									]
 								},
-								"method": "POST",
+								"method": "PATCH",
 								"header": [],
 								"body": {
 									"mode": "raw",
@@ -1002,7 +1044,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/draft/property/{{propertyId}}",
+									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/draft/property/{{propertyId}}/getall",
 									"protocol": "https",
 									"host": [
 										"judiciary-dingo-alias",
@@ -1014,7 +1056,8 @@
 										"contract",
 										"draft",
 										"property",
-										"{{propertyId}}"
+										"{{propertyId}}",
+										"getall"
 									]
 								}
 							},
