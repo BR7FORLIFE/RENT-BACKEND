@@ -9,6 +9,7 @@ import type {
 import type { ContractType } from '../schemas/contract.schema.js';
 import { GlobalRepository } from '../../global/repository-global.js';
 import {
+  contractDraftAvailabilityNotFoundException,
   contractDraftNotFound,
   contractNotFound,
   deniedTransitionedStatusContract,
@@ -101,20 +102,44 @@ export class ContractService {
         optProperty.id,
       );
 
-    //creamos el borrador de contrato
-    const savedDraft = await this.contractRepository.saveContractDraft({
-      content: contractDraft.content,
-      version,
-      landlordAgreed: false,
-      tenantAgreed: false,
-      createdByPropertyMemberId: optPropertyMember.id,
-      propertyId: optProperty.id,
-      landlordMemberId: contractDraft.landlordMemberId,
-      tenantMemberId: optTenantPropertyMember.id,
-      monthlyRent: contractDraft.monthlyRent,
-      depositAmount: contractDraft.depositAmount,
-      startDate: contractDraft.startDate,
-      endDate: contractDraft.endDate,
+    //creamos el borrador de contrato y ademas asignamos el rol de ARRENDADO_PRELIMINAR
+    //para que pueda acceder a los borradores de contratos
+
+    const response = await this.prismaClient.$transaction(async (tx) => {
+      const savedDraft = await this.contractRepository.saveContractDraft(
+        {
+          content: contractDraft.content,
+          version,
+          landlordAgreed: false,
+          tenantAgreed: false,
+          createdByPropertyMemberId: optPropertyMember.id,
+          propertyId: optProperty.id,
+          landlordMemberId: contractDraft.landlordMemberId,
+          tenantMemberId: optTenantPropertyMember.id,
+          monthlyRent: contractDraft.monthlyRent,
+          depositAmount: contractDraft.depositAmount,
+          startDate: contractDraft.startDate,
+          endDate: contractDraft.endDate,
+        },
+        tx,
+      );
+
+      // !!!!!!!!!!!!!!!!!!!!!!!!!OJO DEBO DE BUSCAR SI EL TENANT TIENE EL ROL ARRENDADO_PRELIMINAR
+      // PARA NO GUARDAR MULTIPLES COPIAS DEL PROPERTY MEMBER ROLE
+
+      //asignamos el rol ARRENDADO_PRELIMINAR a la persona interesada y asi obtener ciertas acciones dentro de
+      //dicha propiedad
+      const propertyTenantMemberRole: PropertyMemberRoleType = {
+        propertyMemberId: optTenantPropertyMember.id,
+        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO_PRELIMINAR,
+      };
+
+      await this.propertyMemberRepository.savePropertyMemberRole(
+        propertyTenantMemberRole,
+        tx,
+      );
+
+      return { savedDraft };
     });
 
     //notificamos a los actores dentro del contrato para que se enteren de la
@@ -144,10 +169,10 @@ export class ContractService {
     });
 
     return {
-      id: savedDraft.id,
-      version: savedDraft.version,
+      id: response.savedDraft.id,
+      version: response.savedDraft.version,
       message: 'borrador generado correctamente!',
-      createAt: Date.toString(),
+      createAt: new Date().toString(),
     };
   }
 
@@ -165,7 +190,7 @@ export class ContractService {
 
     //verificamos que tenga la politica para leer contratos
     await this.systemRole.CheckPolicies(optPropertyMember.id, [
-      POLICIES_STATEMENTS_NAMES.VER_CONTRATOS,
+      POLICIES_STATEMENTS_NAMES.VER_CONTRATOS_PRELIMINARES,
     ]);
 
     return await this.contractRepository.findAllContractDraftByPropertyId(
@@ -188,7 +213,7 @@ export class ContractService {
 
     //verificamos politicas
     await this.systemRole.CheckPolicies(optPropertyMember.id, [
-      POLICIES_STATEMENTS_NAMES.VER_CONTRATOS,
+      POLICIES_STATEMENTS_NAMES.VER_CONTRATOS_PRELIMINARES,
     ]);
 
     //retornamos el draft del contrato
@@ -255,28 +280,31 @@ export class ContractService {
         optProperty.id,
       );
 
-    const result = await this.prismaClient.$transaction(async (tx) => {
-      //asignamos el rol ARRENDADO al arrendado y asi obtener ciertas acciones dentro de
-      //dicha propiedad
-      const propertyTenantMemberRole: PropertyMemberRoleType = {
-        propertyMemberId: tenantPropertyMember.id,
-        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO_PRELIMINAR,
-      };
+    //partimos de los DRAFT creados de los contract donde nosotros vamos a extraer aquel
+    //donde ambas partes (landlord y tenant) hayan acordado aceptar dicho borrador y donde la version se la ultima
+    //una vez obteniendo dicho draft rellenaremos el contrato juridico con la informacion parcial del borrador
+    //para asi hacer un proceso transparente entre las partes.
 
-      await this.propertyMemberRepository.savePropertyMemberRole(
-        propertyTenantMemberRole,
-        tx,
+    //buscamos el draft que cumple con los requisitos
+    const optContractDraft =
+      await this.contractRepository.findContractDraftAvailability(
+        optProperty.id,
       );
 
+    if (!optContractDraft) {
+      throw new contractDraftAvailabilityNotFoundException();
+    }
+
+    const result = await this.prismaClient.$transaction(async (tx) => {
       const newContract: ContractType = {
         // la idea es que si hay mas actores se pueda setear la id de quien genero el contracto
         createByUserId: userId,
-        depositAmount: contract.depositAmount,
-        endDate: contract.endDate,
+        depositAmount: Number(optContractDraft.depositAmount),
+        endDate: optContractDraft.endDate,
         landlordMemberId: optLandordPropertyMember.id,
-        monthlyRent: contract.monthlyRent,
+        monthlyRent: Number(optContractDraft.monthlyRent),
         propertyId: optProperty.id,
-        startDate: contract.startDate,
+        startDate: optContractDraft.startDate,
         status: 'PENDING_ACCEPTANCE',
         // si cambia el estado a PENDING o EXECUTION puede ser miembro activo del inmueble
         tenantMemberId: tenantPropertyMember.id,
@@ -284,7 +312,6 @@ export class ContractService {
 
       const { id: contractId } = await this.contractRepository.saveContract(
         newContract,
-        contract.resources,
         tx,
       );
       //enviamos la notificacion al posible arrendado para que se entere y decida

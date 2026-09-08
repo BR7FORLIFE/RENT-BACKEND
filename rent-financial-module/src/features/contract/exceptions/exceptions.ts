@@ -12,6 +12,16 @@ export class contractNotFound extends AppException {
   }
 }
 
+export class contractDraftAvailabilityNotFoundException extends AppException {
+  constructor() {
+    super(
+      'No hay un borrador de contrato donde ambas partes hayan aceptado los terminos!',
+      404,
+      'NOT_FOUND',
+    );
+  }
+}
+
 export class contractDraftNotFound extends AppException {
   constructor() {
     super('Borrador de contrato no encontrado!', 404, 'NOT_FOUND');

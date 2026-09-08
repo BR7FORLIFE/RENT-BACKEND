@@ -91,6 +91,22 @@ export class ContractRepository {
     });
   }
 
+  async findContractDraftAvailability(
+    propertyId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.contractDraft.findFirst({
+      where: {
+        propertyId,
+        tenantAgreed: true,
+        landlordAgreed: true,
+      },
+      orderBy: {
+        version: 'desc',
+      },
+    });
+  }
+
   async findContractByStatusContractAndPropertyId(
     statusContract: StatusContractType,
     propertyId: string,
@@ -149,7 +165,19 @@ export class ContractRepository {
   }
 
   //saves
+
   async saveContract(
+    contract: ContractType,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.contract.create({
+      data: {
+        ...contract,
+      },
+    });
+  }
+
+  async saveContractWithResources(
     contract: ContractType,
     resourcesImages: ResourceImageType[],
     db: Prisma.TransactionClient = this.prisma,
