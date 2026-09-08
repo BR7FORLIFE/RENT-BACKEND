@@ -292,6 +292,11 @@ async function main() {
           'Permite consultar y visualizar los contratos asociados al inmueble',
       },
       {
+        id: POLICIES_STATEMENTS.VER_CONTRATOS_PRELIMINARES,
+        policyName: 'VER_CONTRATOS_PRELIMINARES',
+        description: 'Permite consultar los borradores de contratos generados',
+      },
+      {
         id: POLICIES_STATEMENTS.REGISTRAR_CONTRATOS,
         policyName: 'REGISTRAR_CONTRATOS',
         description: 'Permite registrar nuevos contratos asociados al inmueble',
@@ -604,6 +609,10 @@ async function main() {
         propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
         policy_statement_id: POLICIES_STATEMENTS.VER_HISTORIAL_CONTRATO,
       },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.VER_CONTRATOS_PRELIMINARES,
+      },
 
       //servicios publicos
       {
@@ -793,7 +802,7 @@ async function main() {
       },
       {
         propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO_PRELIMINAR,
-        policy_statement_id: POLICIES_STATEMENTS.VER_CONTRATOS,
+        policy_statement_id: POLICIES_STATEMENTS.VER_CONTRATOS_PRELIMINARES,
       },
       //politicas para el rol MIEMBRO (las personas que se invitan y aceptan)
       // y estan a la espera de un en especifico

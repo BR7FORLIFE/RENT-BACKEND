@@ -44,6 +44,7 @@ VER_DOCUMENTOS_CONTRATO	Consultar documentos asociados [9]
 SUBIR_DOCUMENTOS_CONTRATO	Adjuntar documentos [10]
 ELIMINAR_DOCUMENTOS_CONTRATO	Eliminar documentos [11]
 VER_HISTORIAL_CONTRATO	Consultar modificaciones e historial [12]
+VER_CONTRATOS_PRELIMINARES ver los borradores de contratos [13]
 
 **Servicios Publicos**
 
