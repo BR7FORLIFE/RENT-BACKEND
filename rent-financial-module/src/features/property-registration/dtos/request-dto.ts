@@ -123,3 +123,13 @@ export const loadPropertyDocumentsDtoRequest = z.object({
 export type LoadPropertyDocumentsType = z.infer<
   typeof loadPropertyDocumentsDtoRequest
 >;
+
+//asignar un estado a los miembros de propiedad
+export const changeStatusPropertyMemberDtoRequest = z.object({
+  status: z.enum(['ACTIVE', 'DESACTIVE', 'IN_PROCESS']),
+  propertyId: z.uuid(),
+});
+
+export type ChangeStatusPropertyMemberType = z.infer<
+  typeof changeStatusPropertyMemberDtoRequest
+>;

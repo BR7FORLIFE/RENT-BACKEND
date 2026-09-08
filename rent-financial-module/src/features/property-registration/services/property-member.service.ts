@@ -19,7 +19,10 @@ import type {
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import { getAllUsers, getUserData } from '../api.js';
 import { unionInfoUser, validateInvitationLinked } from './helpers.service.js';
-import type { InvitePropertyMemberType } from '../dtos/request-dto.js';
+import type {
+  ChangeStatusPropertyMemberType,
+  InvitePropertyMemberType,
+} from '../dtos/request-dto.js';
 import { UserNotFound } from '../../../core/global-exception.js';
 import {
   generateSecureString,
@@ -30,11 +33,15 @@ import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../../types/global-types.js';
 import type { PropertyActorRoleType, PropertyMemberMe } from '../types.js';
 import {
   AssingnmentStatusNotAllowedException,
+  ChangeStatusPropertyMemberException,
   NotAllowedStatusByPropertyMemberException,
   PropertyMemberNotFound,
 } from '../../system-property-role/exceptions/exceptions.js';
 import { SystemPropertyRoleRepository } from '../../system-property-role/repository/sytem-property-role.repository.js';
-import { cleanPolicies } from '../../system-property-role/services/system-property.service.js';
+import {
+  cleanPolicies,
+  SystemPropertyService,
+} from '../../system-property-role/services/system-property.service.js';
 
 /**
  * De que se encargara este servicio?
@@ -66,6 +73,7 @@ export class PropertyMemberService {
     private propertyMemberRepository: PropertyMemberRepository,
     private propertyRepository: PropertyRepository,
     private systemPropertyRepository: SystemPropertyRoleRepository,
+    private systemRole: SystemPropertyService,
     private globalRepository: GlobalRepository,
   ) {}
 
@@ -375,6 +383,53 @@ export class PropertyMemberService {
       policies: result.policies
         ? cleanPolicies(result.policies, result.overrides)
         : [],
+    };
+  }
+
+  async changeStatusPropertyMember(
+    userId: string,
+    propertyMemberId: string,
+    status: ChangeStatusPropertyMemberType,
+  ): Promise<{
+    propertyId: string;
+    propertyMemberId: string;
+    message: string;
+  }> {
+    //entontramos la propiedad correspondiente al user ID ya que solo
+    // el propietario puede cambiar el rol de sus miembros ya que si
+    //una persona tuviera el poder de hacerlo podria desvincular al
+    //propio propietario
+    const optOwnProperty = await this.propertyRepository.findPropertyById(
+      userId,
+      status.propertyId,
+    );
+
+    if (!optOwnProperty) {
+      throw new PropertyNotFoundException();
+    }
+
+    //buscamos si el  propertymember esta vinculado al inmueble
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberByIdAndPropertyIdWithoutStatus(
+        propertyMemberId,
+        optOwnProperty.id,
+      );
+
+    //lanzamos una excepcion si dicho estado ya lo posee el miembro
+    if (optPropertyMember.status === status.status) {
+      throw new ChangeStatusPropertyMemberException(status.status);
+    }
+
+    //actualizamos el estado del miembro
+    await this.propertyMemberRepository.updatePropertyMemberStatus(
+      optPropertyMember.id,
+      status.status,
+    );
+
+    return {
+      propertyId: optOwnProperty.id,
+      propertyMemberId: optPropertyMember.id,
+      message: 'Estado cambiado exitosamente!',
     };
   }
 }

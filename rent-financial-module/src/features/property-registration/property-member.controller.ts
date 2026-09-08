@@ -25,8 +25,10 @@ import { ZodValidation } from '../../core/pipes/zod-validation.pipe.js';
 import { PropertyMemberService } from './services/property-member.service.js';
 import {
   assignmentRolesToMember,
+  changeStatusPropertyMemberDtoRequest,
   InvitePropertyMemberDtoRequest,
   type assignmentRolesToMemberType,
+  type ChangeStatusPropertyMemberType,
   type InvitePropertyMemberType,
 } from './dtos/request-dto.js';
 
@@ -37,22 +39,6 @@ import {
 export class PropertyMemberController {
   constructor(private propertyMemberService: PropertyMemberService) {}
 
-  @Get(':propertyId')
-  async getAllPropertyMembersByPropertyId(
-    @Req() req: AuthRequest,
-    @Param('propertyId') propertyId: string,
-    @Query(new ZodValidation(getMembersQuerySchema))
-    queryStatus: GetMembersQuery,
-    @Query(new ZodValidation(paginationSchema)) paginationDto: PaginationType,
-  ) {
-    return await this.propertyMemberService.getAllPropertyMemberByPropertyId(
-      req.user.userId,
-      propertyId,
-      queryStatus.status,
-      paginationDto,
-    );
-  }
-
   //invitaciones de property Members
   @UsePipes(new ZodValidation(InvitePropertyMemberDtoRequest))
   @Post('invite-property-member')
@@ -61,22 +47,6 @@ export class PropertyMemberController {
       await this.propertyMemberService.invitePropertyMembers(invitationReq);
 
     return { id, invitedEmailTo, message };
-  }
-
-  //controlador para asignar una lista de roles al usuario
-  @Post(':propertyMemberId')
-  async assignmentRolesToMember(
-    @Req() req: AuthRequest,
-    @Param('propertyMemberId') propertyMemberId: string,
-    @Body(new ZodValidation(assignmentRolesToMember))
-    body: assignmentRolesToMemberType,
-  ) {
-    return await this.propertyMemberService.assignmentRolesToMember(
-      req.user.userId,
-      propertyMemberId,
-      body.propertyId,
-      body.roles,
-    );
   }
 
   //estos endpoint son importantes ya que sin importar si el miembro
@@ -99,7 +69,7 @@ export class PropertyMemberController {
     );
   }
 
-  @Get('properties/:propertyId')
+  @Get('property/:propertyId')
   async getPropertyByPropertyMember(
     @Req() req: AuthRequest,
     @Param('propertyId') propertyId: string,
@@ -107,6 +77,38 @@ export class PropertyMemberController {
     return await this.propertyMemberService.getPropertyByPropertyMemberId(
       req.user.userId,
       propertyId,
+    );
+  }
+
+  @Get('property/:propertyId/getall')
+  async getAllPropertyMembersByPropertyId(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+    @Query(new ZodValidation(getMembersQuerySchema))
+    queryStatus: GetMembersQuery,
+    @Query(new ZodValidation(paginationSchema)) paginationDto: PaginationType,
+  ) {
+    return await this.propertyMemberService.getAllPropertyMemberByPropertyId(
+      req.user.userId,
+      propertyId,
+      queryStatus.status,
+      paginationDto,
+    );
+  }
+
+  //controlador para asignar una lista de roles al usuario
+  @Post(':propertyMemberId')
+  async assignmentRolesToMember(
+    @Req() req: AuthRequest,
+    @Param('propertyMemberId') propertyMemberId: string,
+    @Body(new ZodValidation(assignmentRolesToMember))
+    body: assignmentRolesToMemberType,
+  ) {
+    return await this.propertyMemberService.assignmentRolesToMember(
+      req.user.userId,
+      propertyMemberId,
+      body.propertyId,
+      body.roles,
     );
   }
 
@@ -118,6 +120,21 @@ export class PropertyMemberController {
     return this.propertyMemberService.propertyMemberMe(
       propertyId,
       req.user.userId,
+    );
+  }
+
+  //metodo que me permite cambiar el estado de un miembro de propiedad
+  @Post(':propertyMemberId/status')
+  async changeStatusPropertyMember(
+    @Req() req: AuthRequest,
+    @Param('propertyMemberId') propertyMemberId: string,
+    @Body(new ZodValidation(changeStatusPropertyMemberDtoRequest))
+    status: ChangeStatusPropertyMemberType,
+  ) {
+    return await this.propertyMemberService.changeStatusPropertyMember(
+      req.user.userId,
+      propertyMemberId,
+      status,
     );
   }
 }
