@@ -232,7 +232,67 @@ export class ContractService {
 
   //metodo para que ambas partes en el contrato esten de acuerdo en el borrador para proceder con el
   //juridico
-  async agreeContractDraft() {}
+  async agreeContractDraft(
+    userId: string,
+    propertyId: string,
+    contractDraftId: string,
+  ): Promise<{ contractDraftId: string; message: string }> {
+    //buscamos el miembro de la propiedad vinculado
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
+        userId,
+        propertyId,
+      );
+
+    //buscamos si hay un borrador para este miembro de propiedad
+    const tenantContractDraft =
+      await this.contractRepository.findContractDraftByMemberId(
+        contractDraftId,
+        propertyId,
+        optPropertyMember.id,
+        'TENANT',
+      );
+
+    if (tenantContractDraft) {
+      //aceptamos el borrador por el posible arrendado
+      await this.contractRepository.updateAgreeContractDraft(
+        tenantContractDraft.id,
+        tenantContractDraft.propertyId,
+        'TENANT',
+        tenantContractDraft.version,
+      );
+
+      return {
+        contractDraftId,
+        message: 'borrador de contrato aceptado exitosamente!',
+      };
+    }
+
+    const landlordContractDraft =
+      await this.contractRepository.findContractDraftByMemberId(
+        contractDraftId,
+        propertyId,
+        optPropertyMember.id,
+        'LANDLORD',
+      );
+
+    if (landlordContractDraft) {
+      //aceptamos el borrador por el posible arrendado
+      await this.contractRepository.updateAgreeContractDraft(
+        landlordContractDraft.id,
+        landlordContractDraft.propertyId,
+        'LANDLORD',
+        landlordContractDraft.version,
+      );
+
+      return {
+        contractDraftId,
+        message: 'borrador de contrato aceptado exitosamente!',
+      };
+    }
+
+    throw new contractDraftNotFound();
+  }
 
   //contracts
   async createContract(

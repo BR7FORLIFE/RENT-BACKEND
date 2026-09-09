@@ -107,6 +107,50 @@ export class ContractRepository {
     });
   }
 
+  //encontrar borrador de contrato por propietario
+  async findContractDraftByMemberId(
+    contractDraftId: string,
+    propertyId: string,
+    propertyMemberId: string,
+    selection: 'LANDLORD' | 'TENANT',
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    if (selection === 'LANDLORD') {
+      return await db.contractDraft.findFirst({
+        where: {
+          id: contractDraftId,
+          propertyId,
+          landlordMemberId: propertyMemberId,
+        },
+      });
+    }
+
+    if (selection === 'TENANT') {
+      return await db.contractDraft.findFirst({
+        where: {
+          id: contractDraftId,
+          propertyId,
+          tenantMemberId: propertyMemberId,
+        },
+      });
+    }
+  }
+
+  async findContractDraftBytenantMemberId(
+    contractDraftId: string,
+    propertyId: string,
+    tenantMemberId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.contractDraft.findFirst({
+      where: {
+        id: contractDraftId,
+        propertyId,
+        tenantMemberId,
+      },
+    });
+  }
+
   async findContractByStatusContractAndPropertyId(
     statusContract: StatusContractType,
     propertyId: string,
@@ -271,5 +315,39 @@ export class ContractRepository {
         status,
       },
     });
+  }
+
+  async updateAgreeContractDraft(
+    contractDraftId: string,
+    propertyId: string,
+    selection: 'LANDLORD' | 'TENANT',
+    version: number,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    if (selection === 'LANDLORD') {
+      await db.contractDraft.update({
+        where: {
+          id: contractDraftId,
+          propertyId,
+          version,
+        },
+        data: {
+          landlordAgreed: true,
+        },
+      });
+    }
+
+    if (selection === 'TENANT') {
+      await db.contractDraft.update({
+        where: {
+          id: contractDraftId,
+          propertyId,
+          version,
+        },
+        data: {
+          tenantAgreed: true,
+        },
+      });
+    }
   }
 }

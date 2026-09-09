@@ -16,6 +16,7 @@ import { ZodValidation } from '../../core/pipes/zod-validation.pipe.js';
 import type { AuthRequest } from '../../types/global-types.js';
 import {
   AcceptedOrRejectedContractDtoRequest,
+  AgreeContractDraftDtoRequest,
   changeContractStatusDtoRequest,
   createContractDtoRequest,
   generateContractDraftDtoRequest,
@@ -162,6 +163,20 @@ export class ContractController {
       contractId,
       body,
       propertyId,
+    );
+  }
+
+  @Post('draft/:contractDraftId/agree')
+  async AgreeContractDraft(
+    @Req() req: AuthRequest,
+    @Param(':contractDraftId') contractDraftId: string,
+    @Body(new ZodValidation(AgreeContractDraftDtoRequest))
+    body: { propertyId: string },
+  ) {
+    return await this.service.agreeContractDraft(
+      req.user.userId,
+      body.propertyId,
+      contractDraftId,
     );
   }
 }

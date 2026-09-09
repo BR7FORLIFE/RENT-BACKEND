@@ -60,3 +60,8 @@ export const generateContractDraftDtoRequest = z.object({
 export type GenerateContractDraftType = z.infer<
   typeof generateContractDraftDtoRequest
 >;
+
+//aceptar un borrador de contrato
+export const AgreeContractDraftDtoRequest = z.object({
+  propertyId: z.uuid(),
+});
