@@ -19,8 +19,8 @@ export type CreateDirectionType = z.infer<typeof createDirectionDtoRequest>;
 
 //economic property info
 export const createEconomicPropertyInfo = z.object({
-  monthlyRent: z.coerce.number(),
-  depositAmount: z.coerce.number(),
+  monthlyRent: z.coerce.number().nonnegative(),
+  depositAmount: z.coerce.number().nonnegative(),
   currency: currencyStatus,
   utilitiesIncluded: z.boolean(),
 });
