@@ -28,7 +28,7 @@ public interface AuthUseCase {
 
     Mono<MeCommandResult> me(UUID userId);
 
-    Mono<MeCommandResult> me(String email);
+    Mono<MeCommandResult> me(String email, UUID userId);
 
     Mono<UsersCommandResult> getAllUsers(List<UUID> usersIds);
 

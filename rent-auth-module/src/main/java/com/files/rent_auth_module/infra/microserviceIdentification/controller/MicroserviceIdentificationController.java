@@ -1,5 +1,7 @@
 package com.files.rent_auth_module.infra.microserviceIdentification.controller;
 
+import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,8 +46,9 @@ public class MicroserviceIdentificationController {
     // obtener un usuario por su email (MICROSERVICE GRANTED)
     @PreAuthorize("hasAuthority('users:read')")
     @GetMapping("/user")
-    public Mono<ResponseEntity<MeResponseDto>> getUserInfo(@RequestParam String email) {
-        return authUseCase.me(email)
+    public Mono<ResponseEntity<MeResponseDto>> getUserInfo(@RequestParam(required = false) String email,
+            @RequestParam(required = false) UUID userId) {
+        return authUseCase.me(email, userId)
                 .map(res -> ResponseEntity.ok().body(new MeResponseDto(
                         res.userId(),
                         res.username(),

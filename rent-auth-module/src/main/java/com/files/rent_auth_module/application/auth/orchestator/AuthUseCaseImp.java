@@ -76,8 +76,25 @@ public class AuthUseCaseImp implements AuthUseCase {
     }
 
     @Override
-    public Mono<MeCommandResult> me(String email) {
-        return authRepositoryPort.findByEmail(email)
+    public Mono<MeCommandResult> me(String email, UUID userId) {
+
+        if(email == null && userId == null){
+                return Mono.error(AuthExceptions.invalidUserQuery());
+        }
+
+        if(email != null){
+                return authRepositoryPort.findByEmail(email)
+                .switchIfEmpty(Mono.error(AuthExceptions.userNotFound()))
+                .map(user -> new MeCommandResult(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getCellphone(),
+                        user.getFullname(),
+                        user.isEnabled()));
+        }
+
+        return authRepositoryPort.findById(userId)
                 .switchIfEmpty(Mono.error(AuthExceptions.userNotFound()))
                 .map(user -> new MeCommandResult(
                         user.getId(),

@@ -27,4 +27,8 @@ public class AuthExceptions extends ExceptionHandler {
     public static AuthExceptions oauthSessionIDNotFound() {
         return new AuthExceptions("Error al obtener las credenciales de acceso!");
     }
+
+    public static AuthExceptions invalidUserQuery() {
+        return new AuthExceptions("No se encontraron parametros de busqueda para el usuario!");
+    }
 }
