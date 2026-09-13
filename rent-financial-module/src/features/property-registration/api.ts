@@ -13,13 +13,17 @@ export interface UserData {
 }
 
 //obtener la informacion de un solo usuario
-export async function getUserData(email: string): Promise<UserData> {
+export async function getUserData(
+  email: string | null,
+  userId: string | null,
+): Promise<UserData> {
   try {
     const { data } = await axiosMicroserviceClient.get<UserData>(
       `${RENT_AUTH_HOST}/rent-auth/microservice-identification/user`,
       {
         params: {
           email,
+          userId,
         },
       },
     );

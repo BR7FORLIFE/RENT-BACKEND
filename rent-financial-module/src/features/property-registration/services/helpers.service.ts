@@ -96,23 +96,25 @@ export function validateInvitationLinked(
   }
 }
 
+interface UnionPartOne {
+  policies: string[];
+  id: string;
+  userId: string;
+  status: PropertyMemberStatus;
+  assignedAt: Date;
+  roles: string[];
+  overrides: string[];
+}
+
 //union user info (AUTH RENT / FINANCIAL RENT)
 export function unionInfoUser(
-  part1: {
-    id: string;
-    userId: string;
-    status: PropertyMemberStatus;
-    assignedAt: Date;
-    roles: string[];
-    policies: string[];
-  }[],
+  part1: UnionPartOne[],
   part2: UserData[],
-) {
+): (UnionPartOne & UserData)[] {
   const userInfo = new Map(part1.map((p1) => [p1.userId, p1]));
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return part2.map(({ isEnabled, ...member }) => ({
+  return part2.map((member) => ({
     ...member,
-    ...userInfo.get(member.userId),
+    ...userInfo.get(member.userId)!,
   }));
 }
