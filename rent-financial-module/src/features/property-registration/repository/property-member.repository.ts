@@ -104,6 +104,69 @@ export class PropertyMemberRepository {
     };
   }
 
+  async findPropertyMemberByIdAndPropertyId(
+    propertyId: string,
+    propertyMemberId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ): Promise<FindAllPropertyMembers | null> {
+    const result = await db.propertyMember.findFirst({
+      where: {
+        id: propertyMemberId,
+        propertyId,
+      },
+      select: {
+        id: true,
+        userId: true,
+        status: true,
+        assignedAt: true,
+        propertyId: true,
+
+        //tenemos las politicas desactivadas por el dueño de la propiedad
+        propertyMemberPoliciesOverride: {
+          select: {
+            policyStatement: true,
+          },
+        },
+
+        propertyMemberRole: {
+          select: {
+            propertyActorRole: {
+              include: {
+                propertyActorRolePolicyStatements: {
+                  select: {
+                    policyStatement: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!result) {
+      return null;
+    }
+
+    return {
+      id: result.id,
+      status: result.status,
+      userId: result.userId,
+      assignedAt: result.assignedAt,
+      roles: result.propertyMemberRole.map(
+        (role) => role.propertyActorRole.name,
+      ),
+      overrides: result.propertyMemberPoliciesOverride.map(
+        (override) => override.policyStatement.policyName,
+      ),
+      policies: result.propertyMemberRole.flatMap((memberRole) =>
+        memberRole.propertyActorRole.propertyActorRolePolicyStatements.map(
+          (policies) => policies.policyStatement.policyName,
+        ),
+      ),
+    };
+  }
+
   async findPropertyMemberByPropertyMemberId(
     propertyMemberId: string,
     db: Prisma.TransactionClient = this.prisma,

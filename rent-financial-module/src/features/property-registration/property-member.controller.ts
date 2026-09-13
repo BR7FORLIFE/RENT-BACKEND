@@ -96,6 +96,19 @@ export class PropertyMemberController {
     );
   }
 
+  @Get(':propertyMemberId/property/:propertyId/get')
+  async getPropertyMemberByIdAndPropertyId(
+    @Req() req: AuthRequest,
+    @Param('propertyMemberId') propertyMemberId: string,
+    @Param('propertyId') propertyId: string,
+  ) {
+    return this.propertyMemberService.getPropertyMemberByIdAndPropertyId(
+      req.user.userId,
+      propertyMemberId,
+      propertyId,
+    );
+  }
+
   //controlador para asignar una lista de roles al usuario
   @Post(':propertyMemberId')
   async assignmentRolesToMember(

@@ -54,6 +54,7 @@ import {
  */
 
 export interface GetAllUserData {
+  id: string;
   userId: string;
   status?: PropertyMemberStatus | undefined;
   assignedAt?: Date | undefined;
@@ -134,6 +135,57 @@ export class PropertyMemberService {
     return { data: unionInfo, metadata: result.metadata };
   }
 
+  async getPropertyMemberByIdAndPropertyId(
+    userId: string,
+    propertyMemberId: string,
+    propertyId: string,
+  ): Promise<GetAllUserData> {
+    //verificamos que sea propietario del inmueble
+    const ownerProperty = await this.propertyRepository.findPropertyById(
+      userId,
+      propertyId,
+    );
+
+    if (!ownerProperty) {
+      throw new PropertyNotFoundException();
+    }
+
+    //obtenemos el propertyMember
+    const optPropertyMember =
+      await this.propertyMemberRepository.findPropertyMemberByIdAndPropertyId(
+        ownerProperty.id,
+        propertyMemberId,
+      );
+
+    if (!optPropertyMember) {
+      throw new PropertyMemberNotFound(propertyMemberId);
+    }
+
+    //limpiamos las politicas de este usuario
+    const propertyMemberCleanPolicies = {
+      ...optPropertyMember,
+      policies: cleanPolicies(
+        optPropertyMember.policies,
+        optPropertyMember.overrides,
+      ),
+    };
+
+    const userData = await getUserData(null, optPropertyMember.userId);
+
+    return {
+      id: optPropertyMember.id,
+      cellphone: userData.cellphone,
+      email: userData.email,
+      fullname: userData.fullname,
+      userId: userData.userId,
+      username: userData.username,
+      policies: propertyMemberCleanPolicies.policies,
+      roles: propertyMemberCleanPolicies.roles,
+      status: propertyMemberCleanPolicies.status,
+      assignedAt: propertyMemberCleanPolicies.assignedAt,
+    };
+  }
+
   //invitacion de miembros en la propiedad
   async invitePropertyMembers(
     invitationReq: InvitePropertyMemberType,
@@ -152,6 +204,7 @@ export class PropertyMemberService {
     // para no despediciar el servicio de correos en una invitacion que no llegará a nada
     const { isEnabled, userId: invitedUserId } = await getUserData(
       invitationReq.email,
+      null,
     );
 
     if (!isEnabled) {
