@@ -23,12 +23,16 @@ import {
   POLICIES_STATEMENTS_NAMES,
   TYPE_TENANT_ACTOR_ROLES_UUIDS,
 } from '../../../types/global-types.js';
-import type { ContractInfoResponse } from '../dtos/response-dto.js';
+import type {
+  ContractDraftInfoResponse,
+  ContractInfoResponse,
+} from '../dtos/response-dto.js';
 import { PropertyMemberRepository } from '../../property-registration/repository/property-member.repository.js';
 import type { PaginationType } from '../../../shared/pagination/pagination-schemas.js';
 import { PropertyNotFoundException } from '../../property-registration/exceptions/exceptions.js';
 import type { NotificationType } from '../../global/global.schema.js';
 import type { createResourceImageType } from '../../global/global.schema-dtos.js';
+import { getUserData } from '../../property-registration/api.js';
 //import type { GenerateIAContractFields } from './helper.service.js';
 
 // estos dos actores importantes en los contratos son miembros activos
@@ -203,7 +207,7 @@ export class ContractService {
     userId: string,
     contractDraftId: string,
     propertyId: string,
-  ) {
+  ): Promise<ContractDraftInfoResponse> {
     //primero verificamos que el mimebro pertenezca en el inmueble
     const optPropertyMember =
       await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
@@ -227,7 +231,39 @@ export class ContractService {
       throw new contractDraftNotFound();
     }
 
-    return optContractDraft;
+    //obtenos la informacion de miembro para obtener el modelo de informacion de usuario completo del arrendador/arrendado
+    const landordMember =
+      await this.systemRole.verifyPropertyMemberByIdAndPropertyId(
+        optContractDraft.landlordMemberId,
+        propertyId,
+      );
+    const tenantMember =
+      await this.systemRole.verifyPropertyMemberByIdAndPropertyId(
+        optContractDraft.tenantMemberId,
+        propertyId,
+      );
+
+    //obtenemos la informacion del usuario comunicandonos con el microservicio de auth
+    const [landordUserData, tenantUserData] = await Promise.all([
+      getUserData(null, landordMember.userId),
+      getUserData(null, tenantMember.userId),
+    ]);
+
+    return {
+      ...optContractDraft,
+      landlordMember: {
+        propertyMemberId: landordMember.id,
+        userData: {
+          ...landordUserData,
+        },
+      },
+      tenantMember: {
+        propertyMemberId: tenantMember.id,
+        userData: {
+          ...tenantUserData,
+        },
+      },
+    };
   }
 
   //metodo para que ambas partes en el contrato esten de acuerdo en el borrador para proceder con el
@@ -324,7 +360,7 @@ export class ContractService {
     //verificamos que no tenga un contrato activo de arrendamiento la vivienda
     const iscurrentContract =
       await this.contractRepository.findContractByStatusContractAndPropertyId(
-        'ACTIVE',
+        'ACTIVO',
         optProperty.id,
       );
 
@@ -365,7 +401,7 @@ export class ContractService {
         monthlyRent: Number(optContractDraft.monthlyRent),
         propertyId: optProperty.id,
         startDate: optContractDraft.startDate,
-        status: 'PENDING_ACCEPTANCE',
+        status: 'PENDIENTE_ACEPTACION',
         // si cambia el estado a PENDING o EXECUTION puede ser miembro activo del inmueble
         tenantMemberId: tenantPropertyMember.id,
       };
@@ -435,7 +471,7 @@ export class ContractService {
         await this.contractRepository.updateStatusContractByTenantId(
           contractId,
           tenantPropertyMember.id,
-          'PENDING_DOCUMENTATION',
+          'PENDIENTE_DOCUMENTACION',
           tx,
         );
 
@@ -455,7 +491,7 @@ export class ContractService {
       await this.contractRepository.updateStatusContractByTenantId(
         contractId,
         tenantPropertyMember.id,
-        'REJECTED',
+        'RECHAZADO',
       );
     }
 
@@ -498,7 +534,7 @@ export class ContractService {
     //verificamos que el contrato este en un estado de PENDING_DOCUMENTATION
     //para poder realizar la operacion correctamente, caso contrario no será
     //permitido ya que indica que el arrendado no aceptó el contrato
-    if (optContract.status !== 'PENDING_DOCUMENTATION') {
+    if (optContract.status !== 'PENDIENTE_DOCUMENTACION') {
       throw new deniedTransitionedStatusContract();
     }
 
@@ -513,7 +549,7 @@ export class ContractService {
       //actualizamos el esatdo del contrato a ACTIVE
       await this.contractRepository.updateStatusContractById(
         optContract.id,
-        'ACTIVE',
+        'ACTIVO',
         tx,
       );
     });
@@ -560,7 +596,7 @@ export class ContractService {
         //actualizamos el estado del contrato a FINALIZADO
         await this.contractRepository.updateStatusContractById(
           contractId,
-          'FINISHED',
+          'FINALIZADO',
         );
         break;
 
@@ -571,7 +607,7 @@ export class ContractService {
 
         await this.contractRepository.updateStatusContractById(
           contractId,
-          'SUSPENDED',
+          'SUSPENDIDO',
         );
         break;
     }
@@ -609,7 +645,39 @@ export class ContractService {
       throw new contractNotFound();
     }
 
-    return data;
+    //obtenos la informacion de miembro para obtener el modelo de informacion de usuario completo del arrendador/arrendado
+    const landordMember =
+      await this.systemRole.verifyPropertyMemberByIdAndPropertyId(
+        data.landlordMemberId,
+        propertyId,
+      );
+    const tenantMember =
+      await this.systemRole.verifyPropertyMemberByIdAndPropertyId(
+        data.tenantMemberId,
+        propertyId,
+      );
+
+    //obtenemos la informacion del usuario comunicandonos con el microservicio de auth
+    const [landordUserData, tenantUserData] = await Promise.all([
+      getUserData(null, landordMember.userId),
+      getUserData(null, tenantMember.userId),
+    ]);
+
+    return {
+      ...data,
+      landlordMember: {
+        propertyMemberId: landordMember.id,
+        userData: {
+          ...landordUserData,
+        },
+      },
+      tenantMember: {
+        propertyMemberId: tenantMember.id,
+        userData: {
+          ...tenantUserData,
+        },
+      },
+    };
   }
 
   async getAllContracts(

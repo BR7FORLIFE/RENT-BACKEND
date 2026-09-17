@@ -1,13 +1,13 @@
 import z from 'zod';
 
 export const StatusContractEnum = z.enum([
-  'DRAFT',
-  'PENDING_ACCEPTANCE',
-  'PENDING_DOCUMENTATION',
-  'ACTIVE',
-  'REJECTED',
-  'SUSPENDED',
-  'FINISHED',
+  'BORRADOR',
+  'PENDIENTE_ACEPTACION',
+  'PENDIENTE_DOCUMENTACION',
+  'ACTIVO',
+  'RECHAZADO',
+  'SUSPENDIDO',
+  'FINALIZADO',
 ]);
 
 export type StatusContractType = z.infer<typeof StatusContractEnum>;
