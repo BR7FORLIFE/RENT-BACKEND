@@ -1,20 +1,25 @@
 import { Prisma } from '../../../../generated/prisma/client.js';
+import type { UserData } from '../../property-registration/api.js';
 
 type StatusContractType =
-  | 'DRAFT'
-  | 'PENDING_ACCEPTANCE'
-  | 'PENDING_DOCUMENTATION'
-  | 'ACTIVE'
-  | 'REJECTED'
-  | 'CANCELLED'
-  | 'SUSPENDED'
-  | 'FINISHED';
+  | 'BORRADOR'
+  | 'PENDIENTE_ACEPTACION'
+  | 'PENDIENTE_DOCUMENTACION'
+  | 'ACTIVO'
+  | 'RECHAZADO'
+  | 'SUSPENDIDO'
+  | 'FINALIZADO';
+
+export interface UserCompleteInfo {
+  propertyMemberId: string;
+  userData: UserData;
+}
 
 export interface ContractInfoResponse {
   id: string;
   propertyId: string;
-  landlordMemberId: string;
-  tenantMemberId: string;
+  landlordMember: UserCompleteInfo;
+  tenantMember: UserCompleteInfo;
   monthlyRent: Prisma.Decimal;
   depositAmount: Prisma.Decimal;
   startDate: Date;
@@ -33,8 +38,8 @@ export interface ContractDraftInfoResponse {
   createdAt: Date;
   updateAt: Date;
   propertyId: string;
-  landlordMemberId: string;
-  tenantMemberId: string;
+  landlordMember: UserCompleteInfo;
+  tenantMember: UserCompleteInfo;
   monthlyRent: Prisma.Decimal;
   depositAmount: Prisma.Decimal;
   startDate: Date;

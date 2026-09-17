@@ -12,9 +12,9 @@ import type {
   PaginationType,
 } from '../../../shared/pagination/pagination-schemas.js';
 import type {
-  ContractDraftInfoResponse,
-  ContractInfoResponse,
-} from '../dtos/response-dto.js';
+  ContractDraftInfoPersistance,
+  ContractResponsePersistance,
+} from './repository-types.js';
 
 @Injectable()
 export class ContractRepository {
@@ -25,7 +25,7 @@ export class ContractRepository {
     propertyId: string,
     paginationDto: PaginationType,
     db: Prisma.TransactionClient = this.prisma,
-  ): Promise<PaginationResponse<ContractInfoResponse>> {
+  ): Promise<PaginationResponse<ContractResponsePersistance>> {
     const { limit, page } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 
@@ -55,7 +55,7 @@ export class ContractRepository {
     propertyId: string,
     paginationDto: PaginationType,
     db: Prisma.TransactionClient = this.prisma,
-  ): Promise<PaginationResponse<ContractDraftInfoResponse>> {
+  ): Promise<PaginationResponse<ContractDraftInfoPersistance>> {
     const { limit, page } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 

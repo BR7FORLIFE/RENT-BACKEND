@@ -20,13 +20,13 @@ enum NotificationType{
 }
 
 enum StatusContract{
-  DRAFT // borrador (fase de creación de contrato) 
-  PENDING_ACCEPTANCE // este estado permite que el posible arrendador acepte o no los terminos del borrador del contrato
-  PENDING_DOCUMENTATION // si acepta dicho usuario quedará pendiente la documentacion de dicho contrato
-  ACTIVE // contrato esta activo y vigente
-  REJECTED // el posible arrendado rechazo la solicitud de contrato
-  SUSPENDED // contrato en estado de suspension, solo el arrendador puede asignar este estado
-  FINISHED //contrato ya expirado o cumplido
+  BORRADOR // borrador (fase de creación de contrato) 
+  PENDIENTE_ACEPTACION // este estado permite que el posible arrendador acepte o no los terminos del borrador del contrato
+  PENDIENTE_DOCUMENTACION // si acepta dicho usuario quedará pendiente la documentacion de dicho contrato
+  ACTIVO // contrato esta activo y vigente
+  RECHAZADO // el posible arrendado rechazo la solicitud de contrato
+  SUSPENDIDO // contrato en estado de suspension, solo el arrendador puede asignar este estado
+  FINALIZADO //contrato ya expirado o cumplido
 }
 
 enum TypeStreet{
