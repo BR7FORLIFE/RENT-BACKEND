@@ -72,6 +72,8 @@ public class AuthUseCaseImp implements AuthUseCase {
                         user.getEmail(),
                         user.getCellphone(),
                         user.getFullname(),
+                        user.getIdentificationType(),
+                        user.getIdentificationNumber(),
                         user.isEnabled()));
     }
 
@@ -91,6 +93,8 @@ public class AuthUseCaseImp implements AuthUseCase {
                         user.getEmail(),
                         user.getCellphone(),
                         user.getFullname(),
+                        user.getIdentificationType(),
+                        user.getIdentificationNumber(),
                         user.isEnabled()));
         }
 
@@ -102,6 +106,8 @@ public class AuthUseCaseImp implements AuthUseCase {
                         user.getEmail(),
                         user.getCellphone(),
                         user.getFullname(),
+                        user.getIdentificationType(),
+                        user.getIdentificationNumber(),
                         user.isEnabled()));
     }
 
@@ -123,6 +129,8 @@ public class AuthUseCaseImp implements AuthUseCase {
                                     user.getEmail(),
                                     user.getCellphone(),
                                     user.getFullname(),
+                                    user.getIdentificationType(),
+                                    user.getIdentificationNumber(),
                                     user.isEnabled()))
                             .toList();
                     return new UsersCommandResult(users);

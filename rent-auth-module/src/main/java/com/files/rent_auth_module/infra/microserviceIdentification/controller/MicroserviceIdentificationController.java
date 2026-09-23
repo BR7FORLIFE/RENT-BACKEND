@@ -55,6 +55,8 @@ public class MicroserviceIdentificationController {
                         res.email(),
                         res.cellphone(),
                         res.fullname(),
+                        res.identificationType(),
+                        res.identificationNumber(),
                         res.isEnabled())));
     }
 

@@ -71,6 +71,8 @@ public class AuthController {
                         res.email(),
                         res.cellphone(),
                         res.fullname(),
+                        res.identificationType(),
+                        res.identificationNumber(),
                         res.isEnabled())));
     }
 
