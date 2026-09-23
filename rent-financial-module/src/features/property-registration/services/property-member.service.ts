@@ -62,6 +62,8 @@ export interface GetAllUserData {
   email: string;
   cellphone: string;
   fullname: string;
+  identificationType: 'CC' | 'CE' | 'TI' | 'PPT' | 'PASSPORT';
+  identificationNumber: number;
   roles?: string[];
   policies?: string[];
 }
@@ -179,6 +181,8 @@ export class PropertyMemberService {
       fullname: userData.fullname,
       userId: userData.userId,
       username: userData.username,
+      identificationNumber: userData.identificationNumber,
+      identificationType: userData.identificationType,
       policies: propertyMemberCleanPolicies.policies,
       roles: propertyMemberCleanPolicies.roles,
       status: propertyMemberCleanPolicies.status,

@@ -9,6 +9,8 @@ export interface UserData {
   email: string;
   cellphone: string;
   fullname: string;
+  identificationType: 'CC' | 'CE' | 'TI' | 'PPT' | 'PASSPORT';
+  identificationNumber: number;
   isEnabled: boolean;
 }
 
