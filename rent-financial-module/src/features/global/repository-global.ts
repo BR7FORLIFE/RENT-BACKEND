@@ -5,7 +5,7 @@ import type {
   DirectionType,
 } from '../property-registration/schemas/property-registration.schema.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
-import type { NotificationType, ResourceImageType } from './global.schema.js';
+import type { ResourceImageType } from './global.schema.js';
 
 /*
  *Repositorio global para utilizacion entre las distintas features sin repetir codigo
@@ -40,16 +40,6 @@ export class GlobalRepository {
     return await db.invitationLinked.create({ data });
   }
 
-  //notifications
-  async saveNotification(
-    data: NotificationType,
-    db: Prisma.TransactionClient = this.prisma,
-  ) {
-    return await db.notifications.create({
-      data,
-    });
-  }
-
   //finds
 
   //property invitations
@@ -63,7 +53,4 @@ export class GlobalRepository {
       },
     });
   }
-
-  //notifications
-  async findAllNotifications() {}
 }

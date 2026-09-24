@@ -27,8 +27,8 @@ export type NotificationTypeEnumType = z.infer<typeof NotitficationTypeEnum>;
 
 export const NotificationSchema = z.object({
   id: z.uuid().optional(),
-  transmitterId: z.uuid(),
-  receiverId: z.uuid(),
+  transmitterId: z.uuid(), //emisor (propertyMember)
+  receiverId: z.uuid(), // receptor (propertyMember)
   source: NotificationSourceEnum,
   type: NotitficationTypeEnum,
   name: z.string(),
