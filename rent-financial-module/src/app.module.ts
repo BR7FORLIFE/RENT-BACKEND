@@ -7,6 +7,7 @@ import { ContractModule } from './features/contract/contract.module.js';
 import { GlobalModule } from './features/global/global.module.js';
 import { MicroserviceAuthModule } from './features/microservice-auth/auth-microservice.module.js';
 import { SytemPropertyRoleModule } from './features/system-property-role/system-property-role.module.js';
+import { WsJwtGuard } from './core/auth/ws.guard.js';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { SytemPropertyRoleModule } from './features/system-property-role/system-
     MicroserviceAuthModule,
     SytemPropertyRoleModule,
   ],
-  providers: [JwtPassport, JwtAuthGuard],
+  providers: [JwtPassport, JwtAuthGuard, WsJwtGuard],
 })
 export class AppModule {}
