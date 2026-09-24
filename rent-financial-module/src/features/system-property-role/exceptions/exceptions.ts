@@ -25,7 +25,7 @@ export class PropertyMemberNotFoundById extends AppException {
 //roles que no se encuentra dentro de la app
 export class PropertyActorRoleNotFoundException extends AppException {
   constructor() {
-    super('El rol no se encuentra registrado!', 404, 'NOT_FOUND');
+    super('Roles no encontrados!', 404, 'NOT_FOUND');
   }
 }
 
@@ -65,10 +65,16 @@ export class PoliciesNotFoundException extends AppException {
 export class PoliciesAuthorizationNotAllowed extends AppException {
   constructor() {
     super(
-      'Acceso denegado!, no cuenta con las politicas necesario para realizar la acción',
+      'Acceso denegado!, sus politicas no permiten realizar la acción',
       401,
       'Unauthorized',
     );
+  }
+}
+
+export class RolesAuthorizationNotAllowed extends AppException {
+  constructor(message: string) {
+    super(message, 406, 'Unauthorized');
   }
 }
 

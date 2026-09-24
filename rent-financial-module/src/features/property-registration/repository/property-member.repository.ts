@@ -198,7 +198,7 @@ export class PropertyMemberRepository {
   ) {
     return await db.propertyMember.findFirst({
       where: {
-        userId: propertyMemberId,
+        id: propertyMemberId,
         propertyId,
       },
       select: {

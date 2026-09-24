@@ -33,6 +33,7 @@ import { PropertyNotFoundException } from '../../property-registration/exception
 import type { NotificationType } from '../../global/global.schema.js';
 import type { createResourceImageType } from '../../global/global.schema-dtos.js';
 import { getUserData } from '../../property-registration/api.js';
+import { PropertyActorRoleNotFoundException } from '../../system-property-role/exceptions/exceptions.js';
 //import type { GenerateIAContractFields } from './helper.service.js';
 
 // estos dos actores importantes en los contratos son miembros activos
@@ -128,20 +129,35 @@ export class ContractService {
         tx,
       );
 
-      // !!!!!!!!!!!!!!!!!!!!!!!!!OJO DEBO DE BUSCAR SI EL TENANT TIENE EL ROL ARRENDADO_PRELIMINAR
-      // PARA NO GUARDAR MULTIPLES COPIAS DEL PROPERTY MEMBER ROLE
+      //verificamos que el usuario tenga el rol ARRENDADO_PRELIMINAR
+      const roles =
+        await this.propertyMemberRepository.findPropertyMemberWithRolesByPropertyMemberIdAndPropertyId(
+          optTenantPropertyMember.id,
+          optProperty.id,
+        );
 
-      //asignamos el rol ARRENDADO_PRELIMINAR a la persona interesada y asi obtener ciertas acciones dentro de
-      //dicha propiedad
-      const propertyTenantMemberRole: PropertyMemberRoleType = {
-        propertyMemberId: optTenantPropertyMember.id,
-        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO_PRELIMINAR,
-      };
+      if (!roles) {
+        throw new PropertyActorRoleNotFoundException();
+      }
 
-      await this.propertyMemberRepository.savePropertyMemberRole(
-        propertyTenantMemberRole,
-        tx,
+      const hasRole = roles.propertyMemberRole.some((role) =>
+        ['ARRENDADO_PRELIMINAR'].includes(role.propertyActorRole.name),
       );
+
+      if (!hasRole) {
+        //asignamos el rol ARRENDADO_PRELIMINAR a la persona interesada y asi obtener ciertas acciones dentro de
+        //dicha propiedad
+        const propertyTenantMemberRole: PropertyMemberRoleType = {
+          propertyMemberId: optTenantPropertyMember.id,
+          propertyActorRoleId:
+            TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO_PRELIMINAR,
+        };
+
+        await this.propertyMemberRepository.savePropertyMemberRole(
+          propertyTenantMemberRole,
+          tx,
+        );
+      }
 
       return { savedDraft };
     });

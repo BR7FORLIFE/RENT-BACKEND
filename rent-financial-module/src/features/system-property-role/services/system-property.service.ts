@@ -4,8 +4,10 @@ import {
   NotAllowedStatusByPropertyMemberException,
   PoliciesAuthorizationNotAllowed,
   PoliciesNotFoundException,
+  PropertyActorRoleNotFoundException,
   PropertyMemberNotFound,
   PropertyMemberNotFoundById,
+  RolesAuthorizationNotAllowed,
 } from '../exceptions/exceptions.js';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 
@@ -58,7 +60,11 @@ export class SystemPropertyService {
     private prisma: PrismaService,
   ) {}
 
-  async CheckPolicies(propertyMemberId: string, allowedPolicies: string[]) {
+  async CheckPolicies(
+    propertyMemberId: string,
+    allowedPolicies: string[],
+    isAllow: 'ALLOW' | 'NOT_ALLOW' = 'ALLOW',
+  ) {
     //antes de encontrar sus respectivas politicas debemos verificar que
     //dicho property member este en un estado active y puede realizar acciones
     // en la app
@@ -81,8 +87,78 @@ export class SystemPropertyService {
         propertyMemberId,
       );
 
-    if (!IsAllowedByPolicies(policies, override, allowedPolicies)) {
-      throw new PoliciesAuthorizationNotAllowed();
+    switch (isAllow) {
+      //las politicas que se adjunten deben cumplir
+      case 'ALLOW':
+        if (!IsAllowedByPolicies(policies, override, allowedPolicies)) {
+          throw new PoliciesAuthorizationNotAllowed();
+        }
+        break;
+
+      //aquellas politicas que no estan permitidas en ciertas acciones
+      case 'NOT_ALLOW':
+        if (IsAllowedByPolicies(policies, override, allowedPolicies)) {
+          throw new PoliciesAuthorizationNotAllowed();
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  async checkRoles(
+    propertyMemberId: string,
+    checkRoles: string[],
+    messageError: string,
+    isAllow: 'ALLOW' | 'NOT_ALLOW' = 'ALLOW',
+  ) {
+    //antes de encontrar sus respectivas politicas debemos verificar que
+    //dicho property member este en un estado active y puede realizar acciones
+    // en la app
+    await this.VerifyPropertyMemberIsActive(propertyMemberId);
+
+    //obtenemos todos los roles del miembro para la propiedad
+    const roles = await this.prisma.propertyMember.findFirst({
+      where: {
+        id: propertyMemberId,
+      },
+      select: {
+        propertyMemberRole: {
+          select: {
+            propertyActorRole: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!roles) {
+      throw new PropertyActorRoleNotFoundException();
+    }
+
+    const includeRole = roles.propertyMemberRole.some((rol) =>
+      checkRoles.includes(rol.propertyActorRole.name),
+    );
+
+    switch (isAllow) {
+      case 'ALLOW':
+        if (!includeRole) {
+          throw new RolesAuthorizationNotAllowed(messageError);
+        }
+        break;
+
+      case 'NOT_ALLOW':
+        if (includeRole) {
+          throw new RolesAuthorizationNotAllowed(messageError);
+        }
+        break;
+
+      default:
+        break;
     }
   }
 
