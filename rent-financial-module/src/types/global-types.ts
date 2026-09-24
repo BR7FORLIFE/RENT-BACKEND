@@ -1,9 +1,19 @@
 import type { Request } from 'express';
+import { Socket } from 'socket.io';
 
 export interface AuthRequest extends Request {
   user: {
     userId: string;
     rols: string[];
+  };
+}
+
+export interface AuthenticatedSocket extends Socket {
+  data: {
+    user: {
+      userId: string;
+      rols: string[];
+    };
   };
 }
 
