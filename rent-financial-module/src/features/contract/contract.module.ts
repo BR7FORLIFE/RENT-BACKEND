@@ -4,8 +4,8 @@ import { ContractService } from './services/contract.service.js';
 import { ContractRepository } from './repository/contract.repository.js';
 import { PrismaModule } from '../../core/database/prisma.module.js';
 import { PropertyRegistrationModule } from '../property-registration/property-registration.module.js';
-import { GlobalModule } from '../global/global.module.js';
 import { SytemPropertyRoleModule } from '../system-property-role/system-property-role.module.js';
+import { NotificationModule } from '../notifications/notification.module.js';
 
 @Module({
   controllers: [ContractController],
@@ -13,7 +13,7 @@ import { SytemPropertyRoleModule } from '../system-property-role/system-property
   imports: [
     PrismaModule,
     PropertyRegistrationModule,
-    GlobalModule,
+    NotificationModule,
     SytemPropertyRoleModule,
   ],
 })

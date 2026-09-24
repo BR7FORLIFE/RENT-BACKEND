@@ -64,6 +64,7 @@ export class ContractRepository {
         where: { propertyId },
         skip,
         take: limit,
+        orderBy: { version: 'desc' },
       }),
       db.contractDraft.count({ where: { propertyId } }),
     ]);

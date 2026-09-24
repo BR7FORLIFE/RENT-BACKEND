@@ -7,7 +7,7 @@ import type {
   GenerateContractDraftType,
 } from '../dtos/request-dto.js';
 import type { ContractType } from '../schemas/contract.schema.js';
-import { GlobalRepository } from '../../global/repository-global.js';
+
 import {
   contractDraftAvailabilityNotFoundException,
   contractDraftNotFound,
@@ -30,10 +30,10 @@ import type {
 import { PropertyMemberRepository } from '../../property-registration/repository/property-member.repository.js';
 import type { PaginationType } from '../../../shared/pagination/pagination-schemas.js';
 import { PropertyNotFoundException } from '../../property-registration/exceptions/exceptions.js';
-import type { NotificationType } from '../../global/global.schema.js';
 import type { createResourceImageType } from '../../global/global.schema-dtos.js';
 import { getUserData } from '../../property-registration/api.js';
 import { PropertyActorRoleNotFoundException } from '../../system-property-role/exceptions/exceptions.js';
+import { NotificationService } from '../../notifications/notification.service.js';
 //import type { GenerateIAContractFields } from './helper.service.js';
 
 // estos dos actores importantes en los contratos son miembros activos
@@ -51,7 +51,7 @@ export class ContractService {
     private readonly propertyMemberRepository: PropertyMemberRepository,
     private readonly systemRole: SystemPropertyService,
     private readonly systemRoleRepository: SystemPropertyRoleRepository,
-    private readonly globalRepository: GlobalRepository,
+    private readonly notificationService: NotificationService,
   ) {}
 
   //contract drafts
@@ -94,6 +94,14 @@ export class ContractService {
       throw new PropertyNotFoundException();
     }
 
+    //verificamos que el arrendador que va estar en el contrato sea miembro
+    //activo de la propiedad
+    const optlandlordPropertyMember =
+      await this.systemRole.verifyPropertyMemberByIdAndPropertyId(
+        contractDraft.landlordMemberId,
+        optProperty.id,
+      );
+
     //verificamos que el arrendado sea un miembro activo en la propiedad
     const optTenantPropertyMember =
       await this.systemRole.verifyPropertyMemberByIdAndPropertyId(
@@ -119,7 +127,7 @@ export class ContractService {
           tenantAgreed: false,
           createdByPropertyMemberId: optPropertyMember.id,
           propertyId: optProperty.id,
-          landlordMemberId: contractDraft.landlordMemberId,
+          landlordMemberId: optlandlordPropertyMember.id,
           tenantMemberId: optTenantPropertyMember.id,
           monthlyRent: contractDraft.monthlyRent,
           depositAmount: contractDraft.depositAmount,
@@ -164,29 +172,27 @@ export class ContractService {
 
     //notificamos a los actores dentro del contrato para que se enteren de la
     //nueva version o borrador del contrato
-    const landlordNotification: NotificationType = {
-      content: `Un nuevo borrador de contrato para la vivienda ${optProperty.propertyName} ha sido generado!`,
-      name: 'Borrador de contrato',
-      receiverId: contractDraft.landlordMemberId,
-      source: 'CONTRACT_SERVICE',
-      transmitterId: optPropertyMember.id,
-      type: 'INFO',
-    };
 
-    const tenantNotification: NotificationType = {
-      content: `Un nuevo borrador de contrato para la vivienda ${optProperty.propertyName} ha sido generado!`,
-      name: 'Borrador de contrato',
-      receiverId: contractDraft.tenantMemberId,
-      source: 'CONTRACT_SERVICE',
-      transmitterId: optPropertyMember.id,
-      type: 'INFO',
-    };
+    //notificamos al arrendador
+    await this.notificationService.sendNotification(
+      userId,
+      optlandlordPropertyMember.userId,
+      `Un nuevo borrador de contrato para la vivienda ${optProperty.propertyName} ha sido generado!`,
+      'Borrador de contrato',
+      'CONTRACT_SERVICE',
+      'INFO',
+    );
 
-    //guardamos las respectivas notificaciones
-    await this.prismaClient.$transaction(async (tx) => {
-      await this.globalRepository.saveNotification(landlordNotification, tx);
-      await this.globalRepository.saveNotification(tenantNotification, tx);
-    });
+    //notificamos al arrendado
+    await this.notificationService.sendNotification(
+      userId,
+      //enviamos a su userId para que sea global de la persona
+      optTenantPropertyMember.userId,
+      `Un nuevo borrador de contrato para la vivienda ${optProperty.propertyName} ha sido generado!`,
+      'Borrador de contrato',
+      'CONTRACT_SERVICE',
+      'INFO',
+    );
 
     return {
       id: response.savedDraft.id,
@@ -429,17 +435,23 @@ export class ContractService {
       //enviamos la notificacion al posible arrendado para que se entere y decida
       // si rechazar o aceptar que se continue el proceso de contratamiento
 
-      const notificationTenantInfo: NotificationType = {
-        content:
-          'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
-        name: 'CREACIÓN DE CONTRATO EN VIGENCIA!',
-        transmitterId: userId,
-        receiverId: optLandordPropertyMember.id,
-        source: 'CONTRACT_SERVICE',
-        type: 'INFO',
-      };
+      await this.notificationService.sendNotification(
+        userId,
+        optLandordPropertyMember.userId,
+        'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
+        'CREACIÓN DE CONTRATO EN VIGENCIA!',
+        'PROPERTY_REGISTRATION_SERVICE',
+        'INFO',
+      );
 
-      await this.globalRepository.saveNotification(notificationTenantInfo, tx);
+      await this.notificationService.sendNotification(
+        userId,
+        tenantPropertyMember.userId,
+        'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
+        'CREACIÓN DE CONTRATO EN VIGENCIA!',
+        'PROPERTY_REGISTRATION_SERVICE',
+        'INFO',
+      );
 
       return { contractId };
     });
