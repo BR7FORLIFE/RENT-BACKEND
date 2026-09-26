@@ -34,6 +34,7 @@ import type { createResourceImageType } from '../../global/global.schema-dtos.js
 import { getUserData } from '../../property-registration/api.js';
 import { PropertyActorRoleNotFoundException } from '../../system-property-role/exceptions/exceptions.js';
 import { NotificationService } from '../../notifications/notification.service.js';
+import { NotificationGateway } from '../../notifications/notification.gateway.js';
 //import type { GenerateIAContractFields } from './helper.service.js';
 
 // estos dos actores importantes en los contratos son miembros activos
@@ -52,6 +53,7 @@ export class ContractService {
     private readonly systemRole: SystemPropertyService,
     private readonly systemRoleRepository: SystemPropertyRoleRepository,
     private readonly notificationService: NotificationService,
+    private readonly notificationGateway: NotificationGateway,
   ) {}
 
   //contract drafts
@@ -174,17 +176,18 @@ export class ContractService {
     //nueva version o borrador del contrato
 
     //notificamos al arrendador
-    await this.notificationService.sendNotification(
-      userId,
-      optlandlordPropertyMember.userId,
-      `Un nuevo borrador de contrato para la vivienda ${optProperty.propertyName} ha sido generado!`,
-      'Borrador de contrato',
-      'CONTRACT_SERVICE',
-      'INFO',
-    );
+    const landlordNotification =
+      await this.notificationService.sendNotification(
+        userId,
+        optlandlordPropertyMember.userId,
+        `Un nuevo borrador de contrato para la vivienda ${optProperty.propertyName} ha sido generado!`,
+        'Borrador de contrato',
+        'CONTRACT_SERVICE',
+        'INFO',
+      );
 
     //notificamos al arrendado
-    await this.notificationService.sendNotification(
+    const tenantNotification = await this.notificationService.sendNotification(
       userId,
       //enviamos a su userId para que sea global de la persona
       optTenantPropertyMember.userId,
@@ -194,6 +197,17 @@ export class ContractService {
       'INFO',
     );
 
+    this.notificationGateway.sendNotification(
+      optlandlordPropertyMember.userId,
+      landlordNotification,
+    );
+
+    this.notificationGateway.sendNotification(
+      optTenantPropertyMember.userId,
+      tenantNotification,
+    );
+
+    //enviamos las notificaciones
     return {
       id: response.savedDraft.id,
       version: response.savedDraft.version,
@@ -435,22 +449,34 @@ export class ContractService {
       //enviamos la notificacion al posible arrendado para que se entere y decida
       // si rechazar o aceptar que se continue el proceso de contratamiento
 
-      await this.notificationService.sendNotification(
-        userId,
+      const landlordNotification =
+        await this.notificationService.sendNotification(
+          userId,
+          optLandordPropertyMember.userId,
+          'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
+          'CREACIÓN DE CONTRATO EN VIGENCIA!',
+          'PROPERTY_REGISTRATION_SERVICE',
+          'INFO',
+        );
+
+      const tenantNotification =
+        await this.notificationService.sendNotification(
+          userId,
+          tenantPropertyMember.userId,
+          'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
+          'CREACIÓN DE CONTRATO EN VIGENCIA!',
+          'PROPERTY_REGISTRATION_SERVICE',
+          'INFO',
+        );
+
+      this.notificationGateway.sendNotification(
         optLandordPropertyMember.userId,
-        'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
-        'CREACIÓN DE CONTRATO EN VIGENCIA!',
-        'PROPERTY_REGISTRATION_SERVICE',
-        'INFO',
+        landlordNotification,
       );
 
-      await this.notificationService.sendNotification(
-        userId,
+      this.notificationGateway.sendNotification(
         tenantPropertyMember.userId,
-        'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
-        'CREACIÓN DE CONTRATO EN VIGENCIA!',
-        'PROPERTY_REGISTRATION_SERVICE',
-        'INFO',
+        tenantNotification,
       );
 
       return { contractId };

@@ -156,7 +156,18 @@ export class PropertyService {
   }
 
   async consultPropertyById(userId: string, id: string): Promise<Property> {
-    const data = await this.propertyRepository.findPropertyById(userId, id);
+    //verificamos que sea un miembro activo en la propiedad
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
+        userId,
+        id,
+      );
+
+    const data =
+      await this.propertyRepository.findPropertyByIdAndPropertyMemberId(
+        optPropertyMember.id,
+        id,
+      );
 
     if (!data) {
       throw new PropertyNotFoundException();
