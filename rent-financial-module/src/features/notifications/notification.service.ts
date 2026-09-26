@@ -44,7 +44,7 @@ export class NotificationService {
 
     await this.notificationRepository.saveNotification(notification); //guardamos la notificacion
 
-    //y enviamos el evento en el canal websockets del cliente
+    return notification;
   }
 
   //propertyMember para obtener todas las notificaciones recibidas

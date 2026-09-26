@@ -9,6 +9,7 @@ import { Server } from 'socket.io';
 import { WsJwtGuard } from '../../core/auth/ws.guard.js';
 import type { AuthenticatedSocket } from '../../types/global-types.js';
 import { NotificationService } from './notification.service.js';
+import type { NotificationType } from '../global/global.schema.js';
 
 @WebSocketGateway({
   namespace: 'notifications', //punto de entrada para el gateway de notificaciones
@@ -35,15 +36,26 @@ export class NotificationGateway {
    */
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('init')
-  handleNotifications(client: AuthenticatedSocket) {
+  async handleNotifications(client: AuthenticatedSocket) {
     const user = client.data.user;
 
-    const notifications = this.notificationService.getAllNotifications(
-      user.userId,
-    );
+    if (!user) {
+      client.disconnect();
+      return;
+    }
 
-    //notification:new es exclusivo del cliente ya que este evento permite
-    // devolver todas las notificaciones desde el servidor
-    client.emit('notifications:new', notifications);
+    // es una room que nos permite enviar mensaje a un usuario en especifico
+    await client.join(`user:${user.userId}`);
+
+    const notifications = await this.notificationService.getAllNotifications(
+      user.userId,
+    ); //obtenemos todas las notificaciones vinculadas al usuario
+
+    client.emit('notifications:init', notifications); //emitimos las notificaciones
+  }
+
+  sendNotification(userId: string, notification: NotificationType) {
+    //enviamos la notificacion al usuario por el evento llamado notification:new
+    this.server.to(`user:${userId}`).emit('notification:new', notification);
   }
 }

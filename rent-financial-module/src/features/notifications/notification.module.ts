@@ -6,8 +6,8 @@ import { NotificationGateway } from './notification.gateway.js';
 
 @Module({
   imports: [PrismaModule],
-  providers: [NotificationGateway, NotificationService, NotificationRepository],
+  providers: [NotificationService, NotificationRepository, NotificationGateway],
   controllers: [],
-  exports: [NotificationService],
+  exports: [NotificationGateway, NotificationService],
 })
 export class NotificationModule {}

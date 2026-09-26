@@ -27,6 +27,10 @@ export class NotificationRepository {
         where: {
           receiverId: userId,
         },
+        orderBy: {
+          createAt: 'desc',
+        },
+        take: 10,
       });
     }
 
