@@ -61,5 +61,4 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 /prisma/migrations
 
 # enviroments
-public.pem
 /microservice-identification/microservice-id.env
