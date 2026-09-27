@@ -6,15 +6,15 @@ spring:
     base-path: /rent-auth
 
   mongodb:
-    username: ${MONGO_USERNAME}
-    password: ${MONGO_PASSWORD}
+    username: ${MONGO_INITDB_ROOT_USERNAME}
+    password: ${MONGO_INITDB_ROOT_PASSWORD}
     representation:
       uuid: standard
     uri: ${MONGO_URI}
   
   data:
     redis:
-      url: redis://auth-cache:6379 # en entornos de docker usar el nombre del servicio
+      url: ${REDIS_URL} # en entornos de docker usar el nombre del servicio
 
   security:
     oauth2:
