@@ -44,6 +44,9 @@ resend:
 jwt: 
   accessToken:
     expired: 900 # 900 segundos de expiracion del access token o 15 min 
+  private-key: ${PRIVATE_KEY_RSA}
+  public-key: ${PUBLIC_KEY_RSA}
+
 
 refreshToken:
   expired: 15 # expiracion de 15 dias
