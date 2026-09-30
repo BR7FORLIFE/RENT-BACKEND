@@ -245,7 +245,7 @@ export class PropertyService {
           break;
         }
 
-        case 'resourcesImages': {
+        case 'resources': {
           const currentImages =
             await this.propertyRepository.findAssetsResourcesByPropertyId(
               property.id,

@@ -169,7 +169,7 @@ export class ContractController {
   @Post('draft/:contractDraftId/agree')
   async AgreeContractDraft(
     @Req() req: AuthRequest,
-    @Param(':contractDraftId') contractDraftId: string,
+    @Param('contractDraftId') contractDraftId: string,
     @Body(new ZodValidation(AgreeContractDraftDtoRequest))
     body: { propertyId: string },
   ) {

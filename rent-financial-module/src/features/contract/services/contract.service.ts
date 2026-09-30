@@ -329,9 +329,6 @@ export class ContractService {
       //aceptamos el borrador por el posible arrendado
       await this.contractRepository.updateAgreeContractDraft(
         tenantContractDraft.id,
-        tenantContractDraft.propertyId,
-        'TENANT',
-        tenantContractDraft.version,
       );
 
       return {
@@ -352,9 +349,6 @@ export class ContractService {
       //aceptamos el borrador por el posible arrendado
       await this.contractRepository.updateAgreeContractDraft(
         landlordContractDraft.id,
-        landlordContractDraft.propertyId,
-        'LANDLORD',
-        landlordContractDraft.version,
       );
 
       return {

@@ -320,35 +320,15 @@ export class ContractRepository {
 
   async updateAgreeContractDraft(
     contractDraftId: string,
-    propertyId: string,
-    selection: 'LANDLORD' | 'TENANT',
-    version: number,
     db: Prisma.TransactionClient = this.prisma,
   ) {
-    if (selection === 'LANDLORD') {
-      await db.contractDraft.update({
-        where: {
-          id: contractDraftId,
-          propertyId,
-          version,
-        },
-        data: {
-          landlordAgreed: true,
-        },
-      });
-    }
-
-    if (selection === 'TENANT') {
-      await db.contractDraft.update({
-        where: {
-          id: contractDraftId,
-          propertyId,
-          version,
-        },
-        data: {
-          tenantAgreed: true,
-        },
-      });
-    }
+    await db.contractDraft.update({
+      where: {
+        id: contractDraftId,
+      },
+      data: {
+        landlordAgreed: true,
+      },
+    });
   }
 }
