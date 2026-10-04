@@ -10,10 +10,13 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
+
 import { JwtAuthGuard } from '../../core/auth/auth.guard.js';
-import { ContractService } from './services/contract.service.js';
 import { ZodValidation } from '../../core/pipes/zod-validation.pipe.js';
 import type { AuthRequest } from '../../types/global-types.js';
+
+import { ContractService } from './services/contract.service.js';
+
 import {
   AcceptedOrRejectedContractDtoRequest,
   AgreeContractDraftDtoRequest,
@@ -27,6 +30,7 @@ import {
   type GenerateContractDraftType,
   type LoadDocumentInContractType,
 } from './dtos/request-dto.js';
+
 import {
   paginationSchema,
   type PaginationType,
@@ -76,13 +80,11 @@ export class ContractController {
     @Param('contractId') contractId: string,
     @Param('propertyId') propertyId: string,
   ) {
-    const data = this.service.getContractbyId(
+    return await this.service.getContractbyId(
       req.user.userId,
       propertyId,
       contractId,
     );
-
-    return data;
   }
 
   @Post('acceptedOrRejected')
@@ -122,6 +124,33 @@ export class ContractController {
     );
   }
 
+  @Get('draft/getAcceptedContracts/property/:propertyId')
+  async getAcceptedContractsDraft(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+    @Query(new ZodValidation(paginationSchema))
+    paginationDto: PaginationType,
+  ) {
+    return await this.service.getAllAcceptedContracts(
+      req.user.userId,
+      propertyId,
+      paginationDto,
+    );
+  }
+
+  @Get('draft/getAcceptedContracts/property/:propertyId/id/:contractDraftId')
+  async getAcceptedContractDraftById(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+    @Param('contractDraftId') contractDraftId: string,
+  ) {
+    return await this.service.getAcceptedContracts(
+      req.user.userId,
+      propertyId,
+      contractDraftId,
+    );
+  }
+
   @Get('draft/:contractDraftId/property/:propertyId')
   async findContractDraftById(
     @Req() req: AuthRequest,
@@ -132,6 +161,20 @@ export class ContractController {
       req.user.userId,
       contractDraftId,
       propertyId,
+    );
+  }
+
+  @Post('draft/:contractDraftId/agree')
+  async AgreeContractDraft(
+    @Req() req: AuthRequest,
+    @Param('contractDraftId') contractDraftId: string,
+    @Body(new ZodValidation(AgreeContractDraftDtoRequest))
+    body: { propertyId: string },
+  ) {
+    return await this.service.agreeContractDraft(
+      req.user.userId,
+      body.propertyId,
+      contractDraftId,
     );
   }
 
@@ -163,20 +206,6 @@ export class ContractController {
       contractId,
       body,
       propertyId,
-    );
-  }
-
-  @Post('draft/:contractDraftId/agree')
-  async AgreeContractDraft(
-    @Req() req: AuthRequest,
-    @Param('contractDraftId') contractDraftId: string,
-    @Body(new ZodValidation(AgreeContractDraftDtoRequest))
-    body: { propertyId: string },
-  ) {
-    return await this.service.agreeContractDraft(
-      req.user.userId,
-      body.propertyId,
-      contractDraftId,
     );
   }
 }

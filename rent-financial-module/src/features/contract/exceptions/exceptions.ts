@@ -37,3 +37,13 @@ export class deniedTransitionedStatusContract extends AppException {
     );
   }
 }
+
+export class contractDraftAcceptedNotFound extends AppException {
+  constructor() {
+    super(
+      'No se encuentra dicho borrador de contrato aceptado por ambas partes',
+      404,
+      'NOT_FOUND',
+    );
+  }
+}

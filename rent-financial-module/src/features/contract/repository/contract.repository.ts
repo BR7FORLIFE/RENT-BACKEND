@@ -82,6 +82,52 @@ export class ContractRepository {
     };
   }
 
+  async findAllContractAccepted(
+    propertyId: string,
+    paginationDto: PaginationType,
+    db: Prisma.TransactionClient = this.prisma,
+  ): Promise<PaginationResponse<ContractDraftInfoPersistance>> {
+    const { limit, page } = paginationDto;
+    const skip = (paginationDto.page - 1) * paginationDto.limit;
+
+    const [data, total] = await db.$transaction([
+      db.contractDraft.findMany({
+        where: { propertyId, landlordAgreed: true, tenantAgreed: true },
+        skip,
+        take: limit,
+        orderBy: { version: 'desc' },
+      }),
+      db.contractDraft.count({ where: { propertyId } }),
+    ]);
+
+    return {
+      data,
+      metadata: {
+        limit: limit,
+        page,
+        hasNextPage: page * limit < total,
+        hasPreviousPage: page > 1,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findContractAcceptedById(
+    propertyId: string,
+    contractAcceptedId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.contractDraft.findFirst({
+      where: {
+        propertyId,
+        tenantAgreed: true,
+        landlordAgreed: true,
+        id: contractAcceptedId,
+      },
+    });
+  }
+
   async findContractDraftByIdAndPropertyId(
     contractDraftId: string,
     propertyId: string,
@@ -320,15 +366,21 @@ export class ContractRepository {
 
   async updateAgreeContractDraft(
     contractDraftId: string,
+    role: 'TENANT' | 'LANDLORD',
     db: Prisma.TransactionClient = this.prisma,
   ) {
     await db.contractDraft.update({
       where: {
         id: contractDraftId,
       },
-      data: {
-        landlordAgreed: true,
-      },
+      data:
+        role === 'TENANT'
+          ? {
+              tenantAgreed: true,
+            }
+          : {
+              landlordAgreed: true,
+            },
     });
   }
 }

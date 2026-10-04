@@ -9,6 +9,7 @@ import type {
 import type { ContractType } from '../schemas/contract.schema.js';
 
 import {
+  contractDraftAcceptedNotFound,
   contractDraftAvailabilityNotFoundException,
   contractDraftNotFound,
   contractNotFound,
@@ -329,6 +330,7 @@ export class ContractService {
       //aceptamos el borrador por el posible arrendado
       await this.contractRepository.updateAgreeContractDraft(
         tenantContractDraft.id,
+        'TENANT',
       );
 
       return {
@@ -349,6 +351,7 @@ export class ContractService {
       //aceptamos el borrador por el posible arrendado
       await this.contractRepository.updateAgreeContractDraft(
         landlordContractDraft.id,
+        'LANDLORD',
       );
 
       return {
@@ -752,4 +755,57 @@ export class ContractService {
   }
 
   // async editContract(userId: string, contractId: string) {}
+  async getAllAcceptedContracts(
+    userId: string,
+    propertyId: string,
+    paginationDto: PaginationType,
+  ) {
+    //verificamos que sea un miembro de la propiedad activo
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
+        userId,
+        propertyId,
+      );
+
+    //verificamos que tenga permisos para ver los borradores de contratos
+    await this.systemRole.CheckPolicies(optPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.VER_CONTRATOS_PRELIMINARES,
+    ]);
+
+    //buscamos todos los contratos aceptados
+    return await this.contractRepository.findAllContractAccepted(
+      propertyId,
+      paginationDto,
+    );
+  }
+
+  async getAcceptedContracts(
+    userId: string,
+    propertyId: string,
+    contractDraftId: string,
+  ) {
+    //verificamos que sea un miembro de la propiedad activo
+    const optPropertyMember =
+      await this.systemRole.verifyPropertyMemberByUserIdInPropertyId(
+        userId,
+        propertyId,
+      );
+
+    //verificamos que tenga permisos para ver los borradores de contratos
+    await this.systemRole.CheckPolicies(optPropertyMember.id, [
+      POLICIES_STATEMENTS_NAMES.VER_CONTRATOS_PRELIMINARES,
+    ]);
+
+    const optContractAccepted =
+      await this.contractRepository.findContractAcceptedById(
+        propertyId,
+        contractDraftId,
+      );
+
+    if (!optContractAccepted) {
+      throw new contractDraftAcceptedNotFound();
+    }
+
+    return optContractAccepted;
+  }
 }
