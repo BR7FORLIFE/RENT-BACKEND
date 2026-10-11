@@ -2256,6 +2256,391 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "Finance",
+          "item": [
+            {
+              "name": "Create Transaction (income)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/finance/property/{{propertyId}}/transactions",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "finance",
+                    "property",
+                    "{{propertyId}}",
+                    "transactions"
+                  ]
+                },
+                "description": "Registra un movimiento (requiere REGISTRAR_MOVIMIENTOS_FINANCIEROS). status inicial: PLANNED, PENDING o PAID. contractId opcional y debe ser del mismo inmueble.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"contractId\": \"{{contractId}}\",\n  \"type\": \"INCOME\",\n  \"category\": \"RENT\",\n  \"status\": \"PENDING\",\n  \"description\": \"Canon de octubre\",\n  \"amount\": \"1500000.00\",\n  \"currency\": \"COP\",\n  \"dueDate\": \"2026-10-05T00:00:00.000Z\",\n  \"occurredAt\": \"2026-10-01T00:00:00.000Z\",\n  \"isSimulated\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res && res.id) pm.collectionVariables.set('financialTransactionId', res.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Transaction (expense)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/finance/property/{{propertyId}}/transactions",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "finance",
+                    "property",
+                    "{{propertyId}}",
+                    "transactions"
+                  ]
+                },
+                "description": "Registra un gasto manual.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"EXPENSE\",\n  \"category\": \"MAINTENANCE\",\n  \"description\": \"Reparacion de tuberia\",\n  \"amount\": \"250000\",\n  \"currency\": \"COP\",\n  \"dueDate\": \"2026-10-20T00:00:00.000Z\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res && res.id) pm.collectionVariables.set('financialTransactionId', res.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Transactions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/finance/property/{{propertyId}}/transactions?type=INCOME&category=RENT&status=PAID&currency=COP&from=2026-01-01&to=2026-12-31&page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "finance",
+                    "property",
+                    "{{propertyId}}",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "INCOME"
+                    },
+                    {
+                      "key": "category",
+                      "value": "RENT"
+                    },
+                    {
+                      "key": "status",
+                      "value": "PAID"
+                    },
+                    {
+                      "key": "currency",
+                      "value": "COP"
+                    },
+                    {
+                      "key": "from",
+                      "value": "2026-01-01"
+                    },
+                    {
+                      "key": "to",
+                      "value": "2026-12-31"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "Lista con filtros (VER_FINANZAS). Excluye CANCELLED salvo que se filtre por status."
+              },
+              "response": []
+            },
+            {
+              "name": "Financial History",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/finance/property/{{propertyId}}/history?from=2026-01-01&to=2026-12-31&page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "finance",
+                    "property",
+                    "{{propertyId}}",
+                    "history"
+                  ],
+                  "query": [
+                    {
+                      "key": "from",
+                      "value": "2026-01-01"
+                    },
+                    {
+                      "key": "to",
+                      "value": "2026-12-31"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "Historial completo del inmueble, incluidos cancelados. Mismos filtros que el listado."
+              },
+              "response": []
+            },
+            {
+              "name": "Financial Summary",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/finance/property/{{propertyId}}/summary?from=2026-01-01&to=2026-12-31",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "finance",
+                    "property",
+                    "{{propertyId}}",
+                    "summary"
+                  ],
+                  "query": [
+                    {
+                      "key": "from",
+                      "value": "2026-01-01"
+                    },
+                    {
+                      "key": "to",
+                      "value": "2026-12-31"
+                    }
+                  ]
+                },
+                "description": "Resumen por moneda: ingresos/gastos realizados (PAID), flujo neto, pendientes y vencidos. from y to obligatorios."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Transaction By ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/finance/property/{{propertyId}}/transactions/{{financialTransactionId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "finance",
+                    "property",
+                    "{{propertyId}}",
+                    "transactions",
+                    "{{financialTransactionId}}"
+                  ]
+                },
+                "description": "Consulta un movimiento del inmueble."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Transaction",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/finance/property/{{propertyId}}/transactions/{{financialTransactionId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "finance",
+                    "property",
+                    "{{propertyId}}",
+                    "transactions",
+                    "{{financialTransactionId}}"
+                  ]
+                },
+                "description": "Edita campos permitidos (EDITAR_MOVIMIENTOS_FINANCIEROS). No aplica a movimientos PAID o CANCELLED.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"Canon de octubre (ajustado)\",\n  \"amount\": \"1550000.00\",\n  \"dueDate\": \"2026-10-10T00:00:00.000Z\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Change Transaction Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/finance/property/{{propertyId}}/transactions/{{financialTransactionId}}/status",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "finance",
+                    "property",
+                    "{{propertyId}}",
+                    "transactions",
+                    "{{financialTransactionId}}",
+                    "status"
+                  ]
+                },
+                "description": "Cambia el estado: PLANNED, PENDING, OVERDUE, PAID, CANCELLED segun transiciones validas. paidAt solo con PAID.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"OVERDUE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Mark Transaction As Paid",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/finance/property/{{propertyId}}/transactions/{{financialTransactionId}}/pay",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "finance",
+                    "property",
+                    "{{propertyId}}",
+                    "transactions",
+                    "{{financialTransactionId}}",
+                    "pay"
+                  ]
+                },
+                "description": "Marca como pagado y registra paidAt (por defecto ahora; no puede ser futuro).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"paidAt\": \"2026-10-03T15:00:00.000Z\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     },
@@ -2431,7 +2816,7 @@
     },
     {
       "key": "BASE_URL",
-      "value": "http://localhost:3002",
+      "value": "https://judiciary-dingo-alias.ngrok-free.dev",
       "type": "default"
     },
     {
@@ -2486,6 +2871,11 @@
     },
     {
       "key": "serviceRequestId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "financialTransactionId",
       "value": "",
       "type": "default"
     }

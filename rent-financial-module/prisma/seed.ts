@@ -555,6 +555,23 @@ async function main() {
         description:
           'Permite publicar ofertas de servicios exclusivas del inmueble (alcance PROPERTY)',
       },
+      {
+        id: POLICIES_STATEMENTS.VER_FINANZAS,
+        policyName: 'VER_FINANZAS',
+        description:
+          'Permite consultar los movimientos y resumenes financieros del inmueble',
+      },
+      {
+        id: POLICIES_STATEMENTS.REGISTRAR_MOVIMIENTOS_FINANCIEROS,
+        policyName: 'REGISTRAR_MOVIMIENTOS_FINANCIEROS',
+        description: 'Permite registrar ingresos y gastos del inmueble',
+      },
+      {
+        id: POLICIES_STATEMENTS.EDITAR_MOVIMIENTOS_FINANCIEROS,
+        policyName: 'EDITAR_MOVIMIENTOS_FINANCIEROS',
+        description:
+          'Permite editar movimientos financieros y cambiar su estado',
+      },
     ],
     skipDuplicates: true,
   });
@@ -906,6 +923,45 @@ async function main() {
       {
         propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.JARDINERO,
         policy_statement_id: POLICIES_STATEMENTS.PUBLICAR_OFERTAS_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.VER_FINANZAS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.REGISTRAR_MOVIMIENTOS_FINANCIEROS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.EDITAR_MOVIMIENTOS_FINANCIEROS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.COPROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.VER_FINANZAS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.COPROPIETARIO,
+        policy_statement_id:
+          POLICIES_STATEMENTS.REGISTRAR_MOVIMIENTOS_FINANCIEROS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.COPROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.EDITAR_MOVIMIENTOS_FINANCIEROS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ADMINISTRADOR,
+        policy_statement_id: POLICIES_STATEMENTS.VER_FINANZAS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ADMINISTRADOR,
+        policy_statement_id:
+          POLICIES_STATEMENTS.REGISTRAR_MOVIMIENTOS_FINANCIEROS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ADMINISTRADOR,
+        policy_statement_id: POLICIES_STATEMENTS.EDITAR_MOVIMIENTOS_FINANCIEROS,
       },
       {
         propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.SOPORTE_OPERATIVO,

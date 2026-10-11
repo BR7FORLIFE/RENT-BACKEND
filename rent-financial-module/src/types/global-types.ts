@@ -149,6 +149,9 @@ export const POLICIES_STATEMENTS = {
   PUBLICAR_OFERTAS_SERVICIOS: 'b3e86c1a-94f7-4025-9d1b-a7c52e08f361',
 
   // politicas referentes a las finanzas
+  VER_FINANZAS: '83ff6fe4-b18c-4ba2-80a7-432b10a335c2',
+  REGISTRAR_MOVIMIENTOS_FINANCIEROS: 'c663646e-2527-4cf6-9fb7-ee82a28020f0',
+  EDITAR_MOVIMIENTOS_FINANCIEROS: '083b42dd-c4df-4ca2-823c-a9f06922ce3f',
 
   //politicas referentes a los documentos
 

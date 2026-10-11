@@ -12,14 +12,14 @@ datasource db {
   provider = "postgresql"
 }
 
-enum NotificationType{
-  WARNING 
-  INFO 
-  ERROR 
+enum NotificationType {
+  WARNING
+  INFO
+  ERROR
   DEBUG
 }
 
-enum StatusContract{
+enum StatusContract {
   BORRADOR // borrador (fase de creación de contrato) 
   PENDIENTE_ACEPTACION // este estado permite que el posible arrendador acepte o no los terminos del borrador del contrato
   PENDIENTE_DOCUMENTACION // si acepta dicho usuario quedará pendiente la documentacion de dicho contrato
@@ -29,7 +29,7 @@ enum StatusContract{
   FINALIZADO //contrato ya expirado o cumplido
 }
 
-enum TypeStreet{
+enum TypeStreet {
   CALLE // calle
   CARRERA // carrera
   AVENIDA // avenida
@@ -37,20 +37,20 @@ enum TypeStreet{
 }
 
 // tipos de precios o pagos de servicio por medio de acuerdos
-enum PriceTypeAgreement{
+enum PriceTypeAgreement {
   CUSTOM_QUOTE // precio de servicio personalizado
   FIXED // precio fijo de servicio
   NEGOTIABLE // precio de servicio negociable
   PERCENTAGE // precio de servicio acordado por partes, cuotas, etc..
 }
 
-enum Currency{
+enum Currency {
   COP
   USD
 }
 
 //estados de pago de dicho servicio (modelo ya que el encargado de esta logica es el modulo de pagos)
-enum PaymentStatus{
+enum PaymentStatus {
   PENDING // pendiente
   COMPLETE // completo
   FAILED // fallido
@@ -62,190 +62,181 @@ enum PaymentStatus{
 }
 
 // tipo de propiedad
-model TypeProperty{
-  id String @id
-  name String @unique
+model TypeProperty {
+  id          String  @id
+  name        String  @unique
   description String?
 
   properties Property[]
 }
 
 //estado de ocupacion del inmueble
-model PropertyOccupationType{
-  id String @id
-  name String @unique
+model PropertyOccupationType {
+  id          String  @id
+  name        String  @unique
   description String?
 
   properties Property[]
 }
 
 //Tipo de acciones con su nombre y descripcion para mas auditoria de lo que hace
-model PropertyActorRole{
-  id String @id
-  name String @unique
+model PropertyActorRole {
+  id          String  @id
+  name        String  @unique
   description String?
- 
-  propertyMemberRoles PropertyMemberRole[]
+
+  propertyMemberRoles               PropertyMemberRole[]
   propertyActorRolePolicyStatements PropertyActorRolePolicyStatements[]
 }
 
 //refleja el tipo de servicio publico dentro del inmueble
-model PublicServiceType{
-  id String @id @default(uuid())
-  name String @unique
+model PublicServiceType {
+  id          String  @id @default(uuid())
+  name        String  @unique
   description String?
 
   publicServices PublicService[]
 }
 
 //refleja la direccion de un inmueble
-model Direction{
-  id String @id @default(uuid())
-  propertyId String @unique
-  latitute Decimal
-  longitud Decimal
-  department String
-  city String
+model Direction {
+  id           String     @id @default(uuid())
+  propertyId   String     @unique
+  latitute     Decimal
+  longitud     Decimal
+  department   String
+  city         String
   neighborhood String
-  typeStreet TypeStreet @map("type_street")
-  numberStreet Int @map("number_street")
-  complement String?
-  createAt DateTime @default(now()) @map("create_at")
-  updateAt DateTime @updatedAt @map("update_at")
+  typeStreet   TypeStreet @map("type_street")
+  numberStreet Int        @map("number_street")
+  complement   String?
+  createAt     DateTime   @default(now()) @map("create_at")
+  updateAt     DateTime   @updatedAt @map("update_at")
 
   property Property @relation(fields: [propertyId], references: [id])
 }
 
 //refleja recursos como imagenes, archivos, etc.
-model ResourceImages{
-  id String @id @default(uuid())
-  assetId String? @map("asset_id")
-  width Int? 
-  height Int?
-  format String?
-  url String
-  secureUrl String? @map("secure_url")
-  createAt DateTime @default(now()) @map("create_at")
-  updateAt DateTime @updatedAt @map("update_at")
+model ResourceImages {
+  id        String   @id @default(uuid())
+  assetId   String?  @map("asset_id")
+  width     Int?
+  height    Int?
+  format    String?
+  url       String
+  secureUrl String?  @map("secure_url")
+  createAt  DateTime @default(now()) @map("create_at")
+  updateAt  DateTime @updatedAt @map("update_at")
 
   properties PropertyResources[]
-  contracts ContractResources[]
+  contracts  ContractResources[]
 }
 
 /**
-Propiedad ¿Que refleja?
+ * Propiedad ¿Que refleja?
+ * Es la entidad principal del sistema refleja lo que es un inmueble y lo importante que es
+ * ya que este nos permite registrar miembros activos dentro de esta, ademas de servicios, contratos
+ * entre otra informacion importante
+ * como tabla independiente o tabla de dominio fuerte todas sus relaciones parten de sus relaciones hijas
+ * ya que este permite borrar todo lo correspondiente a esta.
+ * ¡ Desiciones de integridad !
+ * - No debe tener dependencias hacia otras tablas debe ser entidad meramente fuerte
+ * - Al ser borrada todas sus hijas deben ser borradas para mantener consistencia en la base de datos
+ */
+model Property {
+  id                       String  @id @default(uuid())
+  userId                   String  @map("user_id")
+  registerByUserId         String  @map("register_by_userId")
+  propertyTypeId           String  @map("property_type_id")
+  propertyOccupationTypeId String  @map("property_occupation_type_id")
+  propertyName             String  @map("property_name")
+  propertyDescription      String  @map("property_description")
+  fmi                      String
+  predialNumber            String  @map("predial_number")
+  isPublished              Boolean @map("is_published")
 
-Es la entidad principal del sistema refleja lo que es un inmueble y lo importante que es
-ya que este nos permite registrar miembros activos dentro de esta, ademas de servicios, contratos
-entre otra informacion importante
-
-como tabla independiente o tabla de dominio fuerte todas sus relaciones parten de sus relaciones hijas
-ya que este permite borrar todo lo correspondiente a esta.
-
-¡ Desiciones de integridad !
-
-- No debe tener dependencias hacia otras tablas debe ser entidad meramente fuerte
-- Al ser borrada todas sus hijas deben ser borradas para mantener consistencia en la base de datos
-
-**/
-model Property{
-  id String @id @default(uuid())
-  userId String @map("user_id")
-  registerByUserId String @map("register_by_userId")
-  propertyTypeId String @map("property_type_id")
-  propertyOccupationTypeId String @map("property_occupation_type_id")
-  propertyName String @map("property_name")
-  propertyDescription String @map("property_description")
-  fmi String
-  predialNumber String @map("predial_number")
-  isPublished Boolean @map("is_published")
-  
-   // esto permite que los administradores validen la autenticidad del inmueble
-  isActive Boolean @map("is_active") @default(false)
+  // esto permite que los administradores validen la autenticidad del inmueble
+  isActive Boolean  @default(false) @map("is_active")
   createAt DateTime @default(now()) @map("create_at")
   updateAt DateTime @updatedAt @map("update_at")
 
-
-  serviceRequests ServiceRequest[]
-  publicServices PublicService[]
-  propertyMembers PropertyMember[]
-  contracts Contract[]
-  direction Direction?
-  propertyResources PropertyResources[]
-  typeProperty TypeProperty @relation(fields: [propertyTypeId], references: [id])
-  propertyOccupationType PropertyOccupationType @relation(fields: [propertyOccupationTypeId], references: [id])
-  economicPropertyInformation EconomicPropertyInformation?
+  serviceRequests              ServiceRequest[]
+  publicServices               PublicService[]
+  propertyMembers              PropertyMember[]
+  contracts                    Contract[]
+  direction                    Direction?
+  propertyResources            PropertyResources[]
+  typeProperty                 TypeProperty                  @relation(fields: [propertyTypeId], references: [id])
+  propertyOccupationType       PropertyOccupationType        @relation(fields: [propertyOccupationTypeId], references: [id])
+  economicPropertyInformation  EconomicPropertyInformation?
   propertyStructureDescription PropertyStructureDescription?
+  financialTransactions        FinancialTransaction[]
 }
 
 //tabla intermedia para hacer la comunicacion N:M con resourcesImages
-model PropertyResources{
+model PropertyResources {
   propertyId String @map("property_id")
   resourceId String @map("resource_id")
 
-  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  property       Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   resourcesImage ResourceImages @relation(fields: [resourceId], references: [id])
 
   @@id([propertyId, resourceId])
 }
 
-model EconomicPropertyInformation{
-  id String @id @default(uuid())
-  propertyId String @unique @map("property_id")
-  monthlyRent Decimal @map("monthly_rent")
-  depositAmount Decimal @map("deposit_amount") //cantidad de deposito (para daños o pagos de facturas)
-  currency Currency 
-  utilitiesIncluded Boolean @map("utilities_included") // si es servicios por aparte o vienen incluidos
+model EconomicPropertyInformation {
+  id                String   @id @default(uuid())
+  propertyId        String   @unique @map("property_id")
+  monthlyRent       Decimal  @map("monthly_rent")
+  depositAmount     Decimal  @map("deposit_amount") //cantidad de deposito (para daños o pagos de facturas)
+  currency          Currency
+  utilitiesIncluded Boolean  @map("utilities_included") // si es servicios por aparte o vienen incluidos
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 }
 
 model PropertyStructureDescription {
-  id String @id @default(uuid())
-  propertyId String @unique @map("property_id")
-  bedrooms Int // numero de habitaciones de la propiedad
-  bathrooms Int //numero de baños de la propiedad
-  floors Int //cantidad de pisos de la vivienda
-  parkingSpaces Int //espacios de parqueo
-  area Decimal // area total de la vivienda 
-  lotArea Decimal // area total del lote donde esta construido la propiedad
+  id               String  @id @default(uuid())
+  propertyId       String  @unique @map("property_id")
+  bedrooms         Int // numero de habitaciones de la propiedad
+  bathrooms        Int //numero de baños de la propiedad
+  floors           Int //cantidad de pisos de la vivienda
+  parkingSpaces    Int //espacios de parqueo
+  area             Decimal // area total de la vivienda 
+  lotArea          Decimal // area total del lote donde esta construido la propiedad
   constructionYear Int? // año de contruccion de la vivienda
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 }
 
 /**
-Contratos ¿Que refleja?  - Tabla muy dependiente a otras
+ * Contratos ¿Que refleja?  - Tabla muy dependiente a otras
+ * refleja un acuerdo entre dos personas, para rentar un inmueble, donde se guarda
+ * informacion relevante a dicho contrato, como el dinero de renta, las partes quienes
+ * lo firmaron, el estado de dicho contrato entre otra informacion relevante.
+ * ¡ Desiciones de integridad !
+ * - NO se pueden crear nuevos contratos si es el estado del contrato es activo
+ * - Hay relaciones bilaterales entre Arrendador y Arrendado. para mejor busqueda de informacion
+ */
+model Contract {
+  id               String         @id @default(uuid())
+  propertyId       String         @map("property_id")
+  landlordMemberId String         @map("landlord_member_id")
+  tenantMemberId   String         @map("tenant_member_id")
+  monthlyRent      Decimal        @map("monthly_rent")
+  depositAmount    Decimal        @map("deposit_amount")
+  startDate        DateTime       @map("start_date")
+  endDate          DateTime       @map("end_date")
+  status           StatusContract
+  createByUserId   String         @map("create_by_user_id")
+  createAt         DateTime       @default(now()) @map("create_at")
+  updateAt         DateTime       @updatedAt @map("update_at")
 
-refleja un acuerdo entre dos personas, para rentar un inmueble, donde se guarda
-informacion relevante a dicho contrato, como el dinero de renta, las partes quienes 
-lo firmaron, el estado de dicho contrato entre otra informacion relevante.
-
-¡ Desiciones de integridad !
-
-- NO se pueden crear nuevos contratos si es el estado del contrato es activo
-- Hay relaciones bilaterales entre Arrendador y Arrendado. para mejor busqueda de informacion
-
-**/
-model Contract{
-  id String @id @default(uuid())
-  propertyId String @map("property_id")
-  landlordMemberId String @map("landlord_member_id")
-  tenantMemberId String @map("tenant_member_id")
-  monthlyRent Decimal @map("monthly_rent")
-  depositAmount Decimal @map("deposit_amount")
-  startDate DateTime @map("start_date")
-  endDate DateTime @map("end_date")
-  status StatusContract
-  createByUserId String @map("create_by_user_id")
-  createAt DateTime @default(now()) @map("create_at")
-  updateAt DateTime @updatedAt @map("update_at")
-  
-
-  contractResources ContractResources[]
-  landlord PropertyMember @relation("LandlordContract", fields:[landlordMemberId],references:[id], onDelete: Cascade)
-  tenant PropertyMember @relation("TenantContract", fields:[tenantMemberId], references:[id], onDelete: Cascade)
-  property Property @relation(fields:[propertyId], references:[id], onDelete: Cascade)
+  contractResources     ContractResources[]
+  landlord              PropertyMember         @relation("LandlordContract", fields: [landlordMemberId], references: [id], onDelete: Cascade)
+  tenant                PropertyMember         @relation("TenantContract", fields: [tenantMemberId], references: [id], onDelete: Cascade)
+  property              Property               @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  financialTransactions FinancialTransaction[]
 }
 
 model ContractResources {
@@ -261,53 +252,48 @@ model ContractResources {
 
 //contractDraft
 
-/*
-La idea es la siguiente, es crear una tabla donde se crearan borradores de contratos
-donde el arrendador y arrendado pueden acordar dichos terminos, y con la ayuda de la IA
-crear el draft del contrato, una vez ambas partes han acordado el acuerdo de aceptar 
-el borrador del contrato procederá con la generacion de contrato de manera juridica ahora si
-*/
+/**
+ * La idea es la siguiente, es crear una tabla donde se crearan borradores de contratos
+ * donde el arrendador y arrendado pueden acordar dichos terminos, y con la ayuda de la IA
+ * crear el draft del contrato, una vez ambas partes han acordado el acuerdo de aceptar
+ * el borrador del contrato procederá con la generacion de contrato de manera juridica ahora si
+ */
 
-model ContractDraft{
+model ContractDraft {
   //parametros del borrador
-  id String @id @default(uuid())
-  content String // este parametro es todo el texto del borrador del contrato
-  version Int @default(1) //version del borrador para que ambas partes puedan ver las distintas version del borrador
-  landlordAgreed Boolean @default(false) @map("landlord_agree") //si acepta el borrador el arrendador
-  tenantAgreed Boolean @default(false) @map("tenant_agree") //si acepta el borrador el arrendado
-  createdByPropertyMemberId String @map("created_by_property_member_id") //la id del miembro que creó el borrador
-  createdAt DateTime @default(now()) @map("created_at") //fecha de creacion del borrador
-  updateAt DateTime @updatedAt @map("update_at") //fecha de actualizacion del borrador
+  id                        String   @id @default(uuid())
+  content                   String // este parametro es todo el texto del borrador del contrato
+  version                   Int      @default(1) //version del borrador para que ambas partes puedan ver las distintas version del borrador
+  landlordAgreed            Boolean  @default(false) @map("landlord_agree") //si acepta el borrador el arrendador
+  tenantAgreed              Boolean  @default(false) @map("tenant_agree") //si acepta el borrador el arrendado
+  createdByPropertyMemberId String   @map("created_by_property_member_id") //la id del miembro que creó el borrador
+  createdAt                 DateTime @default(now()) @map("created_at") //fecha de creacion del borrador
+  updateAt                  DateTime @updatedAt @map("update_at") //fecha de actualizacion del borrador
 
   //parametros de contrato juridico, es necesaro ya que debemos mantener sincronizados ambos
   //modelos sino el arrendador puede acordar algo muy diferente al borrador y seria un gran problema
-  propertyId String @map("property_id")
-  landlordMemberId String @map("landlord_member_id")
-  tenantMemberId String @map("tenant_member_id")
-  monthlyRent Decimal @map("monthly_rent")
-  depositAmount Decimal @map("deposit_amount")
-  startDate DateTime @map("start_date")
-  endDate DateTime @map("end_date")
+  propertyId       String   @map("property_id")
+  landlordMemberId String   @map("landlord_member_id")
+  tenantMemberId   String   @map("tenant_member_id")
+  monthlyRent      Decimal  @map("monthly_rent")
+  depositAmount    Decimal  @map("deposit_amount")
+  startDate        DateTime @map("start_date")
+  endDate          DateTime @map("end_date")
 
   @@unique([propertyId, version]) //estos campos deben ser unicos para no tener irrelevancias
 }
 
 /**
-Miembros de la propidad ¿Que refleja?
-
-Un miembro en la propiedad refleja aquellas personas vinculadas al inmueble y que persona fue
-quien agregó dicho miembro, estos actores pueden tener multiples roles o servicios dentro de 
-dicho inmueble permitiendo flexibilidad.
-
-Ademas los miembros pueden ser ya sea Arrendados o Arrendadores vinculados a dichos contratos
-
-¡ Desiciones de Integridad !
-
-- Al borrar una propiedad sus miembros vinculadas a estas deben ser borrados
-- Como es una tabla a la cual tiene relacion 1:N con roles estan tambien deben ser borradas para mantener
-integridad referencial
-
-**/
+ * Miembros de la propidad ¿Que refleja?
+ * Un miembro en la propiedad refleja aquellas personas vinculadas al inmueble y que persona fue
+ * quien agregó dicho miembro, estos actores pueden tener multiples roles o servicios dentro de
+ * dicho inmueble permitiendo flexibilidad.
+ * Ademas los miembros pueden ser ya sea Arrendados o Arrendadores vinculados a dichos contratos
+ * ¡ Desiciones de Integridad !
+ * - Al borrar una propiedad sus miembros vinculadas a estas deben ser borrados
+ * - Como es una tabla a la cual tiene relacion 1:N con roles estan tambien deben ser borradas para mantener
+ * integridad referencial
+ */
 enum statusPropertyMember {
   ACTIVE //miembro activo con el inmueble y puede operar en ella
   DESACTIVE // no puede interactuar con el inmueble hasta que el propietario lo decida
@@ -315,122 +301,119 @@ enum statusPropertyMember {
   // en proceso de convertirse un miembro pero no cumple todos los requisitos antes de serlo
   // ṕor ejemplo -> ha aceptado la invitacion para unise a la vivienda pero el propietario no le
   // ha asignado sus roles
-  IN_PROCESS 
+  IN_PROCESS
 }
 
-model PropertyMember{
-  id String @id @default(uuid())
-  userId String @map("user_id")
-  propertyId String @map("property_id")
-  status statusPropertyMember
-  assignedBy String @map("assigned_by")
-  assignedAt DateTime @default(now()) @map("assigned_at")
-  updateAt DateTime @updatedAt @map("update_at")
+model PropertyMember {
+  id         String               @id @default(uuid())
+  userId     String               @map("user_id")
+  propertyId String               @map("property_id")
+  status     statusPropertyMember
+  assignedBy String               @map("assigned_by")
+  assignedAt DateTime             @default(now()) @map("assigned_at")
+  updateAt   DateTime             @updatedAt @map("update_at")
+
+  property                       Property                         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyMemberRole             PropertyMemberRole[]
+  serviceOfferings               ServiceOffering[]
+  landlordContracts              Contract[]                       @relation("LandlordContract")
+  tenantContracts                Contract[]                       @relation("TenantContract")
+  propertyMemberPoliciesOverride PropertyMemberPoliciesOverride[]
 
   @@unique([userId, propertyId])
-
-  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  propertyMemberRole PropertyMemberRole[]
-  serviceOfferings ServiceOffering[]
-  landlordContracts Contract[] @relation("LandlordContract")
-  tenantContracts Contract[] @relation("TenantContract")
-  propertyMemberPoliciesOverride PropertyMemberPoliciesOverride[]
 }
 
 //refleja una tabla intermedia con su respectiva accion dentro del inmueble
-model PropertyMemberRole{
-  id String @id @default(uuid())
-  propertyMemberId String @map("property_member_id")
+model PropertyMemberRole {
+  id                  String @id @default(uuid())
+  propertyMemberId    String @map("property_member_id")
   propertyActorRoleId String @map("property_actor_role_id")
 
-  @@unique([propertyActorRoleId, propertyMemberId])
-
-  propertyMember PropertyMember @relation(fields: [propertyMemberId], references: [id], onDelete: Cascade)
+  propertyMember    PropertyMember    @relation(fields: [propertyMemberId], references: [id], onDelete: Cascade)
   propertyActorRole PropertyActorRole @relation(fields: [propertyActorRoleId], references: [id])
+
+  @@unique([propertyActorRoleId, propertyMemberId])
 }
 
 /**
-Servicios publicos ¿Que refleja?
+ * Servicios publicos ¿Que refleja?
+ * refleja los servicios publicos de una vivienda, donde sus unicas relaciones correspondientes
+ * son con las propiedades ya que estas cuentan con distintos servicios publicos y ademas esta
+ * enlazada con una tabla logica (lookup Table) que refleja el tipo de servicio publico.
+ * ¡ Desiciones de Integridad !
+ * - al borrar una propiedad sus vinculaciones deben ser borradas en este caso el servicio o los servicios
+ * publicos vinculados al inmueble
+ */
+model PublicService {
+  id                  String   @id @default(uuid())
+  propertyId          String   @map("property_id")
+  publicServiceTypeId String   @map("public_service_type_id")
+  accountNumber       String   @map("account_number")
+  registerDate        DateTime @default(now()) @map("register_date")
+  updateAt            DateTime @updatedAt @map("update_at")
 
-refleja los servicios publicos de una vivienda, donde sus unicas relaciones correspondientes
-son con las propiedades ya que estas cuentan con distintos servicios publicos y ademas esta
-enlazada con una tabla logica (lookup Table) que refleja el tipo de servicio publico.
+  publicServiceType PublicServiceType @relation(fields: [publicServiceTypeId], references: [id])
+  property          Property          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
-¡ Desiciones de Integridad !
-
-- al borrar una propiedad sus vinculaciones deben ser borradas en este caso el servicio o los servicios
-publicos vinculados al inmueble
-
-**/
-model PublicService{
-  id String @id @default(uuid())
-  propertyId String @map("property_id")
-  publicServiceTypeId String @map("public_service_type_id")
-  accountNumber String @map("account_number")
-  registerDate DateTime @default(now()) @map("register_date")
-  updateAt DateTime @updatedAt @map("update_at")
-
-  publicServiceType PublicServiceType @relation(fields:[publicServiceTypeId], references:[id])
-  property Property @relation(fields:[propertyId], references:[id], onDelete: Cascade)
   @@unique([propertyId, publicServiceTypeId])
 }
 
 //invitation linked
-enum StatusInvitationLinked{
+enum StatusInvitationLinked {
   REVOCKED // invitaciones revocadas
   CONSUMED // enlaces de invitacion consumidas o utilizadas
   EXPIRED // enlaces de invitacion en tiempo expiradas
   DRAFT //recien creada a la espera de un estado
 }
 
-model InvitationLinked{
-  id String @id @default(uuid())
-  propertyId String @map("property_id") //hacia que propiedad es la invitacion
-  invitedBy String @map("invited_by")
-  invitedUserId String @map("invited_user_id") //id del usuario activo para la persona invitada
-  invitedEmailTo String @map("invited_email_to")
-  token String 
-  status StatusInvitationLinked @default(DRAFT)
-  expirationTime DateTime @map("expiration_time")
-  createAt DateTime @default(now()) @map("create_at")
-  updateAt DateTime @updatedAt @map("update_at")
+model InvitationLinked {
+  id             String                 @id @default(uuid())
+  propertyId     String                 @map("property_id") //hacia que propiedad es la invitacion
+  invitedBy      String                 @map("invited_by")
+  invitedUserId  String                 @map("invited_user_id") //id del usuario activo para la persona invitada
+  invitedEmailTo String                 @map("invited_email_to")
+  token          String
+  status         StatusInvitationLinked @default(DRAFT)
+  expirationTime DateTime               @map("expiration_time")
+  createAt       DateTime               @default(now()) @map("create_at")
+  updateAt       DateTime               @updatedAt @map("update_at")
 }
 
 //politicas RENT por cada rol
 
 //modelamiento de una politica
-model PolicyStatement{
-  id String @id @default(uuid())
-  policyName String @map("policy_name")
-  description String 
-  createAt DateTime @default(now()) @map("create_at")
-  updateAt DateTime @updatedAt @map("update_at")
+model PolicyStatement {
+  id          String   @id @default(uuid())
+  policyName  String   @map("policy_name")
+  description String
+  createAt    DateTime @default(now()) @map("create_at")
+  updateAt    DateTime @updatedAt @map("update_at")
 
   propertyActorRolePolicyStatements PropertyActorRolePolicyStatements[]
-  propertyMemberPoliciesOverride PropertyMemberPoliciesOverride[]
+  propertyMemberPoliciesOverride    PropertyMemberPoliciesOverride[]
 }
 
 //permite vincular cada rol a un conjunto de politicas
-model PropertyActorRolePolicyStatements{
-  id String @id @default(uuid())
-  propertyActorRoleId String @map("property_actor_role_id")
-  policy_statement_id String @map("policy_statement_id")
-  createAt DateTime @default(now()) @map("create_at")
-  updateAt DateTime @updatedAt @map("update_at")
+model PropertyActorRolePolicyStatements {
+  id                  String   @id @default(uuid())
+  propertyActorRoleId String   @map("property_actor_role_id")
+  policy_statement_id String   @map("policy_statement_id")
+  createAt            DateTime @default(now()) @map("create_at")
+  updateAt            DateTime @updatedAt @map("update_at")
 
   propertyActorRole PropertyActorRole @relation(fields: [propertyActorRoleId], references: [id], onDelete: Cascade)
-  policyStatement PolicyStatement @relation(fields: [policy_statement_id], references: [id], onDelete: Cascade)
+  policyStatement   PolicyStatement   @relation(fields: [policy_statement_id], references: [id], onDelete: Cascade)
 }
 
 ///permite desactivar o activar politicas si por el caso no quiere que dicho rol tenga todos 
 // los permisos
 model PropertyMemberPoliciesOverride {
-  id String @id @default(uuid())
-  propertyMemberId String @map("property_member_id")
-  policyStatementId String @map("policy_statement_id")
-  active Boolean 
+  id                String  @id @default(uuid())
+  propertyMemberId  String  @map("property_member_id")
+  policyStatementId String  @map("policy_statement_id")
+  active            Boolean
 
-  propertyMember PropertyMember @relation(fields: [propertyMemberId], references: [id], onDelete: Cascade)
+  propertyMember  PropertyMember  @relation(fields: [propertyMemberId], references: [id], onDelete: Cascade)
   policyStatement PolicyStatement @relation(fields: [policyStatementId], references: [id], onDelete: Cascade)
 }
 
@@ -438,16 +421,16 @@ model PropertyMemberPoliciesOverride {
 //esto permitira añadir un sistemas de notificaciones global dentro de la aplicacion para enviar
 //cualquier informacion relevante dentro del sistema
 model Notifications {
-  id String @id @default(uuid())
-  transmitterId String @map("transmitter_id") //quien emitio el mensaje o el emisor de la notificacion
-  receiverId String @map("receiver_map") //el receptor del mensaje
-  source String //que servicio dentro de la aplicacion emitió dicha notificacion (Contract-service), (property-registration)
-  type NotificationType @default(INFO) //tipo de notificacion que se envia
-  name String //nombre o titulo de la notificacion
-  content String //contenido de la notificacion
-  readAt DateTime? @map("read_at") //fecha la cual el receptor leyó la notificacion
-  createAt DateTime @map("create_at") @default(now())
-  updateAt DateTime @updatedAt @map("update_at")
+  id            String           @id @default(uuid())
+  transmitterId String           @map("transmitter_id") //quien emitio el mensaje o el emisor de la notificacion
+  receiverId    String           @map("receiver_map") //el receptor del mensaje
+  source        String //que servicio dentro de la aplicacion emitió dicha notificacion (Contract-service), (property-registration)
+  type          NotificationType @default(INFO) //tipo de notificacion que se envia
+  name          String //nombre o titulo de la notificacion
+  content       String //contenido de la notificacion
+  readAt        DateTime?        @map("read_at") //fecha la cual el receptor leyó la notificacion
+  createAt      DateTime         @default(now()) @map("create_at")
+  updateAt      DateTime         @updatedAt @map("update_at")
 }
 
 enum ServiceScope {
@@ -470,42 +453,42 @@ enum ServiceRequestStatus {
 }
 
 model Service {
-  id          String   @id @default(uuid())
-  name        String   @unique
+  id          String  @id @default(uuid())
+  name        String  @unique
   description String
-  isActive    Boolean  @default(true)
+  isActive    Boolean @default(true)
 
-  offerings   ServiceOffering[]
+  offerings ServiceOffering[]
 
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("services")
 }
 
 model ServiceOffering {
-  id                 String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  serviceId          String   @map("service_id")
-  providerUserId     String   @map("provider_user_id")
-  propertyMemberId   String?  @map("property_member_id")
+  serviceId        String  @map("service_id")
+  providerUserId   String  @map("provider_user_id")
+  propertyMemberId String? @map("property_member_id")
 
-  scope              ServiceScope @default(PROPERTY)
-  status             ServiceOfferingStatus @default(ACTIVE)
+  scope  ServiceScope          @default(PROPERTY)
+  status ServiceOfferingStatus @default(ACTIVE)
 
   priceTypeAgreement PriceTypeAgreement @map("price_type_agreement")
-  basePrice          Decimal  @db.Decimal(12, 2) @map("base_price")
+  basePrice          Decimal            @map("base_price") @db.Decimal(12, 2)
   currency           Currency
 
-  validFrom          DateTime  @default(now()) @map("valid_from")
-  validUntil         DateTime? @map("valid_until")
+  validFrom  DateTime  @default(now()) @map("valid_from")
+  validUntil DateTime? @map("valid_until")
 
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   service Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
 
-  propertyMember PropertyMember? @relation(fields: [propertyMemberId],references: [id],onDelete: Restrict)
+  propertyMember PropertyMember? @relation(fields: [propertyMemberId], references: [id], onDelete: Restrict)
 
   requests ServiceRequest[]
 
@@ -513,7 +496,6 @@ model ServiceOffering {
   @@index([providerUserId, status])
   @@index([propertyMemberId, status])
   @@index([scope, status])
-
   @@map("service_offerings")
 }
 
@@ -534,36 +516,36 @@ enum ServiceRequestHistoryAction {
 // agreedPrice = precio aceptado por ambas partes (null mientras no haya acuerdo).
 // El estado financiero del pago NO vive aqui (lo gestiona el modulo de pagos).
 model ServiceRequest {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  serviceOfferingId String   @map("service_offering_id")
-  propertyId        String   @map("property_id")
+  serviceOfferingId String @map("service_offering_id")
+  propertyId        String @map("property_id")
 
-  requestedByUserId String   @map("requested_by_user_id")
-  providerUserId    String   @map("provider_user_id")
+  requestedByUserId String @map("requested_by_user_id")
+  providerUserId    String @map("provider_user_id")
 
-  status            ServiceRequestStatus @default(REQUESTED)
-  notes             String?
+  status ServiceRequestStatus @default(REQUESTED)
+  notes  String?
 
-  publishedPrice    Decimal  @db.Decimal(12, 2) @map("published_price")
-  proposedPrice     Decimal? @db.Decimal(12, 2) @map("proposed_price")
-  proposedByUserId  String?  @map("proposed_by_user_id")
-  agreedPrice       Decimal? @db.Decimal(12, 2) @map("agreed_price")
-  priceAgreedAt     DateTime? @map("price_agreed_at")
-  currency          Currency
+  publishedPrice   Decimal   @map("published_price") @db.Decimal(12, 2)
+  proposedPrice    Decimal?  @map("proposed_price") @db.Decimal(12, 2)
+  proposedByUserId String?   @map("proposed_by_user_id")
+  agreedPrice      Decimal?  @map("agreed_price") @db.Decimal(12, 2)
+  priceAgreedAt    DateTime? @map("price_agreed_at")
+  currency         Currency
 
-  requestedAt       DateTime  @default(now()) @map("requested_at")
-  acceptedAt        DateTime? @map("accepted_at")
-  startedAt         DateTime? @map("started_at")
-  completedAt       DateTime? @map("completed_at")
-  cancelledAt       DateTime? @map("cancelled_at")
+  requestedAt DateTime  @default(now()) @map("requested_at")
+  acceptedAt  DateTime? @map("accepted_at")
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  cancelledAt DateTime? @map("cancelled_at")
 
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  offering ServiceOffering @relation(fields: [serviceOfferingId],references: [id],onDelete: Restrict)
+  offering ServiceOffering @relation(fields: [serviceOfferingId], references: [id], onDelete: Restrict)
 
-  property Property @relation(fields: [propertyId],references: [id],onDelete: Restrict )
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Restrict)
 
   history ServiceRequestHistory[]
 
@@ -571,23 +553,79 @@ model ServiceRequest {
   @@index([providerUserId, status, requestedAt])
   @@index([requestedByUserId, requestedAt])
   @@index([serviceOfferingId, requestedAt])
-
   @@map("service_requests")
 }
 
 // Bitacora append-only de la solicitud: nunca se actualiza ni se elimina (Restrict).
 model ServiceRequestHistory {
-  id               String   @id @default(uuid())
-  serviceRequestId String   @map("service_request_id")
+  id               String                      @id @default(uuid())
+  serviceRequestId String                      @map("service_request_id")
   action           ServiceRequestHistoryAction
-  fromStatus       ServiceRequestStatus? @map("from_status")
-  toStatus         ServiceRequestStatus  @map("to_status")
-  actorUserId      String   @map("actor_user_id")
+  fromStatus       ServiceRequestStatus?       @map("from_status")
+  toStatus         ServiceRequestStatus        @map("to_status")
+  actorUserId      String                      @map("actor_user_id")
   reason           String?
-  createdAt        DateTime @default(now()) @map("created_at")
+  createdAt        DateTime                    @default(now()) @map("created_at")
 
   serviceRequest ServiceRequest @relation(fields: [serviceRequestId], references: [id], onDelete: Restrict)
 
   @@index([serviceRequestId, createdAt])
   @@map("service_request_history")
+}
+
+enum FinancialTransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum FinancialCategory {
+  RENT
+  SERVICE
+  UTILITY
+  MAINTENANCE
+  DEPOSIT
+  OTHER
+}
+
+enum FinancialRecordStatus {
+  PLANNED
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model FinancialTransaction {
+  id String @id @default(uuid())
+
+  propertyId String  @map("property_id")
+  contractId String? @map("contract_id")
+
+  type     FinancialTransactionType
+  category FinancialCategory
+  status   FinancialRecordStatus    @default(PENDING)
+
+  description String
+  amount      Decimal  @db.Decimal(12, 2)
+  currency    Currency
+
+  dueDate    DateTime? @map("due_date")
+  occurredAt DateTime  @default(now()) @map("occurred_at")
+  paidAt     DateTime? @map("paid_at")
+
+  isSimulated Boolean @default(true) @map("is_simulated")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+
+  contract Contract? @relation(fields: [contractId], references: [id], onDelete: Restrict)
+
+  @@index([propertyId, type, status])
+  @@index([propertyId, occurredAt])
+  @@index([propertyId, category])
+  @@index([contractId])
+  @@index([status, dueDate])
+  @@map("financial_transactions")
 }

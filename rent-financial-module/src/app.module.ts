@@ -8,6 +8,7 @@ import { GlobalModule } from './features/global/global.module.js';
 import { MicroserviceAuthModule } from './features/microservice-auth/auth-microservice.module.js';
 import { SytemPropertyRoleModule } from './features/system-property-role/system-property-role.module.js';
 import { PropertiesServicesModule } from './features/properties-services/properties-services.module.js';
+import { FinanceModule } from './features/finance/finance.module.js';
 import { WsJwtGuard } from './core/auth/ws.guard.js';
 
 @Module({
@@ -19,6 +20,7 @@ import { WsJwtGuard } from './core/auth/ws.guard.js';
     MicroserviceAuthModule,
     SytemPropertyRoleModule,
     PropertiesServicesModule,
+    FinanceModule,
   ],
   providers: [JwtPassport, JwtAuthGuard, WsJwtGuard],
 })
