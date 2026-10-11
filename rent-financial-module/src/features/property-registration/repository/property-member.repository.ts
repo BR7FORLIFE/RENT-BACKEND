@@ -26,7 +26,7 @@ export class PropertyMemberRepository {
     const { page, limit } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 
-    const [data, total] = await db.$transaction([
+    const [data, total] = await Promise.all([
       db.propertyMember.findMany({
         where: {
           propertyId,

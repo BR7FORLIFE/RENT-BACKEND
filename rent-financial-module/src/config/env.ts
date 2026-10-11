@@ -32,4 +32,9 @@ export const RENT_FINANCIAL_CLIENT_SECRET =
 //Resend ENVIROMENT VARIABLES
 export const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
+//URL publica de este servicio (se usa en los enlaces de los correos)
+export const PUBLIC_BASE_URL = (
+  process.env.PUBLIC_BASE_URL ?? 'http://localhost:3002'
+).replace(/\/$/, '');
+
 export const ISSUER_EMAIL = process.env.ISSUER_EMAIL;

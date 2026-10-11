@@ -12,6 +12,7 @@ export const NotificationSourceEnum = z.enum([
   'CONTRACT_SERVICE',
   'PROPERTY_REGISTRATION_SERVICE',
   'SYSTEM_ROLE_SERVICE',
+  'SERVICE_REQUEST_SERVICE',
 ]);
 
 export type NotificationSource = z.infer<typeof NotificationSourceEnum>;

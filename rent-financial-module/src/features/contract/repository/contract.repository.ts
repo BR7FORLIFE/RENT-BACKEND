@@ -29,7 +29,7 @@ export class ContractRepository {
     const { limit, page } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 
-    const [data, total] = await db.$transaction([
+    const [data, total] = await Promise.all([
       db.contract.findMany({
         where: { propertyId },
         skip,
@@ -59,7 +59,7 @@ export class ContractRepository {
     const { limit, page } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 
-    const [data, total] = await db.$transaction([
+    const [data, total] = await Promise.all([
       db.contractDraft.findMany({
         where: { propertyId },
         skip,
@@ -90,14 +90,16 @@ export class ContractRepository {
     const { limit, page } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 
-    const [data, total] = await db.$transaction([
+    const [data, total] = await Promise.all([
       db.contractDraft.findMany({
         where: { propertyId, landlordAgreed: true, tenantAgreed: true },
         skip,
         take: limit,
         orderBy: { version: 'desc' },
       }),
-      db.contractDraft.count({ where: { propertyId } }),
+      db.contractDraft.count({
+        where: { propertyId, landlordAgreed: true, tenantAgreed: true },
+      }),
     ]);
 
     return {

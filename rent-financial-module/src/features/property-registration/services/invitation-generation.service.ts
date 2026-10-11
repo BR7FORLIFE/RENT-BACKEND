@@ -13,7 +13,16 @@
 import { webcrypto } from 'node:crypto';
 import { resendClient } from '../../../config/config.js';
 import { ResendException } from '../../../core/global-exception.js';
-import { ISSUER_EMAIL } from '../../../config/env.js';
+import { ISSUER_EMAIL, PUBLIC_BASE_URL } from '../../../config/env.js';
+
+export function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 export function generateSecureString(length: number) {
   //funcion para generar cadenas aleatorias
@@ -41,7 +50,8 @@ export async function sendInvitedEmailTo(
   token: string,
   propertyName: string,
 ) {
-  const ACCEPT_INVITATION_PATH = `https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-process-public/accept-invitation?token=${token}`;
+  const ACCEPT_INVITATION_PATH = `${PUBLIC_BASE_URL}/rent-financial/property-process-public/accept-invitation?token=${encodeURIComponent(token)}`;
+  const safePropertyName = escapeHtml(propertyName);
 
   const html = `
     <!DOCTYPE html>
@@ -103,7 +113,7 @@ export async function sendInvitedEmailTo(
                       color:#111827;
                     "
                   >
-                    ${propertyName}
+                    ${safePropertyName}
                   </p>
                 </td>
               </tr>

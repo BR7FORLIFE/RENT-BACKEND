@@ -72,6 +72,48 @@ export class PropertyRegistrationController {
     return response;
   }
 
+  //feed publico: propiedades publicadas (declarado antes de ':id')
+  @Get('published')
+  async consultPublishedProperties(
+    @Query(new ZodValidation(paginationSchema)) paginationDto: PaginationType,
+  ) {
+    return await this.propertyService.consultPublishedProperties(paginationDto);
+  }
+
+  @Get('published/:propertyId')
+  async consultPublishedPropertyById(@Param('propertyId') propertyId: string) {
+    return {
+      property:
+        await this.propertyService.consultPublishedPropertyById(propertyId),
+    };
+  }
+
+  @HttpCode(200)
+  @Post(':propertyId/publish')
+  async publishProperty(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+  ) {
+    return await this.propertyService.setPublished(
+      req.user.userId,
+      propertyId,
+      true,
+    );
+  }
+
+  @HttpCode(200)
+  @Post(':propertyId/unpublish')
+  async unpublishProperty(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+  ) {
+    return await this.propertyService.setPublished(
+      req.user.userId,
+      propertyId,
+      false,
+    );
+  }
+
   @Get(':id')
   async consultPropertyById(@Req() req: AuthRequest, @Param('id') id: string) {
     const data = await this.propertyService.consultPropertyById(
@@ -84,13 +126,13 @@ export class PropertyRegistrationController {
     };
   }
 
-  @UsePipes(new ZodValidation(EditingPropertyDtoRequest))
   @HttpCode(201)
   @Patch(':propertyId')
   async modifyProperty(
     @Req() req: AuthRequest,
     @Param('propertyId') propertyId: string,
-    @Body() editingProperty: EditingPropertyType,
+    @Body(new ZodValidation(EditingPropertyDtoRequest))
+    editingProperty: EditingPropertyType,
   ) {
     const { id, message } = await this.propertyService.editingProperty(
       req.user.userId,

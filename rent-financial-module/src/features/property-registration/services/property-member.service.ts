@@ -34,6 +34,7 @@ import type { PropertyActorRoleType, PropertyMemberMe } from '../types.js';
 import {
   AssingnmentStatusNotAllowedException,
   ChangeStatusPropertyMemberException,
+  OwnerStatusChangeNotAllowedException,
   NotAllowedStatusByPropertyMemberException,
   PropertyMemberNotFound,
 } from '../../system-property-role/exceptions/exceptions.js';
@@ -192,11 +193,12 @@ export class PropertyMemberService {
 
   //invitacion de miembros en la propiedad
   async invitePropertyMembers(
+    ownerUserId: string,
     invitationReq: InvitePropertyMemberType,
   ): Promise<{ id: string; invitedEmailTo: string; message: string }> {
     //verificamos que el usuario sea propietario de dicho inmueble
     const optIsOwnerToProperty = await this.propertyRepository.findPropertyById(
-      invitationReq.userId,
+      ownerUserId,
       invitationReq.propertyId,
     );
 
@@ -233,7 +235,7 @@ export class PropertyMemberService {
     //creamos la transaccion en la base de datos
     const invitation: createInvitationPropertyMemberType = {
       propertyId: invitationReq.propertyId,
-      invitedBy: invitationReq.userId,
+      invitedBy: ownerUserId,
       invitedUserId,
       invitedEmailTo: invitationReq.email,
       status: 'DRAFT',
@@ -272,6 +274,12 @@ export class PropertyMemberService {
         propertyId: optInvitationLinked.propertyId,
         status: 'IN_PROCESS',
       };
+
+      //la invitacion queda consumida en la misma transaccion (no reutilizable)
+      await this.globalRepository.markInvitationAsConsumed(
+        optInvitationLinked.id,
+        tx,
+      );
 
       const { id: propertyMemberId } =
         await this.propertyMemberRepository.savePropertyMember(
@@ -471,6 +479,11 @@ export class PropertyMemberService {
         propertyMemberId,
         optOwnProperty.id,
       );
+
+    //el propietario no puede cambiar su propio estado (perderia acceso al inmueble)
+    if (optPropertyMember.userId === userId) {
+      throw new OwnerStatusChangeNotAllowedException();
+    }
 
     //lanzamos una excepcion si dicho estado ya lo posee el miembro
     if (optPropertyMember.status === status.status) {

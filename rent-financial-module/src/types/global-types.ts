@@ -142,6 +142,12 @@ export const POLICIES_STATEMENTS = {
 
   //politicas de servicios prestados dentro del inmueble
 
+  //politicas de solicitudes de servicios
+  SOLICITAR_SERVICIOS: '5c1f3a7e-2b84-4d96-a1e0-7f3b9c42d815',
+  VER_SOLICITUDES_SERVICIOS: 'e9a24b60-1d37-4c58-8f92-b6d0a3175c4e',
+  CANCELAR_SOLICITUDES_SERVICIOS: '28d7f4b1-6e03-4a95-b1c8-0e5a92f37d64',
+  PUBLICAR_OFERTAS_SERVICIOS: 'b3e86c1a-94f7-4025-9d1b-a7c52e08f361',
+
   // politicas referentes a las finanzas
 
   //politicas referentes a los documentos

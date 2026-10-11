@@ -66,8 +66,8 @@ export class PoliciesAuthorizationNotAllowed extends AppException {
   constructor() {
     super(
       'Acceso denegado!, sus politicas no permiten realizar la acción',
-      401,
-      'Unauthorized',
+      403,
+      'FORBIDDEN',
     );
   }
 }
@@ -82,6 +82,17 @@ export class ChangeStatusPropertyMemberException extends AppException {
   constructor(status: PropertyMemberStatus) {
     super(
       `El miembro actual ya posee dicho estado ${status}, coloque un estado valido para cambiar.`,
+      406,
+      'NOT_ACCEPTABLE',
+    );
+  }
+}
+
+//el propietario no puede modificar su propio estado de miembro
+export class OwnerStatusChangeNotAllowedException extends AppException {
+  constructor() {
+    super(
+      'El propietario no puede cambiar su propio estado en el inmueble',
       406,
       'NOT_ACCEPTABLE',
     );

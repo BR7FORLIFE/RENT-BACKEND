@@ -7,7 +7,6 @@ import {
   Query,
   Req,
   UseGuards,
-  UsePipes,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../core/auth/auth.guard.js';
 import type { AuthRequest } from '../../types/global-types.js';
@@ -40,11 +39,18 @@ export class PropertyMemberController {
   constructor(private propertyMemberService: PropertyMemberService) {}
 
   //invitaciones de property Members
-  @UsePipes(new ZodValidation(InvitePropertyMemberDtoRequest))
   @Post('invite-property-member')
-  async invitePropertyMembers(@Body() invitationReq: InvitePropertyMemberType) {
+  async invitePropertyMembers(
+    @Req() req: AuthRequest,
+    @Body(new ZodValidation(InvitePropertyMemberDtoRequest))
+    invitationReq: InvitePropertyMemberType,
+  ) {
+    //el propietario siempre sale del JWT, nunca del body
     const { id, invitedEmailTo, message } =
-      await this.propertyMemberService.invitePropertyMembers(invitationReq);
+      await this.propertyMemberService.invitePropertyMembers(
+        req.user.userId,
+        invitationReq,
+      );
 
     return { id, invitedEmailTo, message };
   }

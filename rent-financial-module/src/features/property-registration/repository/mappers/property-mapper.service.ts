@@ -36,7 +36,7 @@ export class PropertyServiceMapper {
         ? {
             ...structureInfoResponse,
             area: structureInfoResponse.area.toNumber(),
-            lotArea: structureInfoResponse.area.toNumber(),
+            lotArea: structureInfoResponse.lotArea.toNumber(),
           }
         : null,
       resources: resourceImages.map((resource) => ({

@@ -1,5 +1,7 @@
 import {
   Catch,
+  HttpException,
+  HttpStatus,
   type ArgumentsHost,
   type ExceptionFilter,
 } from '@nestjs/common';
@@ -11,7 +13,13 @@ import { ZodError } from 'zod';
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
-    console.log(exception);
+    //solo se registran errores inesperados (no los de dominio/validacion)
+    const isExpected =
+      exception instanceof AppException ||
+      exception instanceof ZodError ||
+      exception instanceof HttpException;
+    if (!isExpected) console.error(exception);
+
     const ctx = host.switchToHttp();
 
     const request: Request = ctx.getRequest();
@@ -37,6 +45,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       };
 
       return response.status(406).json(res);
+    }
+
+    if (exception instanceof HttpException) {
+      const status = exception.getStatus();
+      const res: ErrorHttpResponse = {
+        message: exception.message,
+        error: HttpStatus[status] ?? 'HTTP_ERROR',
+        localDatetime: new Date().toISOString(),
+        path: request.path,
+      };
+
+      return response.status(status).json(res);
     }
 
     return response.status(500).json({

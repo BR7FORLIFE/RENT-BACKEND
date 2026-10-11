@@ -7,6 +7,7 @@ import { ContractModule } from './features/contract/contract.module.js';
 import { GlobalModule } from './features/global/global.module.js';
 import { MicroserviceAuthModule } from './features/microservice-auth/auth-microservice.module.js';
 import { SytemPropertyRoleModule } from './features/system-property-role/system-property-role.module.js';
+import { PropertiesServicesModule } from './features/properties-services/properties-services.module.js';
 import { WsJwtGuard } from './core/auth/ws.guard.js';
 
 @Module({
@@ -17,6 +18,7 @@ import { WsJwtGuard } from './core/auth/ws.guard.js';
     GlobalModule,
     MicroserviceAuthModule,
     SytemPropertyRoleModule,
+    PropertiesServicesModule,
   ],
   providers: [JwtPassport, JwtAuthGuard, WsJwtGuard],
 })

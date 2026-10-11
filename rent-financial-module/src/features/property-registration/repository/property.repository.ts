@@ -30,7 +30,7 @@ export class PropertyRepository {
     const { limit, page } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 
-    const [data, total] = await db.$transaction([
+    const [data, total] = await Promise.all([
       db.property.findMany({
         where: { userId },
         skip,
@@ -129,15 +129,18 @@ export class PropertyRepository {
     db: Prisma.TransactionClient = this.prisma,
   ) {
     if (fmi) {
-      return await db.property.findFirst({
+      const byFmi = await db.property.findFirst({
         where: {
           userId,
           fmi,
         },
       });
+
+      if (byFmi) return byFmi;
     }
+
     if (predialNumber) {
-      return await this.prisma.property.findFirst({
+      return await db.property.findFirst({
         where: {
           userId,
           predialNumber,
@@ -276,7 +279,7 @@ export class PropertyRepository {
     const { page, limit } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 
-    const [data, total] = await db.$transaction([
+    const [data, total] = await Promise.all([
       db.property.findMany({
         where: {
           propertyMembers: {
@@ -300,6 +303,7 @@ export class PropertyRepository {
           propertyMembers: {
             some: {
               userId,
+              status,
             },
           },
         },
@@ -346,9 +350,9 @@ export class PropertyRepository {
     db: Prisma.TransactionClient = this.prisma,
   ): Promise<PaginationResponse<ResourceImagePersistence>> {
     const { page, limit } = paginationDto;
-    const skip = paginationDto.page - 1 * paginationDto.limit;
+    const skip = (paginationDto.page - 1) * paginationDto.limit;
 
-    const [data, total] = await db.$transaction([
+    const [data, total] = await Promise.all([
       db.propertyResources.findMany({
         where: {
           propertyId,
@@ -433,7 +437,7 @@ export class PropertyRepository {
           create: {
             area: structurePropertyInfo.area,
             bathrooms: structurePropertyInfo.bathrooms,
-            bedrooms: structurePropertyInfo.bathrooms,
+            bedrooms: structurePropertyInfo.bedrooms,
             floors: structurePropertyInfo.floors,
             lotArea: structurePropertyInfo.lotArea,
             parkingSpaces: structurePropertyInfo.parkingSpaces,
@@ -442,6 +446,92 @@ export class PropertyRepository {
         },
       },
     });
+  }
+
+  //propiedad perteneciente al usuario (dueño segun Property.userId)
+  async findOwnedPropertyById(
+    userId: string,
+    id: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.property.findFirst({
+      where: { id, userId },
+      select: { id: true, isPublished: true },
+    });
+  }
+
+  //feed publico: solo propiedades publicadas
+  async findAllPublished(
+    paginationDto: PaginationType,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    const { limit, page } = paginationDto;
+    const skip = (page - 1) * limit;
+    const where = { isPublished: true };
+
+    const [rows, total] = await Promise.all([
+      db.property.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createAt: 'desc' },
+        select: {
+          id: true,
+          propertyName: true,
+          propertyDescription: true,
+          typeProperty: { select: { name: true } },
+          propertyStructureDescription: true,
+          propertyResources: { select: { resourcesImage: true } },
+        },
+      }),
+      db.property.count({ where }),
+    ]);
+
+    return {
+      data: rows.map((row) => ({
+        id: row.id,
+        propertyName: row.propertyName,
+        propertyDescription: row.propertyDescription,
+        typeProperty: row.typeProperty.name,
+        propertyStructureDescription: row.propertyStructureDescription,
+        resourceImages: row.propertyResources.map((r) => r.resourcesImage),
+      })),
+      metadata: {
+        limit,
+        page,
+        hasNextPage: page * limit < total,
+        hasPreviousPage: page > 1,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findPublishedById(
+    id: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    const row = await db.property.findFirst({
+      where: { id, isPublished: true },
+      select: {
+        id: true,
+        userId: true,
+        propertyName: true,
+        typeProperty: { select: { name: true } },
+        propertyStructureDescription: true,
+        propertyResources: { select: { resourcesImage: true } },
+      },
+    });
+    if (!row) return null;
+
+    return {
+      id: row.id,
+      ownerUserId: row.userId,
+      propertyName: row.propertyName,
+      typeProperty: row.typeProperty.name,
+      propertyStructureDescription: row.propertyStructureDescription,
+      resourceImages: row.propertyResources.map((r) => r.resourcesImage),
+    };
   }
 
   //update functions
@@ -459,27 +549,44 @@ export class PropertyRepository {
   }
 
   async updateResourcesImages(
+    propertyId: string,
     toDelete: string[],
-    toInsert: Prisma.ResourceImagesCreateManyInput[],
-    db: Prisma.TransactionClient = this.prisma,
+    toInsert: ResourceImageType[],
+    db: Prisma.TransactionClient | PrismaService = this.prisma,
   ): Promise<void> {
-    await db.$transaction(async (tx) => {
+    const run = async (tx: Prisma.TransactionClient) => {
       if (toDelete.length > 0) {
-        await tx.resourceImages.deleteMany({
+        //solo recursos vinculados a esta propiedad (assetId puede repetirse en otras)
+        const links = await tx.propertyResources.findMany({
           where: {
-            assetId: {
-              in: toDelete,
-            },
+            propertyId,
+            resourcesImage: { assetId: { in: toDelete } },
           },
+          select: { resourceId: true },
         });
+        const resourceIds = links.map((link) => link.resourceId);
+
+        if (resourceIds.length > 0) {
+          await tx.propertyResources.deleteMany({
+            where: { propertyId, resourceId: { in: resourceIds } },
+          });
+          await tx.resourceImages.deleteMany({
+            where: { id: { in: resourceIds } },
+          });
+        }
       }
 
       if (toInsert.length > 0) {
-        await tx.resourceImages.createMany({
-          data: toInsert,
-        });
+        await this.saveAssetsResourcesByPropertyId(propertyId, toInsert, tx);
       }
-    });
+    };
+
+    //si ya estamos dentro de una transaccion no se anida otra
+    if ('$transaction' in db) {
+      await db.$transaction(run);
+    } else {
+      await run(db);
+    }
   }
 
   async saveAssetsResourcesByPropertyId(

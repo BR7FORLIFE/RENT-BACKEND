@@ -1,1408 +1,2493 @@
 {
-	"info": {
-		"_postman_id": "bb83b742-6acd-4869-9662-8db44aaac569",
-		"name": "RENT",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "42659813"
-	},
-	"item": [
-		{
-			"name": "auth - Spring",
-			"item": [
-				{
-					"name": "register",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"br7forlife\",\n    \"password\": \"123456\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"cellphone\": \"3003311999\",\n    \"fullname\": \"brayan andres diaz pacheco\",\n    \"identificationType\": \"CC\",\n    \"identificationNumber\": \"199945478063\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/auth/register",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"auth",
-								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Email Verification",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/email/verify?token=11ddaca402dbd687be2c435b3f2b1675f9bdd8964dfb1c64454a0612b811d219",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"email",
-								"verify"
-							],
-							"query": [
-								{
-									"key": "token",
-									"value": "11ddaca402dbd687be2c435b3f2b1675f9bdd8964dfb1c64454a0612b811d219"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Reenvio Email",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"userId\": \"{{userId}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/email/forward",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"email",
-								"forward"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Oauth2 Me",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://192.168.1.136:3001/rent-auth/oauth2/authorization/google",
-							"protocol": "http",
-							"host": [
-								"192",
-								"168",
-								"1",
-								"136"
-							],
-							"port": "3001",
-							"path": [
-								"rent-auth",
-								"oauth2",
-								"authorization",
-								"google"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const response = pm.response.json();",
-									"",
-									"pm.globals.set(\"JWT\", response.accessToken);"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"123456\"\n} ",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/auth/login",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"auth",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Refresh",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"userId\": \"52b710a6-6232-4724-8463-4f8d34157ded\",\n    \"refreshToken\": \"Ha8HhId5RcSfOXzOQ_HKfeyFvPntFhC72wbIEW_fWQ8\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/auth/refresh",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"auth",
-								"refresh"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Refresh - Rotate",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"userId\": \"00125882-47e9-42d8-9117-ac2086d0c628\",\n    \"refreshToken\": \"j9EPxzRK1kr1tG1gcSdQ5UrQYND3N5gifwPLxj2dCnE\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/auth/refresh/rotate",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"auth",
-								"refresh",
-								"rotate"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/auth/logout",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"auth",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Oauth2 Get Credentials",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"sessionID\": \"Kzo7QX5bEA1UNiszvbDTCpSbIm82u3B61h-wrgUx73Q\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/auth/oauth2/exchange",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"auth",
-								"oauth2",
-								"exchange"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Me",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{JWT}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/auth/me",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"auth",
-								"me"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Edit Profile",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{JWT}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": null,\n    \"cellphone\": \"987654321\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/auth/user-edit",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"auth",
-								"user-edit"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Financial-module - NestJs",
-			"item": [
-				{
-					"name": "property-registration-feature",
-					"item": [
-						{
-							"name": "Register Property By User ID",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "  {\n    \"propertyType\": \"RESIDENCIAL\",\n    \"propertyOccupationType\": \"DESOCUPADO\",\n    \"direction\": {\n      \"latitute\": 10.4365,\n      \"longitud\": -75.5123,\n      \"department\": \"Bolivar\",\n      \"city\": \"Cartagena\",\n      \"neighborhood\": \"La Boquilla\",\n      \"typeStreet\": \"CALLE\",\n      \"numberStreet\": 5,\n      \"complement\": \"Al lado del mar\"\n    },\n    \"fmi\": \"060-1234572\",\n    \"predialNumber\": \"130010101000000123456000000004\",\n    \"propertyName\": \"Propiedad en los caracoles\",\n    \"propertyDescription\": \"Este es una propiedad ubicada en los caracoles con 2 cuartos, 1 baño, etc...\",\n    \"structurePropertyInfo\": {\n        \"bedrooms\": 2,\n        \"bathrooms\": 2,\n        \"floors\": 1,\n        \"parkingSpaces\": 0,\n        \"area\": 24.50,\n        \"lotArea\": 35,\n        \"constructionYear\": 2011\n    },\n    \"economicPropertyInfo\": {\n        \"monthlyRent\": 7000000,\n        \"depositAmount\": 300000,\n        \"currency\": \"COP\",\n        \"utilitiesIncluded\": false\n    },\n    \"resources\": [\n        {\n            \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n            \"width\": 70,\n            \"height\": 35,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-1.png\",\n            \"secureUrl\": \"https://example.com/images/property-1.png\"\n        },\n        {\n            \"assetId\": \"a1d8f1d9-9f8c-4d18-9d90-5b8c9e8d12a4\",\n            \"width\": 1280,\n            \"height\": 720,\n            \"format\": \"jpg\",\n            \"url\": \"http://example.com/images/property-2.jpg\",\n            \"secureUrl\": \"https://example.com/images/property-2.jpg\"\n        },\n        {\n            \"assetId\": \"3c2f6b4e-85d4-47f2-a8d3-94f7c5b8b8e1\",\n            \"width\": 1920,\n            \"height\": 1080,\n            \"format\": \"jpeg\",\n            \"url\": \"http://example.com/images/property-3.jpeg\",\n            \"secureUrl\": \"https://example.com/images/property-3.jpeg\"\n        },\n        {\n            \"assetId\": \"e7a4d5c9-1f26-4d59-bd8d-2d7c5d8a9f61\",\n            \"width\": 800,\n            \"height\": 600,\n            \"format\": \"webp\",\n            \"url\": \"http://example.com/images/property-4.webp\",\n            \"secureUrl\": \"https://example.com/images/property-4.webp\"\n        },\n        {\n            \"assetId\": \"5b9f6d0a-c9e2-4a5b-8f0f-3b7d1c9e2f44\",\n            \"width\": 1024,\n            \"height\": 768,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-5.png\",\n            \"secureUrl\": \"https://example.com/images/property-5.png\"\n        }\n    ]\n  }",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get All Property By User ID",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Property By ID",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property/37d22037-8b1f-4fad-bdb9-355e0772b763",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property",
-										"37d22037-8b1f-4fad-bdb9-355e0772b763"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Editing Property",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "PATCH",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"propertyName\": \"Apartamento frente al mar\",\n    \"propertyType\": \"COMMERCIAL\",\n    \"propertyOccupationType\": \"VACANT\",\n    \"resources\": [\n        {\n        \"assetId\": \"e3d8d8f0-8c53-4b8a-9d5f-0b7e3d2f1a11\",\n        \"width\": 1280,\n        \"height\": 720,\n        \"format\": \"jpg\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-1.jpg\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-1.jpg\"\n        },\n        {\n        \"assetId\": \"8f4e2a10-9b35-4f4e-91f2-4c9d6a1d9b22\",\n        \"width\": 1920,\n        \"height\": 1080,\n        \"format\": \"png\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-2.png\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-2.png\"\n        },\n        {\n        \"assetId\": \"1b7c6f4d-3e92-4c86-8a5e-6d7f9a3b4c33\",\n        \"width\": 1024,\n        \"height\": 768,\n        \"format\": \"webp\",\n        \"url\": \"http://res.cloudinary.com/demo/image/upload/v1/property-3.webp\",\n        \"secureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1/property-3.webp\"\n        }\n    ]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property/f4b3bf91-4149-4c89-ba60-c6b0b3dc6b8a",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property",
-										"f4b3bf91-4149-4c89-ba60-c6b0b3dc6b8a"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Change Owner In Property",
-							"request": {
-								"method": "POST",
-								"header": []
-							},
-							"response": []
-						},
-						{
-							"name": "IA-suggestion",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"propertyField\": \"PropertyName\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property/IA-registration-suggestion",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property",
-										"IA-registration-suggestion"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Invite Property Member",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"userId\": \"d34a772f-04f1-491a-ab23-92db0d20f197\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"propertyId\": \"a3ff51f6-01d7-4afa-b3fd-56e6dfab8ca1\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/invite-property-member",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property-member",
-										"invite-property-member"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Accept Invitation Property Member",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-process-public/accept-invitation?token=FUb6GREIa1rYU8AdaFVX",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property-process-public",
-										"accept-invitation"
-									],
-									"query": [
-										{
-											"key": "token",
-											"value": "FUb6GREIa1rYU8AdaFVX"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get All Property Members",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/property/{{propertyId}}/getall?status=ACTIVE",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property-member",
-										"property",
-										"{{propertyId}}",
-										"getall"
-									],
-									"query": [
-										{
-											"key": "status",
-											"value": "ACTIVE"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Assignment Rols To Property Members",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"propertyId\": \"d283be3e-b22e-42f5-b56d-f26e18813cff\",\n    \"roles\": [\"ARRENDADO\"]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/{{MEMBER_ID}}",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property-member",
-										"{{MEMBER_ID}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Change status in property member id",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"propertyId\": \"{{propertyId}}\",\n    \"status\": \"ACTIVE\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/{{propertyMemberId}}/status",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property-member",
-										"{{propertyMemberId}}",
-										"status"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Contract",
-					"item": [
-						{
-							"name": "Create Contract",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"propertyId\": \"085714f8-1e7b-4a5e-9ab7-4b249e2d8a3c\",\n    \"landlordMemberId\": {{landlordMemberId}},\n    \"tenantMemberId\": {{tenantMemberId}}\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"contract"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Contract By ID",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/{{contractId}}/property/{{propertyId}}",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"contract",
-										"{{contractId}}",
-										"property",
-										"{{propertyId}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get All Contracts",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/property/{{propertyId}}",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"contract",
-										"property",
-										"{{propertyId}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "AcceptedOrRejectedByTenant",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"contractId\": {{contractId}},\n    \"propertyId\": {{propertyId}},\n    \"status\": \"ACCEPTED\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/acceptedOrRejected",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"contract",
-										"acceptedOrRejected"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Load contract documentation",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"propertyId\": {{propertyId}},\n    \"resources\": [\n        {\n            \"assetId\": \"e9eac17a-a3b8-4fab-a3ff-2255d75df0be\",\n            \"width\": 70,\n            \"height\": 35,\n            \"format\": \"pdf\",\n            \"url\": \"http://example.com/images/property-30.png\",\n            \"secureUrl\": \"https://example.com/images/property-1.png\"\n        }\n    ]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/{{contractId}}/documents",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"contract",
-										"{{contractId}}",
-										"documents"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Change contract status",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "PATCH",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"status\": \"SUSPENDED\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/{{contractId}}/property/{{propertyId}}/status",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"contract",
-										"{{contractId}}",
-										"property",
-										"{{propertyId}}",
-										"status"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Generate contract draft with IA",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/generateIA",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"contract",
-										"generateIA"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Create contract draft",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"content\": \"CONTRATO DE ARRENDAMIENTO DE VIVIENDA\\n\\nEl presente documento establece las condiciones del contrato de arrendamiento celebrado entre el arrendador y el arrendatario respecto del inmueble objeto del contrato.\\n\\nPRIMERA. OBJETO: El arrendador entrega al arrendatario el inmueble identificado dentro de la plataforma RENT.\\n\\nSEGUNDA. CANON: El arrendatario pagará un canon mensual de $900.000 COP.\\n\\nTERCERA. DEPÓSITO: Se establece un depósito de $500.000 COP como garantía de las obligaciones acordadas entre las partes.\\n\\nCUARTA. DURACIÓN: El contrato tendrá una duración de doce meses, iniciando el 1 de octubre de 2026 y finalizando el 1 de octubre de 2027.\\n\\nQUINTA. ACEPTACIÓN: Las partes declaran conocer y aceptar las condiciones establecidas en el presente borrador, sujeto a su aprobación definitiva.\",\n  \"propertyId\": \"a3ff51f6-01d7-4afa-b3fd-56e6dfab8ca1\",\n  \"landlordMemberId\": \"416255b0-9cbb-41ad-8ca2-840c0b455761\",\n  \"tenantMemberId\": \"cc21bebd-ce11-4f8b-865b-cbce231dda41\",\n  \"monthlyRent\": 900000,\n  \"depositAmount\": 500000,\n  \"startDate\": \"2026-10-01T00:00:00.000Z\",\n  \"endDate\": \"2027-10-01T00:00:00.000Z\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/draft",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"contract",
-										"draft"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get all contract draft by property id",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/draft/property/{{propertyId}}/getall",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"contract",
-										"draft",
-										"property",
-										"{{propertyId}}",
-										"getall"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get contract draft by contract id and property id",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/contract/draft/{{contractDraftId}}/property/{{propertyId}}",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"contract",
-										"draft",
-										"{{contractDraftId}}",
-										"property",
-										"{{propertyId}}"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Property Members (IN_PROCESS / ACTIVE)",
-					"item": [
-						{
-							"name": "Get All Properties (PROPERTY MEMBER)",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/properties?status=IN_PROCESS",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property-member",
-										"properties"
-									],
-									"query": [
-										{
-											"key": "status",
-											"value": "IN_PROCESS"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Property By ID (PROPERTY MEMBER)",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/property/{{propertyId}}",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property-member",
-										"property",
-										"{{propertyId}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get All Property Documents By Property ID",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property/{{propertyId}}/documentation",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property",
-										"{{propertyId}}",
-										"documentation"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Property Member /ME",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{JWT}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://judiciary-dingo-alias.ngrok-free.dev/rent-financial/property-member/{{propertyId}}/me",
-									"protocol": "https",
-									"host": [
-										"judiciary-dingo-alias",
-										"ngrok-free",
-										"dev"
-									],
-									"path": [
-										"rent-financial",
-										"property-member",
-										"{{propertyId}}",
-										"me"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "Microservice Identification",
-			"item": [
-				{
-					"name": "Get Microservice Jwt",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"clientId\": \"rent-financial\",\n    \"clientSecret\": \"ee31d461300344a6aac6ac4283877162\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/microservice-identification",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"microservice-identification"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get User",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{MICROSERVICE_JWT}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/microservice-identification/user?email=juan.perez@gmail.com",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"microservice-identification",
-								"user"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "juan.perez@gmail.com"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Users",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{MICROSERVICE_JWT}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"usersIds\": [\"a2b70fb0-8fbf-4dc6-a1cc-ee75e2bd9d8e\"]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{DEFAULT_PATH}}/microservice-identification/users",
-							"host": [
-								"{{DEFAULT_PATH}}"
-							],
-							"path": [
-								"microservice-identification",
-								"users"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Gateway Test",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"br7forlife\",\n    \"password\": \"123456\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"cellphone\": \"3003311999\",\n    \"fullname\": \"brayan andres diaz pacheco\",\n    \"identificationType\": \"CC\",\n    \"identificationNumber\": \"199945478063\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:3000/rent-auth/auth/register",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"rent-auth",
-						"auth",
-						"register"
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "DEFAULT_PATH",
-			"value": ""
-		},
-		{
-			"key": "MICROSERVICE_JWT",
-			"value": "",
-			"type": "default"
-		}
-	]
+  "info": {
+    "_postman_id": "bb83b742-6acd-4869-9662-8db44aaac569",
+    "name": "RENT",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42659813",
+    "description": "Colección de RENT. Configura BASE_URL y JWT (access token de rent-auth); los IDs se guardan solos al crear recursos."
+  },
+  "item": [
+    {
+      "name": "auth - Spring",
+      "item": [
+        {
+          "name": "register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"br7forlife\",\n    \"password\": \"123456\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"cellphone\": \"3003311999\",\n    \"fullname\": \"brayan andres diaz pacheco\",\n    \"identificationType\": \"CC\",\n    \"identificationNumber\": \"199945478063\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/auth/register",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Email Verification",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/email/verify?token=11ddaca402dbd687be2c435b3f2b1675f9bdd8964dfb1c64454a0612b811d219",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "email",
+                "verify"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "11ddaca402dbd687be2c435b3f2b1675f9bdd8964dfb1c64454a0612b811d219"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reenvio Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"userId\": \"{{userId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/email/forward",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "email",
+                "forward"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Oauth2 Me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://192.168.1.136:3001/rent-auth/oauth2/authorization/google",
+              "protocol": "http",
+              "host": [
+                "192",
+                "168",
+                "1",
+                "136"
+              ],
+              "port": "3001",
+              "path": [
+                "rent-auth",
+                "oauth2",
+                "authorization",
+                "google"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.globals.set(\"JWT\", response.accessToken);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"123456\"\n} ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/auth/login",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"userId\": \"52b710a6-6232-4724-8463-4f8d34157ded\",\n    \"refreshToken\": \"Ha8HhId5RcSfOXzOQ_HKfeyFvPntFhC72wbIEW_fWQ8\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/auth/refresh",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh - Rotate",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"userId\": \"00125882-47e9-42d8-9117-ac2086d0c628\",\n    \"refreshToken\": \"j9EPxzRK1kr1tG1gcSdQ5UrQYND3N5gifwPLxj2dCnE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/auth/refresh/rotate",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "auth",
+                "refresh",
+                "rotate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/auth/logout",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Oauth2 Get Credentials",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sessionID\": \"Kzo7QX5bEA1UNiszvbDTCpSbIm82u3B61h-wrgUx73Q\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/auth/oauth2/exchange",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "auth",
+                "oauth2",
+                "exchange"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Me",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/auth/me",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Edit Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": null,\n    \"cellphone\": \"987654321\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/auth/user-edit",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "auth",
+                "user-edit"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Financial-module - NestJs",
+      "description": "Microservicio de propiedades, miembros y contratos. Prefijo global /rent-financial. Todas las carpetas usan Bearer {{JWT}} salvo el endpoint público de invitación.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{JWT}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Property",
+          "description": "Registro, consulta y edición de propiedades (el dueño es Property.userId).",
+          "item": [
+            {
+              "name": "Register Property",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property"
+                  ]
+                },
+                "description": "Registra una propiedad. El usuario del JWT queda como dueño (Property.userId) y recibe el rol PROPIETARIO. Guarda `propertyId` automáticamente.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "  {\n    \"propertyType\": \"RESIDENCIAL\",\n    \"propertyOccupationType\": \"DESOCUPADO\",\n    \"direction\": {\n      \"latitute\": 10.4365,\n      \"longitud\": -75.5123,\n      \"department\": \"Bolivar\",\n      \"city\": \"Cartagena\",\n      \"neighborhood\": \"La Boquilla\",\n      \"typeStreet\": \"CALLE\",\n      \"numberStreet\": 5,\n      \"complement\": \"Al lado del mar\"\n    },\n    \"fmi\": \"060-1234572\",\n    \"predialNumber\": \"130010101000000123456000000004\",\n    \"propertyName\": \"Propiedad en los caracoles\",\n    \"propertyDescription\": \"Este es una propiedad ubicada en los caracoles con 2 cuartos, 1 baño, etc...\",\n    \"structurePropertyInfo\": {\n        \"bedrooms\": 2,\n        \"bathrooms\": 2,\n        \"floors\": 1,\n        \"parkingSpaces\": 0,\n        \"area\": 24.50,\n        \"lotArea\": 35,\n        \"constructionYear\": 2011\n    },\n    \"economicPropertyInfo\": {\n        \"monthlyRent\": 7000000,\n        \"depositAmount\": 300000,\n        \"currency\": \"COP\",\n        \"utilitiesIncluded\": false\n    },\n    \"resources\": [\n        {\n            \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n            \"width\": 70,\n            \"height\": 35,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-1.png\",\n            \"secureUrl\": \"https://example.com/images/property-1.png\"\n        },\n        {\n            \"assetId\": \"a1d8f1d9-9f8c-4d18-9d90-5b8c9e8d12a4\",\n            \"width\": 1280,\n            \"height\": 720,\n            \"format\": \"jpg\",\n            \"url\": \"http://example.com/images/property-2.jpg\",\n            \"secureUrl\": \"https://example.com/images/property-2.jpg\"\n        },\n        {\n            \"assetId\": \"3c2f6b4e-85d4-47f2-a8d3-94f7c5b8b8e1\",\n            \"width\": 1920,\n            \"height\": 1080,\n            \"format\": \"jpeg\",\n            \"url\": \"http://example.com/images/property-3.jpeg\",\n            \"secureUrl\": \"https://example.com/images/property-3.jpeg\"\n        },\n        {\n            \"assetId\": \"e7a4d5c9-1f26-4d59-bd8d-2d7c5d8a9f61\",\n            \"width\": 800,\n            \"height\": 600,\n            \"format\": \"webp\",\n            \"url\": \"http://example.com/images/property-4.webp\",\n            \"secureUrl\": \"https://example.com/images/property-4.webp\"\n        },\n        {\n            \"assetId\": \"5b9f6d0a-c9e2-4a5b-8f0f-3b7d1c9e2f44\",\n            \"width\": 1024,\n            \"height\": 768,\n            \"format\": \"png\",\n            \"url\": \"http://example.com/images/property-5.png\",\n            \"secureUrl\": \"https://example.com/images/property-5.png\"\n        }\n    ]\n  }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res && res.id) pm.collectionVariables.set('propertyId', res.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get My Properties (owner)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "Lista paginada de las propiedades donde el JWT es el dueño."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Property By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property/{{propertyId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property",
+                    "{{propertyId}}"
+                  ]
+                },
+                "description": "Detalle de una propiedad. Exige ser miembro ACTIVE."
+              },
+              "response": []
+            },
+            {
+              "name": "Edit Property",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property/{{propertyId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property",
+                    "{{propertyId}}"
+                  ]
+                },
+                "description": "Edita campos parciales de la propiedad. Política EDITAR_INMUEBLE. Acepta `direction` (upsert), recursos a insertar/eliminar, etc. Todos los campos son opcionales.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"propertyName\": \"Casa remodelada\",\n  \"propertyDescription\": \"Descripción actualizada\",\n  \"direction\": {\n    \"city\": \"Cartagena\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "IA Registration Suggestion",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property/IA-registration-suggestion",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property",
+                    "IA-registration-suggestion"
+                  ]
+                },
+                "description": "Sugerencia generada con IA (Ollama) para un campo del formulario de registro.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"propertyField\": \"PropertyName\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Property Documentation",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property/{{propertyId}}/documentation?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property",
+                    "{{propertyId}}",
+                    "documentation"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "Documentos de la propiedad. Política VER_DOCUMENTOS_INMUEBLE."
+              },
+              "response": []
+            },
+            {
+              "name": "Load Property Documents",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property/{{propertyId}}/documents",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property",
+                    "{{propertyId}}",
+                    "documents"
+                  ]
+                },
+                "description": "Sube documentos a la propiedad. Política SUBIR_DOCUMENTOS_INMUEBLE.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"resources\": [\n    {\n      \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n      \"width\": 70,\n      \"height\": 35,\n      \"format\": \"png\",\n      \"url\": \"http://example.com/img/1.png\",\n      \"secureUrl\": \"https://example.com/img/1.png\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Publicación (feed)",
+          "description": "Publicar/despublicar y feed público de propiedades.",
+          "item": [
+            {
+              "name": "Publish Property",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property/{{propertyId}}/publish",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property",
+                    "{{propertyId}}",
+                    "publish"
+                  ]
+                },
+                "description": "Publica el inmueble en el feed. Solo el dueño (Property.userId == JWT); si no, 404."
+              },
+              "response": []
+            },
+            {
+              "name": "Unpublish Property",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property/{{propertyId}}/unpublish",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property",
+                    "{{propertyId}}",
+                    "unpublish"
+                  ]
+                },
+                "description": "Retira el inmueble del feed. Solo el dueño."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Published Feed",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property/published?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property",
+                    "published"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "Feed de propiedades con isPublished=true: id, nombre, descripción, tipo y propertyStructureDescription."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Published Property Detail",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property/published/{{propertyId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property",
+                    "published",
+                    "{{propertyId}}"
+                  ]
+                },
+                "description": "Resumen: nombre, tipo, estructura y ownerContact {email, cellphone} obtenido del microservicio de auth."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Property Members",
+          "description": "Invitaciones, miembros, roles y estados.",
+          "item": [
+            {
+              "name": "Invite Property Member",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property-member/invite-property-member",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property-member",
+                    "invite-property-member"
+                  ]
+                },
+                "description": "Envía una invitación por correo. El dueño sale del JWT (el body NO lleva userId).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"invitado@example.com\",\n  \"propertyId\": \"{{propertyId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Accept Invitation (public, no JWT)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property-process-public/accept-invitation?token={{invitationToken}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property-process-public",
+                    "accept-invitation"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": "{{invitationToken}}"
+                    }
+                  ]
+                },
+                "description": "Endpoint público del enlace del correo: crea el miembro IN_PROCESS. La invitación pasa a CONSUMED.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get My Properties (as member)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property-member/properties?status=ACTIVE&page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property-member",
+                    "properties"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "ACTIVE"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "Propiedades donde soy miembro, filtradas por estado."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Property (as member)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property-member/property/{{propertyId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property-member",
+                    "property",
+                    "{{propertyId}}"
+                  ]
+                },
+                "description": "Detalle de la propiedad desde la perspectiva de un miembro."
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Members of Property",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property-member/property/{{propertyId}}/getall?status=ACTIVE&page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property-member",
+                    "property",
+                    "{{propertyId}}",
+                    "getall"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "ACTIVE"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "Miembros de la propiedad (solo dueño)."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Member By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property-member/{{propertyMemberId}}/property/{{propertyId}}/get",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property-member",
+                    "{{propertyMemberId}}",
+                    "property",
+                    "{{propertyId}}",
+                    "get"
+                  ]
+                },
+                "description": "Un miembro concreto de la propiedad (solo dueño)."
+              },
+              "response": []
+            },
+            {
+              "name": "Assign Roles To Member",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property-member/{{propertyMemberId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property-member",
+                    "{{propertyMemberId}}"
+                  ]
+                },
+                "description": "Asigna roles al miembro y lo activa (solo dueño). Roles válidos: claves de TYPE_PROPERTY_ACTOR_ROLE_UUIDS.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"propertyId\": \"{{propertyId}}\",\n  \"roles\": [\n    \"ARRENDADO\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Change Member Status",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property-member/{{propertyMemberId}}/status",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property-member",
+                    "{{propertyMemberId}}",
+                    "status"
+                  ]
+                },
+                "description": "Cambia el estado del miembro (solo dueño). El dueño no puede cambiar su propio estado (406).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"propertyId\": \"{{propertyId}}\",\n  \"status\": \"ACTIVE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "My Membership In Property (/me)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/property-member/{{propertyId}}/me",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "property-member",
+                    "{{propertyId}}",
+                    "me"
+                  ]
+                },
+                "description": "Mi membresía, roles y políticas efectivas en la propiedad."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Contract Draft",
+          "description": "Borradores de contrato (versionados por propiedad).",
+          "item": [
+            {
+              "name": "Create Contract Draft",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract/draft",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract",
+                    "draft"
+                  ]
+                },
+                "description": "Crea una versión de borrador (REGISTRAR_CONTRATOS). endDate debe ser > startDate (406). Notifica a ambas partes.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"content\": \"CONTRATO DE ARRENDAMIENTO DE VIVIENDA\\n\\nEl presente documento establece las condiciones del contrato de arrendamiento celebrado entre el arrendador y el arrendatario respecto del inmueble objeto del contrato.\\n\\nPRIMERA. OBJETO: El arrendador entrega al arrendatario el inmueble identificado dentro de la plataforma RENT.\\n\\nSEGUNDA. CANON: El arrendatario pagará un canon mensual de $900.000 COP.\\n\\nTERCERA. DEPÓSITO: Se establece un depósito de $500.000 COP como garantía de las obligaciones acordadas entre las partes.\\n\\nCUARTA. DURACIÓN: El contrato tendrá una duración de doce meses, iniciando el 1 de octubre de 2026 y finalizando el 1 de octubre de 2027.\\n\\nQUINTA. ACEPTACIÓN: Las partes declaran conocer y aceptar las condiciones establecidas en el presente borrador, sujeto a su aprobación definitiva.\",\n  \"propertyId\": \"{{propertyId}}\",\n  \"landlordMemberId\": \"{{landlordMemberId}}\",\n  \"tenantMemberId\": \"{{tenantMemberId}}\",\n  \"monthlyRent\": 900000,\n  \"depositAmount\": 500000,\n  \"startDate\": \"2026-10-01T00:00:00.000Z\",\n  \"endDate\": \"2027-10-01T00:00:00.000Z\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res && res.id) pm.collectionVariables.set('contractDraftId', res.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get All Drafts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract/draft/property/{{propertyId}}/getall?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract",
+                    "draft",
+                    "property",
+                    "{{propertyId}}",
+                    "getall"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "Borradores de la propiedad."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Draft By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract/draft/{{contractDraftId}}/property/{{propertyId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract",
+                    "draft",
+                    "{{contractDraftId}}",
+                    "property",
+                    "{{propertyId}}"
+                  ]
+                },
+                "description": "Un borrador concreto."
+              },
+              "response": []
+            },
+            {
+              "name": "Agree Draft",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract/draft/{{contractDraftId}}/agree",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract",
+                    "draft",
+                    "{{contractDraftId}}",
+                    "agree"
+                  ]
+                },
+                "description": "Arrendador o arrendatario aceptan el borrador (por separado).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"propertyId\": \"{{propertyId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Accepted Drafts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract/draft/getAcceptedContracts/property/{{propertyId}}?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract",
+                    "draft",
+                    "getAcceptedContracts",
+                    "property",
+                    "{{propertyId}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "Borradores aceptados por ambas partes."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Accepted Draft By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract/draft/getAcceptedContracts/property/{{propertyId}}/id/{{contractDraftId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract",
+                    "draft",
+                    "getAcceptedContracts",
+                    "property",
+                    "{{propertyId}}",
+                    "id",
+                    "{{contractDraftId}}"
+                  ]
+                },
+                "description": "Un borrador aceptado por ambas partes."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Contract",
+          "description": "Contratos: PENDIENTE_ACEPTACION → PENDIENTE_DOCUMENTACION → ACTIVO → SUSPENDIDO/FINALIZADO.",
+          "item": [
+            {
+              "name": "Create Contract",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract"
+                  ]
+                },
+                "description": "Crea el contrato (PENDIENTE_ACEPTACION) desde el último borrador aceptado; debe corresponder al landlord/tenant indicados.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"propertyId\": \"{{propertyId}}\",\n  \"landlordMemberId\": \"{{landlordMemberId}}\",\n  \"tenantMemberId\": \"{{tenantMemberId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res && res.id) pm.collectionVariables.set('contractId', res.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get All Contracts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract/property/{{propertyId}}?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract",
+                    "property",
+                    "{{propertyId}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    }
+                  ]
+                },
+                "description": "Contratos de la propiedad."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Contract By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract/{{contractId}}/property/{{propertyId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract",
+                    "{{contractId}}",
+                    "property",
+                    "{{propertyId}}"
+                  ]
+                },
+                "description": "Un contrato concreto."
+              },
+              "response": []
+            },
+            {
+              "name": "Accept Or Reject (tenant)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract/acceptedOrRejected",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract",
+                    "acceptedOrRejected"
+                  ]
+                },
+                "description": "El arrendatario acepta (→ PENDIENTE_DOCUMENTACION, rol ARRENDADO) o rechaza (→ RECHAZADO).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"contractId\": \"{{contractId}}\",\n  \"propertyId\": \"{{propertyId}}\",\n  \"status\": \"ACCEPTED\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Load Contract Documents",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract/{{contractId}}/documents",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract",
+                    "{{contractId}}",
+                    "documents"
+                  ]
+                },
+                "description": "Carga la documentación (SUBIR_DOCUMENTOS_CONTRATO); el contrato pasa a ACTIVO.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"propertyId\": \"{{propertyId}}\",\n  \"resources\": [\n    {\n      \"assetId\": \"7723dd68-3ed2-4983-834a-53d423882d63\",\n      \"width\": 70,\n      \"height\": 35,\n      \"format\": \"png\",\n      \"url\": \"http://example.com/img/1.png\",\n      \"secureUrl\": \"https://example.com/img/1.png\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Change Contract Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/contract/{{contractId}}/property/{{propertyId}}/status",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "contract",
+                    "{{contractId}}",
+                    "property",
+                    "{{propertyId}}",
+                    "status"
+                  ]
+                },
+                "description": "SUSPENDED solo desde ACTIVO; FINISHED desde ACTIVO o SUSPENDIDO. Valores: SUSPENDED | FINISHED.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"SUSPENDED\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Services Catalog",
+          "item": [
+            {
+              "name": "List Services",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/services?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "services"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "disabled": false
+                    },
+                    {
+                      "key": "search",
+                      "value": "plom",
+                      "disabled": true
+                    },
+                    {
+                      "key": "isActive",
+                      "value": "true",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Lista paginada del catálogo."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Service By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/services/{{serviceId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "services",
+                    "{{serviceId}}"
+                  ]
+                },
+                "description": "Detalle de un servicio."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Service",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/services",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "services"
+                  ]
+                },
+                "description": "Crea categoría (rol administrativo).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Plomer\\u00eda\",\n  \"description\": \"Reparaciones e instalaciones de plomer\\u00eda\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res && res.id) pm.collectionVariables.set('serviceId', res.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Service",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/services/{{serviceId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "services",
+                    "{{serviceId}}"
+                  ]
+                },
+                "description": "Actualiza nombre/descripción.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"Descripci\\u00f3n actualizada\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Change Service Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/services/{{serviceId}}/status",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "services",
+                    "{{serviceId}}",
+                    "status"
+                  ]
+                },
+                "description": "Activa/desactiva el servicio.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isActive\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Service Offerings",
+          "item": [
+            {
+              "name": "List Offerings",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-offerings?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-offerings"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "disabled": false
+                    },
+                    {
+                      "key": "serviceId",
+                      "value": "{{serviceId}}",
+                      "disabled": true
+                    },
+                    {
+                      "key": "providerUserId",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "scope",
+                      "value": "PUBLIC",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "ACTIVE",
+                      "disabled": true
+                    },
+                    {
+                      "key": "currency",
+                      "value": "COP",
+                      "disabled": true
+                    },
+                    {
+                      "key": "minPrice",
+                      "value": "10000",
+                      "disabled": true
+                    },
+                    {
+                      "key": "maxPrice",
+                      "value": "500000",
+                      "disabled": true
+                    },
+                    {
+                      "key": "onlyValid",
+                      "value": "true",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "createdAt",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sortOrder",
+                      "value": "desc",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Ofertas disponibles con filtros."
+              },
+              "response": []
+            },
+            {
+              "name": "List My Offerings",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-offerings/mine?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-offerings",
+                    "mine"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Ofertas del proveedor autenticado."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Offering By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-offerings/{{offeringId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-offerings",
+                    "{{offeringId}}"
+                  ]
+                },
+                "description": "Detalle de oferta."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Offering (PUBLIC)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-offerings",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-offerings"
+                  ]
+                },
+                "description": "Publica oferta pública; el proveedor sale del JWT.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"serviceId\": \"{{serviceId}}\",\n  \"scope\": \"PUBLIC\",\n  \"priceTypeAgreement\": \"FIXED\",\n  \"basePrice\": \"150000.00\",\n  \"currency\": \"COP\",\n  \"validFrom\": \"2026-10-10T00:00:00.000Z\",\n  \"validUntil\": \"2027-10-10T00:00:00.000Z\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res && res.id) pm.collectionVariables.set('offeringId', res.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Offering (PROPERTY)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-offerings",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-offerings"
+                  ]
+                },
+                "description": "Oferta exclusiva de un inmueble (requiere propertyMemberId del proveedor).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"serviceId\": \"{{serviceId}}\",\n  \"scope\": \"PROPERTY\",\n  \"propertyMemberId\": \"{{propertyMemberId}}\",\n  \"priceTypeAgreement\": \"NEGOTIABLE\",\n  \"basePrice\": \"100000\",\n  \"currency\": \"COP\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Offering",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-offerings/{{offeringId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-offerings",
+                    "{{offeringId}}"
+                  ]
+                },
+                "description": "Actualiza condiciones de oferta propia.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"basePrice\": \"175000.00\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Change Offering Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-offerings/{{offeringId}}/status",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-offerings",
+                    "{{offeringId}}",
+                    "status"
+                  ]
+                },
+                "description": "Activa/desactiva oferta propia.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"INACTIVE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Service Requests",
+          "item": [
+            {
+              "name": "Create Service Request",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests"
+                  ]
+                },
+                "description": "Crea solicitud (queda REQUESTED); solicitante y proveedor salen del JWT/oferta.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"serviceOfferingId\": \"{{offeringId}}\",\n  \"propertyId\": \"{{propertyId}}\",\n  \"notes\": \"Fuga en el ba\\u00f1o principal\",\n  \"proposedPrice\": \"120000\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const res = pm.response.json();",
+                      "if (res && res.id) pm.collectionVariables.set('serviceRequestId', res.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Accessible Requests",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "disabled": false
+                    },
+                    {
+                      "key": "status",
+                      "value": "REQUESTED",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Solicitudes accesibles al usuario."
+              },
+              "response": []
+            },
+            {
+              "name": "List My Requests",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests/mine?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests",
+                    "mine"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Solicitudes realizadas por mí."
+              },
+              "response": []
+            },
+            {
+              "name": "List Provider Requests",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests/provider/mine?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests",
+                    "provider",
+                    "mine"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Solicitudes recibidas como proveedor."
+              },
+              "response": []
+            },
+            {
+              "name": "List Requests By Property",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests/property/{{propertyId}}?page=1&limit=20",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests",
+                    "property",
+                    "{{propertyId}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Solicitudes de un inmueble."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Request By ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests/{{serviceRequestId}}",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests",
+                    "{{serviceRequestId}}"
+                  ]
+                },
+                "description": "Detalle de solicitud autorizada."
+              },
+              "response": []
+            },
+            {
+              "name": "Accept Request",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests/{{serviceRequestId}}/accept",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests",
+                    "{{serviceRequestId}}",
+                    "accept"
+                  ]
+                },
+                "description": "Proveedor acepta (REQUESTED→ACCEPTED).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Observaci\\u00f3n opcional\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Reject Request",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests/{{serviceRequestId}}/reject",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests",
+                    "{{serviceRequestId}}",
+                    "reject"
+                  ]
+                },
+                "description": "Proveedor rechaza (REQUESTED→REJECTED).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Observaci\\u00f3n opcional\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Start Request",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests/{{serviceRequestId}}/start",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests",
+                    "{{serviceRequestId}}",
+                    "start"
+                  ]
+                },
+                "description": "Proveedor inicia (ACCEPTED→IN_PROGRESS).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Observaci\\u00f3n opcional\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Complete Request",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests/{{serviceRequestId}}/complete",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests",
+                    "{{serviceRequestId}}",
+                    "complete"
+                  ]
+                },
+                "description": "Completa (IN_PROGRESS→COMPLETED).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Observaci\\u00f3n opcional\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Cancel Request",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests/{{serviceRequestId}}/cancel",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests",
+                    "{{serviceRequestId}}",
+                    "cancel"
+                  ]
+                },
+                "description": "Cancela según actor y estado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Observaci\\u00f3n opcional\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Propose Price",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests/{{serviceRequestId}}/price/propose",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests",
+                    "{{serviceRequestId}}",
+                    "price",
+                    "propose"
+                  ]
+                },
+                "description": "Propone precio (NEGOTIABLE/CUSTOM_QUOTE/PERCENTAGE).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"price\": \"130000\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Accept Price",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/rent-financial/service-requests/{{serviceRequestId}}/price/accept",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "rent-financial",
+                    "service-requests",
+                    "{{serviceRequestId}}",
+                    "price",
+                    "accept"
+                  ]
+                },
+                "description": "La contraparte acepta el precio propuesto."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Microservice Identification",
+      "item": [
+        {
+          "name": "Get Microservice Jwt",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"clientId\": \"rent-financial\",\n    \"clientSecret\": \"ee31d461300344a6aac6ac4283877162\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/microservice-identification",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "microservice-identification"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MICROSERVICE_JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/microservice-identification/user?email=juan.perez@gmail.com",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "microservice-identification",
+                "user"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "juan.perez@gmail.com"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MICROSERVICE_JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"usersIds\": [\"a2b70fb0-8fbf-4dc6-a1cc-ee75e2bd9d8e\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{DEFAULT_PATH}}/microservice-identification/users",
+              "host": [
+                "{{DEFAULT_PATH}}"
+              ],
+              "path": [
+                "microservice-identification",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Gateway Test",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"br7forlife\",\n    \"password\": \"123456\",\n    \"email\": \"diazpachecobrayan@gmail.com\",\n    \"cellphone\": \"3003311999\",\n    \"fullname\": \"brayan andres diaz pacheco\",\n    \"identificationType\": \"CC\",\n    \"identificationNumber\": \"199945478063\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/rent-auth/auth/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "rent-auth",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "DEFAULT_PATH",
+      "value": ""
+    },
+    {
+      "key": "MICROSERVICE_JWT",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:3002",
+      "type": "default"
+    },
+    {
+      "key": "JWT",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "propertyId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "propertyMemberId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "landlordMemberId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "tenantMemberId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "contractId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "contractDraftId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "invitationToken",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "serviceId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "offeringId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "serviceRequestId",
+      "value": "",
+      "type": "default"
+    }
+  ]
 }

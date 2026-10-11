@@ -43,19 +43,24 @@ export type changeContractStatusType = z.infer<
 export const generateIAContentContractDtoRequest = z.object({});
 
 //generar borradores de contratos
-export const generateContractDraftDtoRequest = z.object({
-  //borrador de contrato
-  content: z.string(),
+export const generateContractDraftDtoRequest = z
+  .object({
+    //borrador de contrato
+    content: z.string(),
 
-  //parametros parciales de propiedades
-  propertyId: z.uuid(),
-  landlordMemberId: z.uuid(),
-  tenantMemberId: z.uuid(),
-  monthlyRent: z.coerce.number().nonnegative(),
-  depositAmount: z.coerce.number().nonnegative(),
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date(),
-});
+    //parametros parciales de propiedades
+    propertyId: z.uuid(),
+    landlordMemberId: z.uuid(),
+    tenantMemberId: z.uuid(),
+    monthlyRent: z.coerce.number().nonnegative(),
+    depositAmount: z.coerce.number().nonnegative(),
+    startDate: z.coerce.date(),
+    endDate: z.coerce.date(),
+  })
+  .refine((dto) => dto.endDate > dto.startDate, {
+    message: 'La fecha de fin debe ser posterior a la fecha de inicio',
+    path: ['endDate'],
+  });
 
 export type GenerateContractDraftType = z.infer<
   typeof generateContractDraftDtoRequest

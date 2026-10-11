@@ -529,6 +529,32 @@ async function main() {
         description:
           'Permite cancelar invitaciones de miembros que se encuentren pendientes',
       },
+
+      // politicas de servicios prestados dentro del inmueble
+      {
+        id: POLICIES_STATEMENTS.SOLICITAR_SERVICIOS,
+        policyName: 'SOLICITAR_SERVICIOS',
+        description:
+          'Permite solicitar servicios (ofertas de proveedores) para el inmueble',
+      },
+      {
+        id: POLICIES_STATEMENTS.VER_SOLICITUDES_SERVICIOS,
+        policyName: 'VER_SOLICITUDES_SERVICIOS',
+        description:
+          'Permite consultar las solicitudes de servicios del inmueble',
+      },
+      {
+        id: POLICIES_STATEMENTS.CANCELAR_SOLICITUDES_SERVICIOS,
+        policyName: 'CANCELAR_SOLICITUDES_SERVICIOS',
+        description:
+          'Permite cancelar solicitudes de servicios del inmueble realizadas por otros miembros',
+      },
+      {
+        id: POLICIES_STATEMENTS.PUBLICAR_OFERTAS_SERVICIOS,
+        policyName: 'PUBLICAR_OFERTAS_SERVICIOS',
+        description:
+          'Permite publicar ofertas de servicios exclusivas del inmueble (alcance PROPERTY)',
+      },
     ],
     skipDuplicates: true,
   });
@@ -811,9 +837,148 @@ async function main() {
         policy_statement_id: POLICIES_STATEMENTS.VER_INMUEBLE,
       },
 
+      //servicios prestados (solicitudes y ofertas)
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.SOLICITAR_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.VER_SOLICITUDES_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.CANCELAR_SOLICITUDES_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.COPROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.SOLICITAR_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.COPROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.VER_SOLICITUDES_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.COPROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.CANCELAR_SOLICITUDES_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ADMINISTRADOR,
+        policy_statement_id: POLICIES_STATEMENTS.SOLICITAR_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ADMINISTRADOR,
+        policy_statement_id: POLICIES_STATEMENTS.VER_SOLICITUDES_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ADMINISTRADOR,
+        policy_statement_id: POLICIES_STATEMENTS.CANCELAR_SOLICITUDES_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO,
+        policy_statement_id: POLICIES_STATEMENTS.SOLICITAR_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO,
+        policy_statement_id: POLICIES_STATEMENTS.VER_SOLICITUDES_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.TECNICO,
+        policy_statement_id: POLICIES_STATEMENTS.PUBLICAR_OFERTAS_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ELECTRICISTA,
+        policy_statement_id: POLICIES_STATEMENTS.PUBLICAR_OFERTAS_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.PLOMERO,
+        policy_statement_id: POLICIES_STATEMENTS.PUBLICAR_OFERTAS_SERVICIOS,
+      },
+      {
+        propertyActorRoleId:
+          TYPE_PROPERTY_ACTOR_ROLE_UUIDS.PERSONAL_MANTENIMIENTO,
+        policy_statement_id: POLICIES_STATEMENTS.PUBLICAR_OFERTAS_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.PERSONAL_LIMPIEZA,
+        policy_statement_id: POLICIES_STATEMENTS.PUBLICAR_OFERTAS_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.JARDINERO,
+        policy_statement_id: POLICIES_STATEMENTS.PUBLICAR_OFERTAS_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.SOPORTE_OPERATIVO,
+        policy_statement_id: POLICIES_STATEMENTS.PUBLICAR_OFERTAS_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ADMINISTRADOR,
+        policy_statement_id: POLICIES_STATEMENTS.PUBLICAR_OFERTAS_SERVICIOS,
+      },
+      {
+        propertyActorRoleId: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+        policy_statement_id: POLICIES_STATEMENTS.PUBLICAR_OFERTAS_SERVICIOS,
+      },
+
       //ROL DE PROPIETARIO POSEE TODOS LOS PERMISOS POSIBLES EN
       // LA APLICACION
     ],
+    skipDuplicates: true,
+  });
+
+  // Catalogo base de servicios (administrado luego por usuarios con rol global ADMIN
+  // desde /services). `name` es unico, por eso skipDuplicates lo hace idempotente.
+  await prisma.service.createMany({
+    data: [
+      {
+        name: 'Aseo y limpieza',
+        description: 'Servicios de limpieza y aseo para inmuebles.',
+      },
+      {
+        name: 'Plomería',
+        description:
+          'Instalación, mantenimiento y reparación de tuberías y sanitarios.',
+      },
+      {
+        name: 'Electricidad',
+        description: 'Instalación, mantenimiento y reparación eléctrica.',
+      },
+      {
+        name: 'Cerrajería',
+        description: 'Cambio, apertura y reparación de cerraduras.',
+      },
+      {
+        name: 'Pintura',
+        description: 'Pintura y acabados de interiores y exteriores.',
+      },
+      {
+        name: 'Carpintería',
+        description:
+          'Fabricación, instalación y reparación de elementos en madera.',
+      },
+      {
+        name: 'Jardinería',
+        description: 'Mantenimiento de jardines y zonas verdes.',
+      },
+      {
+        name: 'Fumigación',
+        description: 'Control de plagas e insectos.',
+      },
+      {
+        name: 'Mudanzas y transporte',
+        description: 'Traslado de enseres y mudanzas.',
+      },
+      {
+        name: 'Mantenimiento de electrodomésticos',
+        description: 'Reparación y mantenimiento de electrodomésticos.',
+      },
+      {
+        name: 'Seguridad y vigilancia',
+        description:
+          'Instalación de alarmas, cámaras y servicios de vigilancia.',
+      },
+    ],
+    skipDuplicates: true,
   });
 }
 

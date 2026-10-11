@@ -112,16 +112,18 @@ export class ContractService {
         optProperty.id,
       );
 
-    //encontramos la ultima version del borrador del contrato
-    const version =
-      await this.contractRepository.findLastVersionInContractDraft(
-        optProperty.id,
-      );
-
     //creamos el borrador de contrato y ademas asignamos el rol de ARRENDADO_PRELIMINAR
     //para que pueda acceder a los borradores de contratos
 
     const response = await this.prismaClient.$transaction(async (tx) => {
+      //la version se calcula dentro de la transaccion para reducir la carrera
+      //con @@unique([propertyId, version])
+      const version =
+        await this.contractRepository.findLastVersionInContractDraft(
+          optProperty.id,
+          tx,
+        );
+
       const savedDraft = await this.contractRepository.saveContractDraft(
         {
           content: contractDraft.content,
@@ -402,6 +404,13 @@ export class ContractService {
       throw new propertyWithContractAvalibityException();
     }
 
+    //validamos que el arrendador indicado sea miembro activo del inmueble
+    const landlordPropertyMember =
+      await this.systemRole.verifyPropertyMemberByIdAndPropertyId(
+        contract.landlordMemberId,
+        optProperty.id,
+      );
+
     //validamos si el posible arrendado pertenecen a dicho inmueble
     const tenantPropertyMember =
       await this.systemRole.verifyPropertyMemberByIdAndPropertyId(
@@ -420,7 +429,12 @@ export class ContractService {
         optProperty.id,
       );
 
-    if (!optContractDraft) {
+    //el borrador aceptado debe corresponder a las partes solicitadas
+    if (
+      !optContractDraft ||
+      optContractDraft.tenantMemberId !== tenantPropertyMember.id ||
+      optContractDraft.landlordMemberId !== landlordPropertyMember.id
+    ) {
       throw new contractDraftAvailabilityNotFoundException();
     }
 
@@ -430,7 +444,7 @@ export class ContractService {
         createByUserId: userId,
         depositAmount: Number(optContractDraft.depositAmount),
         endDate: optContractDraft.endDate,
-        landlordMemberId: optLandordPropertyMember.id,
+        landlordMemberId: landlordPropertyMember.id,
         monthlyRent: Number(optContractDraft.monthlyRent),
         propertyId: optProperty.id,
         startDate: optContractDraft.startDate,
@@ -449,7 +463,7 @@ export class ContractService {
       const landlordNotification =
         await this.notificationService.sendNotification(
           userId,
-          optLandordPropertyMember.userId,
+          landlordPropertyMember.userId,
           'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
           'CREACIÓN DE CONTRATO EN VIGENCIA!',
           'PROPERTY_REGISTRATION_SERVICE',
@@ -467,7 +481,7 @@ export class ContractService {
         );
 
       this.notificationGateway.sendNotification(
-        optLandordPropertyMember.userId,
+        landlordPropertyMember.userId,
         landlordNotification,
       );
 
@@ -502,7 +516,7 @@ export class ContractService {
     const optContract =
       await this.contractRepository.findContractByIdAndTenantMemberId(
         contractId,
-        tenantId,
+        tenantPropertyMember.id,
       );
 
     if (!optContract) {
@@ -512,7 +526,7 @@ export class ContractService {
     //verificamos que el contrato no este RECHAZADO, CANCELADO, SUSPENDIDO
     // FINALIZADO porque no queremos modificar el estado del contrato si cuenta
     // con estos estados previos
-    if (!['PENDING_ACCEPTANCE'].includes(optContract.status)) {
+    if (optContract.status !== 'PENDIENTE_ACEPTACION') {
       throw new deniedTransitionedStatusContract();
     }
 
@@ -531,6 +545,7 @@ export class ContractService {
           tenantPropertyMember.id,
           TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO_PRELIMINAR,
           TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO,
+          tx,
         );
       });
 
@@ -539,11 +554,14 @@ export class ContractService {
         message: 'Contrato aceptado exitosamente!',
       };
     } else {
-      await this.contractRepository.updateStatusContractByTenantId(
-        contractId,
-        tenantPropertyMember.id,
-        'RECHAZADO',
-      );
+      await this.prismaClient.$transaction(async (tx) => {
+        await this.contractRepository.updateStatusContractByTenantId(
+          contractId,
+          tenantPropertyMember.id,
+          'RECHAZADO',
+          tx,
+        );
+      });
     }
 
     return {
@@ -635,6 +653,13 @@ export class ContractService {
       throw new contractNotFound();
     }
 
+    //solo se puede suspender/finalizar un contrato en un estado de origen valido
+    const allowedOrigins: Record<changeContractStatusType['status'], string[]> =
+      {
+        SUSPENDED: ['ACTIVO'],
+        FINISHED: ['ACTIVO', 'SUSPENDIDO'],
+      };
+
     //tenemos que verificar si el miembro actual tiene permisos para
     //cambiar el estado del contrato segun el tipo, ya que no basta con que cumpla
     //algunas de las politicas sino que debe permitir lo necesario para cada contract status
@@ -643,6 +668,10 @@ export class ContractService {
         await this.systemRole.CheckPolicies(optPropertyMember.id, [
           POLICIES_STATEMENTS_NAMES.FINALIZAR_CONTRATOS,
         ]);
+
+        if (!allowedOrigins.FINISHED.includes(optContract.status)) {
+          throw new deniedTransitionedStatusContract();
+        }
 
         //actualizamos el estado del contrato a FINALIZADO
         await this.contractRepository.updateStatusContractById(
@@ -655,6 +684,10 @@ export class ContractService {
         await this.systemRole.CheckPolicies(optPropertyMember.id, [
           POLICIES_STATEMENTS_NAMES.SUSPENDER_CONTRATOS,
         ]);
+
+        if (!allowedOrigins.SUSPENDED.includes(optContract.status)) {
+          throw new deniedTransitionedStatusContract();
+        }
 
         await this.contractRepository.updateStatusContractById(
           contractId,

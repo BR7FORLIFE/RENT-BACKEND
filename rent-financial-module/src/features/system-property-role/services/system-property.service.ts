@@ -106,6 +106,46 @@ export class SystemPropertyService {
     }
   }
 
+  // Variante booleana de CheckPolicies para consultas (no lanza): devuelve los inmuebles donde
+  // el usuario es miembro ACTIVE y alguna de sus politicas efectivas (roles - overrides)
+  // coincide con las permitidas.
+  async getPropertyIdsWithPolicies(
+    userId: string,
+    allowedPolicies: string[],
+  ): Promise<string[]> {
+    const members = await this.prisma.propertyMember.findMany({
+      where: { userId, status: 'ACTIVE' },
+      select: { id: true, propertyId: true },
+    });
+
+    const checks = await Promise.all(
+      members.map(async (member) => {
+        const policies =
+          (await this.systemRepository.findAllPoliciesByPropertyMemberId(
+            member.id,
+          )) ?? [];
+        const override =
+          await this.systemRepository.findOverridePolicyByPropertyMemberId(
+            member.id,
+          );
+        return IsAllowedByPolicies(policies, override, allowedPolicies)
+          ? member.propertyId
+          : null;
+      }),
+    );
+
+    return checks.filter((id): id is string => id !== null);
+  }
+
+  async hasPoliciesInProperty(
+    userId: string,
+    propertyId: string,
+    allowedPolicies: string[],
+  ): Promise<boolean> {
+    const ids = await this.getPropertyIdsWithPolicies(userId, allowedPolicies);
+    return ids.includes(propertyId);
+  }
+
   async checkRoles(
     propertyMemberId: string,
     checkRoles: string[],

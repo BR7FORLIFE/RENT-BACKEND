@@ -34,6 +34,7 @@ import { PropertyMemberRepository } from '../repository/property-member.reposito
 import type { Property } from '../dtos/response-dto.js';
 import { PropertyServiceMapper } from '../repository/mappers/property-mapper.service.js';
 import { SystemPropertyService } from '../../system-property-role/services/system-property.service.js';
+import { getUserData } from '../api.js';
 import type { createResourceImageType } from '../../global/global.schema-dtos.js';
 
 @Injectable()
@@ -176,6 +177,47 @@ export class PropertyService {
     return this.propertyMapper.toDomain(data);
   }
 
+  //publicar / despublicar: solo el dueño (Property.userId == JWT.userId)
+  async setPublished(
+    userId: string,
+    propertyId: string,
+    isPublished: boolean,
+  ): Promise<{ id: string; isPublished: boolean }> {
+    const owned = await this.propertyRepository.findOwnedPropertyById(
+      userId,
+      propertyId,
+    );
+    if (!owned) {
+      throw new PropertyNotFoundException();
+    }
+
+    await this.propertyRepository.updateProperty(propertyId, { isPublished });
+    return { id: propertyId, isPublished };
+  }
+
+  async consultPublishedProperties(paginationDto: PaginationType) {
+    return await this.propertyRepository.findAllPublished(paginationDto);
+  }
+
+  async consultPublishedPropertyById(propertyId: string) {
+    const property =
+      await this.propertyRepository.findPublishedById(propertyId);
+    if (!property) {
+      throw new PropertyNotFoundException();
+    }
+
+    //contacto del dueño desde el microservicio de autenticacion
+    const owner = await getUserData(null, property.ownerUserId);
+
+    return {
+      id: property.id,
+      propertyName: property.propertyName,
+      typeProperty: property.typeProperty,
+      propertyStructureDescription: property.propertyStructureDescription,
+      ownerContact: { email: owner.email, cellphone: owner.cellphone },
+    };
+  }
+
   async editingProperty(
     userId: string,
     propertyId: string,
@@ -264,24 +306,29 @@ export class PropertyService {
             )
             .map((resource) => resource.resourcesImage.assetId!);
 
-          const toInsert: Prisma.ResourceImagesCreateManyInput[] =
-            incomingImages
-              .filter((image) => !current.has(image.assetId!))
-              .map((image) => ({
-                assetId: image.assetId,
-                width: image.width,
-                height: image.height,
-                format: image.format,
-                url: image.url,
-                secureUrl: image.secureUrl,
-                propertyId: property.id,
-              }));
+          const toInsert: createResourceImageType[] = incomingImages.filter(
+            (image) => !current.has(image.assetId!),
+          );
 
+          //solo afecta los recursos vinculados a ESTA propiedad
           await this.propertyRepository.updateResourcesImages(
+            property.id,
             toDelete,
             toInsert,
           );
 
+          break;
+        }
+
+        case 'direction': {
+          //la direccion es una relacion 1:1, se crea o actualiza de forma anidada
+          const direction = value as Prisma.DirectionUpdateWithoutPropertyInput;
+          data.direction = {
+            upsert: {
+              create: direction as Prisma.DirectionCreateWithoutPropertyInput,
+              update: direction,
+            },
+          };
           break;
         }
 

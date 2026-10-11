@@ -40,6 +40,17 @@ export class GlobalRepository {
     return await db.invitationLinked.create({ data });
   }
 
+  //updates
+  async markInvitationAsConsumed(
+    id: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.invitationLinked.update({
+      where: { id },
+      data: { status: 'CONSUMED' },
+    });
+  }
+
   //finds
 
   //property invitations
