@@ -1,61 +1,103 @@
 import { UseGuards } from '@nestjs/common';
 import {
+  MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 
 import { Server } from 'socket.io';
+import { z } from 'zod';
 import { WsJwtGuard } from '../../core/auth/ws.guard.js';
 import type { AuthenticatedSocket } from '../../types/global-types.js';
-import { NotificationService } from './notification.service.js';
-import type { NotificationType } from '../global/global.schema.js';
+import {
+  NotificationService,
+  type NotificationRecord,
+} from './notification.service.js';
+
+const MarkAsReadSchema = z.object({
+  ids: z.array(z.uuid()).min(1).max(100),
+});
 
 @WebSocketGateway({
-  namespace: 'notifications', //punto de entrada para el gateway de notificaciones
+  namespace: 'notifications',
   cors: {
-    origin: '*', //esto se configura con el origen del cliente
+    origin: '*',
   },
 })
 export class NotificationGateway {
   constructor(private readonly notificationService: NotificationService) {}
 
   @WebSocketServer()
-  server: Server; //importante ya que es una instancia de Socket.IO
+  server: Server;
 
-  //este metodo permite que el usuario se conecte pr primera vez y recupera todas
-  //las notificaciones para estar al dia
+  private authenticatedUser(client: AuthenticatedSocket) {
+    const user = client.data.user;
 
-  /**
-   *  CREAMOS UN SOLO FLUJO WEBSOCKETS
-   *
-   *  init -> notifications:new (cliente - servidor)
-   * notifications:new -> init (servidor - cliente) | notificaciones
-   *
-   *
-   */
+    if (!user?.userId) {
+      client.disconnect();
+      return null;
+    }
+
+    return user;
+  }
+
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('init')
   async handleNotifications(client: AuthenticatedSocket) {
-    const user = client.data.user;
+    const user = this.authenticatedUser(client);
 
-    if (!user) {
-      client.disconnect();
-      return;
-    }
+    if (!user) return;
 
-    // es una room que nos permite enviar mensaje a un usuario en especifico
     await client.join(`user:${user.userId}`);
 
     const notifications = await this.notificationService.getAllNotifications(
       user.userId,
-    ); //obtenemos todas las notificaciones vinculadas al usuario
+    );
 
-    client.emit('notifications:init', notifications); //emitimos las notificaciones
+    client.emit('notifications:init', notifications);
   }
 
-  sendNotification(userId: string, notification: NotificationType) {
-    //enviamos la notificacion al usuario por el evento llamado notification:new
-    this.server.to(`user:${userId}`).emit('notification:new', notification);
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('notifications:read')
+  async handleMarkAsRead(
+    client: AuthenticatedSocket,
+    @MessageBody() body: unknown,
+  ) {
+    const user = this.authenticatedUser(client);
+
+    if (!user) return;
+
+    const parsed = MarkAsReadSchema.safeParse(body);
+
+    if (!parsed.success) {
+      throw new WsException('Identificadores de notificaciones inválidos');
+    }
+
+    const result = await this.notificationService.markAsRead(
+      user.userId,
+      parsed.data.ids,
+    );
+
+    client.emit('notifications:unread-count', result);
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('notifications:read-all')
+  async handleMarkAllAsRead(client: AuthenticatedSocket) {
+    const user = this.authenticatedUser(client);
+
+    if (!user) return;
+
+    const result = await this.notificationService.markAsRead(user.userId);
+
+    client.emit('notifications:unread-count', result);
+  }
+
+  sendNotification(userId: string, notification: NotificationRecord) {
+    this.server
+      ?.to(`user:${userId}`)
+      .emit('notification:new', this.notificationService.toItem(notification));
   }
 }

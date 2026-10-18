@@ -5,23 +5,46 @@ import type {
   NotificationType,
   NotificationTypeEnumType,
 } from '../global/global.schema.js';
-import { PrismaService } from '../../core/database/prisma.service.js';
 
-interface ContentNotification {
+const NOTIFICATIONS_LIMIT = 50;
+
+export type NotificationRecord = Awaited<
+  ReturnType<NotificationRepository['saveNotification']>
+>;
+
+export interface NotificationItem {
+  id: string;
+  transmitterId: string;
+  receiverId: string;
+  source: string;
   name: string;
   content: string;
   typeNotification: NotificationTypeEnumType;
+  readAt: Date | null;
+  createdAt: Date;
 }
 
-interface NotificationResponse {
-  transmitter: ContentNotification[];
-  receiver: ContentNotification[];
+export interface NotificationResponse {
+  transmitter: NotificationItem[];
+  receiver: NotificationItem[];
+  unreadCount: number;
 }
+
+const toItem = (notification: NotificationRecord): NotificationItem => ({
+  id: notification.id,
+  transmitterId: notification.transmitterId,
+  receiverId: notification.receiverId,
+  source: notification.source,
+  name: notification.name,
+  content: notification.content,
+  typeNotification: notification.type,
+  readAt: notification.readAt,
+  createdAt: notification.createAt,
+});
 
 @Injectable()
 export class NotificationService {
   constructor(
-    private readonly prismaClient: PrismaService,
     private readonly notificationRepository: NotificationRepository,
   ) {}
 
@@ -32,7 +55,7 @@ export class NotificationService {
     name: string,
     source: NotificationSource,
     type: NotificationTypeEnumType,
-  ) {
+  ): Promise<NotificationRecord> {
     const notification: NotificationType = {
       transmitterId,
       receiverId,
@@ -42,41 +65,40 @@ export class NotificationService {
       type,
     };
 
-    await this.notificationRepository.saveNotification(notification); //guardamos la notificacion
-
-    return notification;
+    return await this.notificationRepository.saveNotification(notification);
   }
 
-  //propertyMember para obtener todas las notificaciones recibidas
-  async getAllNotifications(userId: string): Promise<NotificationResponse> {
-    const data = await this.prismaClient.$transaction(async (tx) => {
-      const transmitter =
-        await this.notificationRepository.findAllNotifications(
-          userId,
-          'TRANSMITTER',
-          tx,
-        );
+  toItem(notification: NotificationRecord): NotificationItem {
+    return toItem(notification);
+  }
 
-      const receiver = await this.notificationRepository.findAllNotifications(
+  async getAllNotifications(userId: string): Promise<NotificationResponse> {
+    const [transmitter, receiver, unreadCount] = await Promise.all([
+      this.notificationRepository.findAllNotifications(
+        userId,
+        'TRANSMITTER',
+        NOTIFICATIONS_LIMIT,
+      ),
+      this.notificationRepository.findAllNotifications(
         userId,
         'RECEIVER',
-        tx,
-      );
-
-      return { transmitter, receiver };
-    });
+        NOTIFICATIONS_LIMIT,
+      ),
+      this.notificationRepository.countUnread(userId),
+    ]);
 
     return {
-      receiver: data.receiver.map(({ name, content, type }) => ({
-        name,
-        content,
-        typeNotification: type,
-      })),
-      transmitter: data.transmitter.map(({ name, content, type }) => ({
-        name,
-        content,
-        typeNotification: type,
-      })),
+      receiver: receiver.map(toItem),
+      transmitter: transmitter.map(toItem),
+      unreadCount,
+    };
+  }
+
+  async markAsRead(userId: string, ids?: string[]) {
+    await this.notificationRepository.markAsRead(userId, ids);
+
+    return {
+      unreadCount: await this.notificationRepository.countUnread(userId),
     };
   }
 }

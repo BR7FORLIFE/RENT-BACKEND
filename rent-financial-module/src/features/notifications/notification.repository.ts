@@ -7,7 +7,6 @@ import type { Prisma } from '../../../generated/prisma/client.js';
 export class NotificationRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  //notifications
   async saveNotification(
     data: NotificationType,
     db: Prisma.TransactionClient = this.prisma,
@@ -20,24 +19,42 @@ export class NotificationRepository {
   async findAllNotifications(
     userId: string,
     type: 'TRANSMITTER' | 'RECEIVER',
+    limit: number,
     db: Prisma.TransactionClient = this.prisma,
   ) {
-    if (type === 'RECEIVER') {
-      return await db.notifications.findMany({
-        where: {
-          receiverId: userId,
-        },
-        orderBy: {
-          createAt: 'desc',
-        },
-        take: 10,
-      });
-    }
-
     return await db.notifications.findMany({
-      where: {
-        transmitterId: userId,
-      },
+      where:
+        type === 'RECEIVER'
+          ? { receiverId: userId }
+          : { transmitterId: userId },
+      orderBy: { createAt: 'desc' },
+      take: limit,
     });
+  }
+
+  async countUnread(
+    userId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.notifications.count({
+      where: { receiverId: userId, readAt: null },
+    });
+  }
+
+  async markAsRead(
+    userId: string,
+    ids?: string[],
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    const { count } = await db.notifications.updateMany({
+      where: {
+        receiverId: userId,
+        readAt: null,
+        ...(ids ? { id: { in: ids } } : {}),
+      },
+      data: { readAt: new Date() },
+    });
+
+    return count;
   }
 }
