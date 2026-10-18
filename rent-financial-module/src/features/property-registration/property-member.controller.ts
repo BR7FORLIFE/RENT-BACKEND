@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -26,7 +27,11 @@ import {
   assignmentRolesToMember,
   changeStatusPropertyMemberDtoRequest,
   InvitePropertyMemberDtoRequest,
+  PropertyActorRoleSchema,
+  setMemberRolePolicyDtoRequest,
   type assignmentRolesToMemberType,
+  type PropertyActorRoleType,
+  type SetMemberRolePolicyType,
   type ChangeStatusPropertyMemberType,
   type InvitePropertyMemberType,
 } from './dtos/request-dto.js';
@@ -112,6 +117,40 @@ export class PropertyMemberController {
       req.user.userId,
       propertyMemberId,
       propertyId,
+    );
+  }
+
+  //politicas de un rol del miembro, indicando cuales estan activas
+  @Get(':propertyMemberId/property/:propertyId/role/:role/policies')
+  async getMemberRolePolicies(
+    @Req() req: AuthRequest,
+    @Param('propertyMemberId') propertyMemberId: string,
+    @Param('propertyId') propertyId: string,
+    @Param('role', new ZodValidation(PropertyActorRoleSchema))
+    role: PropertyActorRoleType,
+  ) {
+    return await this.propertyMemberService.getMemberRolePolicies(
+      req.user.userId,
+      propertyMemberId,
+      propertyId,
+      role,
+    );
+  }
+
+  //activar / desactivar una politica de un rol del miembro (override)
+  @Patch(':propertyMemberId/property/:propertyId/policies')
+  async setMemberRolePolicyActive(
+    @Req() req: AuthRequest,
+    @Param('propertyMemberId') propertyMemberId: string,
+    @Param('propertyId') propertyId: string,
+    @Body(new ZodValidation(setMemberRolePolicyDtoRequest))
+    body: SetMemberRolePolicyType,
+  ) {
+    return await this.propertyMemberService.setMemberRolePolicyActive(
+      req.user.userId,
+      propertyMemberId,
+      propertyId,
+      body,
     );
   }
 

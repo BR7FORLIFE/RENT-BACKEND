@@ -17,6 +17,8 @@ describe('PropertyMemberController (HTTP)', () => {
     assignmentRolesToMember: jest.fn(),
     propertyMemberMe: jest.fn(),
     changeStatusPropertyMember: jest.fn(),
+    getMemberRolePolicies: jest.fn(),
+    setMemberRolePolicyActive: jest.fn(),
   };
 
   beforeAll(async () => {
@@ -204,6 +206,53 @@ describe('PropertyMemberController (HTTP)', () => {
       expect(service.changeStatusPropertyMember).toHaveBeenCalledWith(
         TEST_USER.userId,
         'm1',
+        body,
+      );
+    });
+  });
+
+  describe('politicas de un rol del miembro', () => {
+    it('GET delega con el userId del JWT y el rol de la ruta', async () => {
+      const [m, p] = [uuid(), uuid()];
+      service.getMemberRolePolicies.mockResolvedValue({ policies: [] });
+
+      await request(app.getHttpServer())
+        .get(`/property-member/${m}/property/${p}/role/ADMINISTRADOR/policies`)
+        .expect(200);
+
+      expect(service.getMemberRolePolicies).toHaveBeenCalledWith(
+        TEST_USER.userId,
+        m,
+        p,
+        'ADMINISTRADOR',
+      );
+    });
+
+    it('GET rechaza un rol inexistente', async () => {
+      await request(app.getHttpServer())
+        .get(`/property-member/${uuid()}/property/${uuid()}/role/NOPE/policies`)
+        .expect(406);
+    });
+
+    it('PATCH valida el body y delega', async () => {
+      const [m, p] = [uuid(), uuid()];
+      const body = { role: 'ADMINISTRADOR', policyId: uuid(), active: false };
+      service.setMemberRolePolicyActive.mockResolvedValue({ message: 'ok' });
+
+      await request(app.getHttpServer())
+        .patch(`/property-member/${m}/property/${p}/policies`)
+        .send({ ...body, active: 'no' })
+        .expect(406);
+
+      await request(app.getHttpServer())
+        .patch(`/property-member/${m}/property/${p}/policies`)
+        .send(body)
+        .expect(200);
+
+      expect(service.setMemberRolePolicyActive).toHaveBeenCalledWith(
+        TEST_USER.userId,
+        m,
+        p,
         body,
       );
     });
