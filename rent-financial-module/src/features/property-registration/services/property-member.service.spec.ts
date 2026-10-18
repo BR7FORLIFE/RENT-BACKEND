@@ -10,6 +10,9 @@ import {
   ChangeStatusPropertyMemberException,
   NotAllowedStatusByPropertyMemberException,
   PropertyMemberNotFound,
+  OwnerPoliciesChangeNotAllowedException,
+  PolicyNotInRoleException,
+  RoleNotAssignedToMemberException,
 } from '../../system-property-role/exceptions/exceptions.js';
 import { UserNotFound } from '../../../core/global-exception.js';
 import { getAllUsers, getUserData } from '../api.js';
@@ -50,6 +53,9 @@ describe('PropertyMemberService', () => {
     findAllPoliciesByPropertyMemberId: jest.fn(),
     findActorRolesByPropertyMemberId: jest.fn(),
     findOverridePolicyByPropertyMemberId: jest.fn(),
+    findPolicyStatementsByActorRoleId: jest.fn(),
+    findAllPolicyOverridesByPropertyMemberId: jest.fn(),
+    upsertPolicyOverride: jest.fn(),
   };
   const systemRole = {
     verifyPropertyMemberByIdAndPropertyIdWithoutStatus: jest.fn(),
@@ -59,6 +65,8 @@ describe('PropertyMemberService', () => {
     findPropertyInvitationByToken: jest.fn(),
     markInvitationAsConsumed: jest.fn(),
   };
+
+  const notificationDispatcher = { notify: jest.fn() };
 
   let service: PropertyMemberService;
 
@@ -76,6 +84,7 @@ describe('PropertyMemberService', () => {
       systemPropertyRepository as never,
       systemRole as never,
       globalRepository as never,
+      notificationDispatcher as never,
     );
   });
 
@@ -435,7 +444,26 @@ describe('PropertyMemberService', () => {
       );
       expect(
         propertyMemberRepository.updatePropertyMemberStatus,
-      ).toHaveBeenCalledWith('m1', 'ACTIVE');
+      ).toHaveBeenCalledWith('m1', 'ACTIVE', tx);
+    });
+
+    it('ignora roles repetidos en la solicitud', async () => {
+      propertyMemberRepository.findPropertyMemberWithRolesByPropertyMemberIdAndPropertyId.mockResolvedValue(
+        memberWithRoles('ACTIVE'),
+      );
+
+      await service.assignmentRolesToMember('u1', 'm1', 'p1', [
+        'INVITADO',
+        'INVITADO',
+      ]);
+
+      expect(
+        propertyMemberRepository.savePropertyMemberWithRoles,
+      ).toHaveBeenCalledWith(
+        'm1',
+        [TYPE_PROPERTY_ACTOR_ROLE_UUIDS.INVITADO],
+        tx,
+      );
     });
 
     it('no cambia el estado de miembros que ya están ACTIVE', async () => {
@@ -616,6 +644,104 @@ describe('PropertyMemberService', () => {
       await expect(
         service.changeStatusPropertyMember('u1', 'm1', body),
       ).rejects.toBeDefined();
+    });
+  });
+
+  describe('politicas de un rol del miembro', () => {
+    const policies = [
+      { id: 'pol1', policyName: 'VER_INMUEBLE', description: 'd1' },
+      { id: 'pol2', policyName: 'EDITAR_INMUEBLE', description: 'd2' },
+    ];
+
+    beforeEach(() => {
+      propertyRepository.findPropertyById.mockResolvedValue({ id: 'p1' });
+      systemRole.verifyPropertyMemberByIdAndPropertyIdWithoutStatus.mockResolvedValue(
+        { id: 'm1', userId: 'tenant', status: 'ACTIVE' },
+      );
+      systemPropertyRepository.findActorRolesByPropertyMemberId.mockResolvedValue(
+        ['ADMINISTRADOR'],
+      );
+      systemPropertyRepository.findPolicyStatementsByActorRoleId.mockResolvedValue(
+        policies,
+      );
+    });
+
+    it('lista las politicas del rol marcando las desactivadas por override', async () => {
+      systemPropertyRepository.findAllPolicyOverridesByPropertyMemberId.mockResolvedValue(
+        [
+          { policyStatementId: 'pol2', active: false },
+          { policyStatementId: 'pol1', active: true },
+        ],
+      );
+
+      const res = await service.getMemberRolePolicies(
+        'owner',
+        'm1',
+        'p1',
+        'ADMINISTRADOR',
+      );
+
+      expect(
+        systemPropertyRepository.findPolicyStatementsByActorRoleId,
+      ).toHaveBeenCalledWith(TYPE_PROPERTY_ACTOR_ROLE_UUIDS.ADMINISTRADOR);
+      expect(res.policies).toEqual([
+        { ...policies[0], active: true },
+        { ...policies[1], active: false },
+      ]);
+    });
+
+    it('solo el propietario puede consultar', async () => {
+      propertyRepository.findPropertyById.mockResolvedValue(null);
+
+      await expect(
+        service.getMemberRolePolicies('x', 'm1', 'p1', 'ADMINISTRADOR'),
+      ).rejects.toBeInstanceOf(PropertyNotFoundException);
+    });
+
+    it('rechaza un rol que el miembro no tiene', async () => {
+      await expect(
+        service.getMemberRolePolicies('owner', 'm1', 'p1', 'INVITADO'),
+      ).rejects.toBeInstanceOf(RoleNotAssignedToMemberException);
+    });
+
+    it('desactiva una politica del rol', async () => {
+      const res = await service.setMemberRolePolicyActive('owner', 'm1', 'p1', {
+        role: 'ADMINISTRADOR',
+        policyId: 'pol1',
+        active: false,
+      });
+
+      expect(
+        systemPropertyRepository.upsertPolicyOverride,
+      ).toHaveBeenCalledWith('m1', 'pol1', false);
+      expect(res.message).toEqual(expect.any(String));
+    });
+
+    it('rechaza una politica que no pertenece al rol', async () => {
+      await expect(
+        service.setMemberRolePolicyActive('owner', 'm1', 'p1', {
+          role: 'ADMINISTRADOR',
+          policyId: 'otra',
+          active: false,
+        }),
+      ).rejects.toBeInstanceOf(PolicyNotInRoleException);
+      expect(
+        systemPropertyRepository.upsertPolicyOverride,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('el propietario no puede modificar sus propias politicas', async () => {
+      systemRole.verifyPropertyMemberByIdAndPropertyIdWithoutStatus.mockResolvedValue(
+        { id: 'm1', userId: 'owner', status: 'ACTIVE' },
+      );
+
+      await expect(
+        service.setMemberRolePolicyActive('owner', 'm1', 'p1', {
+          role: 'ADMINISTRADOR',
+          policyId: 'pol1',
+          active: false,
+        }),
+      ).rejects.toBeInstanceOf(OwnerPoliciesChangeNotAllowedException);
     });
   });
 });

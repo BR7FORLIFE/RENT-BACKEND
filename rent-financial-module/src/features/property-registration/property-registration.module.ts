@@ -11,6 +11,7 @@ import { PropertyMemberService } from './services/property-member.service.js';
 import { PropertyMemberRepository } from './repository/property-member.repository.js';
 import { PropertyServiceMapper } from './repository/mappers/property-mapper.service.js';
 import { SytemPropertyRoleModule } from '../system-property-role/system-property-role.module.js';
+import { NotificationModule } from '../notifications/notification.module.js';
 
 @Module({
   controllers: [
@@ -27,6 +28,11 @@ import { SytemPropertyRoleModule } from '../system-property-role/system-property
     PropertyServiceMapper,
   ],
   exports: [PropertyRepository, PropertyHelper, PropertyMemberRepository],
-  imports: [PrismaModule, GlobalModule, SytemPropertyRoleModule],
+  imports: [
+    PrismaModule,
+    GlobalModule,
+    SytemPropertyRoleModule,
+    NotificationModule,
+  ],
 })
 export class PropertyRegistrationModule {}

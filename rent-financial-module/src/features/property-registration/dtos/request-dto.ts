@@ -97,7 +97,7 @@ export type InvitePropertyMemberType = z.infer<
 >;
 
 //validar los roles de miembros
-const PropertyActorRoleSchema = z.enum(
+export const PropertyActorRoleSchema = z.enum(
   Object.keys(TYPE_PROPERTY_ACTOR_ROLE_UUIDS) as [
     keyof typeof TYPE_PROPERTY_ACTOR_ROLE_UUIDS,
     ...(keyof typeof TYPE_PROPERTY_ACTOR_ROLE_UUIDS)[],
@@ -108,7 +108,7 @@ export type PropertyActorRoleType = z.infer<typeof PropertyActorRoleSchema>;
 
 export const assignmentRolesToMember = z.object({
   propertyId: z.uuid(),
-  roles: z.array(PropertyActorRoleSchema),
+  roles: z.array(PropertyActorRoleSchema).min(1),
 });
 
 export type assignmentRolesToMemberType = z.infer<
@@ -131,4 +131,15 @@ export const changeStatusPropertyMemberDtoRequest = z.object({
 
 export type ChangeStatusPropertyMemberType = z.infer<
   typeof changeStatusPropertyMemberDtoRequest
+>;
+
+//activar / desactivar una politica de un rol para un miembro (override)
+export const setMemberRolePolicyDtoRequest = z.object({
+  role: PropertyActorRoleSchema,
+  policyId: z.uuid(),
+  active: z.boolean(),
+});
+
+export type SetMemberRolePolicyType = z.infer<
+  typeof setMemberRolePolicyDtoRequest
 >;

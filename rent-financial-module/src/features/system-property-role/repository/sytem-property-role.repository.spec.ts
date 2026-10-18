@@ -4,7 +4,11 @@ describe('SystemPropertyRoleRepository', () => {
   const prisma = {
     propertyMemberRole: { findMany: jest.fn(), update: jest.fn() },
     propertyActorRolePolicyStatements: { findMany: jest.fn() },
-    propertyMemberPoliciesOverride: { findMany: jest.fn() },
+    propertyMemberPoliciesOverride: {
+      findMany: jest.fn(),
+      updateMany: jest.fn(),
+      create: jest.fn(),
+    },
     propertyMember: { findUnique: jest.fn() },
   };
   let repo: SystemPropertyRoleRepository;
@@ -107,6 +111,38 @@ describe('SystemPropertyRoleRepository', () => {
         },
       },
       data: { propertyActorRoleId: 'new' },
+    });
+  });
+
+  it('upsertPolicyOverride actualiza si ya existe y no crea', async () => {
+    prisma.propertyMemberPoliciesOverride.updateMany.mockResolvedValue({
+      count: 1,
+    });
+
+    await repo.upsertPolicyOverride('m1', 'pol1', false);
+
+    expect(
+      prisma.propertyMemberPoliciesOverride.updateMany,
+    ).toHaveBeenCalledWith({
+      where: { propertyMemberId: 'm1', policyStatementId: 'pol1' },
+      data: { active: false },
+    });
+    expect(prisma.propertyMemberPoliciesOverride.create).not.toHaveBeenCalled();
+  });
+
+  it('upsertPolicyOverride crea el override si no existia', async () => {
+    prisma.propertyMemberPoliciesOverride.updateMany.mockResolvedValue({
+      count: 0,
+    });
+
+    await repo.upsertPolicyOverride('m1', 'pol1', true);
+
+    expect(prisma.propertyMemberPoliciesOverride.create).toHaveBeenCalledWith({
+      data: {
+        propertyMemberId: 'm1',
+        policyStatementId: 'pol1',
+        active: true,
+      },
     });
   });
 });

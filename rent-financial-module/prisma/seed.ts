@@ -7,6 +7,7 @@ import {
   TYPE_LANDORD_ACTOR_ROLES_UUIDS,
   POLICIES_STATEMENTS,
 } from '../src/types/global-types.js';
+import { seedDemo } from './seed-demo.js';
 
 const prisma = new PrismaService();
 
@@ -1036,6 +1037,36 @@ async function main() {
     ],
     skipDuplicates: true,
   });
+
+  await prisma.publicServiceType.createMany({
+    data: [
+      { name: 'ENERGIA', description: 'Servicio de energía eléctrica.' },
+      { name: 'AGUA', description: 'Servicio de acueducto y alcantarillado.' },
+      { name: 'GAS', description: 'Servicio de gas natural domiciliario.' },
+      {
+        name: 'INTERNET',
+        description: 'Servicio de internet residencial o comercial.',
+      },
+      { name: 'TELEFONIA', description: 'Servicio de telefonía fija o móvil.' },
+      {
+        name: 'TELEVISION',
+        description: 'Servicio de televisión por suscripción.',
+      },
+      {
+        name: 'ASEO',
+        description: 'Servicio de recolección de basuras y aseo urbano.',
+      },
+      {
+        name: 'ADMINISTRACION',
+        description: 'Cuota de administración de copropiedad.',
+      },
+    ],
+    skipDuplicates: true,
+  });
+
+  if (process.env.SEED_DEMO === 'true') {
+    await seedDemo(prisma);
+  }
 }
 
 await main().finally(() => prisma.$disconnect());

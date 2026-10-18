@@ -98,3 +98,28 @@ export class OwnerStatusChangeNotAllowedException extends AppException {
     );
   }
 }
+
+//el miembro no tiene el rol sobre el que se quiere trabajar
+export class RoleNotAssignedToMemberException extends AppException {
+  constructor(role: string) {
+    super(`El miembro no tiene asignado el rol ${role}`, 406, 'NOT_ACCEPTABLE');
+  }
+}
+
+//la politica no pertenece al rol indicado
+export class PolicyNotInRoleException extends AppException {
+  constructor() {
+    super('La politica no pertenece al rol indicado', 406, 'NOT_ACCEPTABLE');
+  }
+}
+
+//el propietario no puede modificar sus propias politicas (perderia acceso)
+export class OwnerPoliciesChangeNotAllowedException extends AppException {
+  constructor() {
+    super(
+      'El propietario no puede modificar sus propias politicas en el inmueble',
+      406,
+      'NOT_ACCEPTABLE',
+    );
+  }
+}

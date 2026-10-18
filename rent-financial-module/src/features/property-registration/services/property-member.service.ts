@@ -22,12 +22,14 @@ import { unionInfoUser, validateInvitationLinked } from './helpers.service.js';
 import type {
   ChangeStatusPropertyMemberType,
   InvitePropertyMemberType,
+  SetMemberRolePolicyType,
 } from '../dtos/request-dto.js';
 import { UserNotFound } from '../../../core/global-exception.js';
 import {
   generateSecureString,
   sendInvitedEmailTo,
 } from './invitation-generation.service.js';
+import { NotificationDispatcher } from '../../notifications/notification-dispatcher.service.js';
 import { GlobalRepository } from '../../global/repository-global.js';
 import { TYPE_PROPERTY_ACTOR_ROLE_UUIDS } from '../../../types/global-types.js';
 import type { PropertyActorRoleType, PropertyMemberMe } from '../types.js';
@@ -37,6 +39,9 @@ import {
   OwnerStatusChangeNotAllowedException,
   NotAllowedStatusByPropertyMemberException,
   PropertyMemberNotFound,
+  OwnerPoliciesChangeNotAllowedException,
+  PolicyNotInRoleException,
+  RoleNotAssignedToMemberException,
 } from '../../system-property-role/exceptions/exceptions.js';
 import { SystemPropertyRoleRepository } from '../../system-property-role/repository/sytem-property-role.repository.js';
 import {
@@ -79,6 +84,7 @@ export class PropertyMemberService {
     private systemPropertyRepository: SystemPropertyRoleRepository,
     private systemRole: SystemPropertyService,
     private globalRepository: GlobalRepository,
+    private notificationDispatcher: NotificationDispatcher,
   ) {}
 
   /**
@@ -298,6 +304,15 @@ export class PropertyMemberService {
       );
     });
 
+    //avisamos al propietario (quien invito) que debe asignarle roles
+    await this.notificationDispatcher.notify(
+      'PROPERTY_REGISTRATION_SERVICE',
+      optInvitationLinked.invitedUserId,
+      [optInvitationLinked.invitedBy],
+      'Invitacion aceptada',
+      'Un usuario acepto la invitacion a tu inmueble, asignale un rol para que pueda participar',
+    );
+
     return {
       message: 'Invitacion aceptada!, miembro en proceso de la propiedad',
     };
@@ -339,6 +354,7 @@ export class PropertyMemberService {
     // que le quiere añadir el usuario
     const { propertyMemberRole, ...propertyMember } = optPropertyMember;
 
+    //eliminamos roles repetidos en la solicitud (violarian el unique de la BD)
     const assignedRoles = new Set(roles);
 
     const exists = propertyMemberRole.some((role) =>
@@ -352,7 +368,7 @@ export class PropertyMemberService {
     await this.prismaClient.$transaction(async (tx) => {
       //asignamos los respectivos roles al dicho miembro de la propiedad y transicionamos su estado
       //de IN_PROCCESS a ACTIVE
-      const rolesUuids = roles.map(
+      const rolesUuids = [...assignedRoles].map(
         (rol) => TYPE_PROPERTY_ACTOR_ROLE_UUIDS[rol],
       );
       //asignamos los distintos roles al usuario
@@ -361,16 +377,24 @@ export class PropertyMemberService {
         rolesUuids,
         tx,
       );
+
+      //si el usuario esta en proceso de activacion lo activamos en la misma transaccion
+      if (optPropertyMember.status === 'IN_PROCESS') {
+        await this.propertyMemberRepository.updatePropertyMemberStatus(
+          propertyMember.id,
+          'ACTIVE',
+          tx,
+        );
+      }
     });
 
-    //si el usuario esta el proceso de activacion pues lo activamos de lo contrario no lo hacemos
-    if (optPropertyMember.status === 'IN_PROCESS') {
-      //guardamos en la base de datos
-      await this.propertyMemberRepository.updatePropertyMemberStatus(
-        propertyMember.id,
-        'ACTIVE',
-      );
-    }
+    await this.notificationDispatcher.notify(
+      'PROPERTY_REGISTRATION_SERVICE',
+      ownerId,
+      [optPropertyMember.userId],
+      'Roles asignados',
+      `Se te asignaron los roles ${[...assignedRoles].join(', ')} en el inmueble ${optOwnerProperty.propertyName}`,
+    );
 
     return {
       message:
@@ -500,6 +524,121 @@ export class PropertyMemberService {
       propertyId: optOwnProperty.id,
       propertyMemberId: optPropertyMember.id,
       message: 'Estado cambiado exitosamente!',
+    };
+  }
+
+  //valida que quien consulta es el dueño, que el miembro pertenece a la propiedad
+  //y que tiene el rol indicado; retorna lo necesario para operar sobre sus politicas
+  private async resolveMemberRole(
+    ownerId: string,
+    propertyMemberId: string,
+    propertyId: string,
+    role: PropertyActorRoleType,
+  ) {
+    const property = await this.propertyRepository.findPropertyById(
+      ownerId,
+      propertyId,
+    );
+
+    if (!property) {
+      throw new PropertyNotFoundException();
+    }
+
+    const member =
+      await this.systemRole.verifyPropertyMemberByIdAndPropertyIdWithoutStatus(
+        propertyMemberId,
+        property.id,
+      );
+
+    const memberRoles =
+      await this.systemPropertyRepository.findActorRolesByPropertyMemberId(
+        member.id,
+      );
+
+    if (!memberRoles.includes(role)) {
+      throw new RoleNotAssignedToMemberException(role);
+    }
+
+    return { member, roleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS[role] };
+  }
+
+  //politicas de un rol de un miembro indicando cuales estan activas
+  //(activa = pertenece al rol y no tiene override active=false)
+  async getMemberRolePolicies(
+    ownerId: string,
+    propertyMemberId: string,
+    propertyId: string,
+    role: PropertyActorRoleType,
+  ) {
+    const { member, roleId } = await this.resolveMemberRole(
+      ownerId,
+      propertyMemberId,
+      propertyId,
+      role,
+    );
+
+    const [policies, overrides] = await Promise.all([
+      this.systemPropertyRepository.findPolicyStatementsByActorRoleId(roleId),
+      this.systemPropertyRepository.findAllPolicyOverridesByPropertyMemberId(
+        member.id,
+      ),
+    ]);
+
+    const disabled = new Set(
+      overrides.filter((o) => !o.active).map((o) => o.policyStatementId),
+    );
+
+    return {
+      propertyMemberId: member.id,
+      propertyId,
+      role,
+      policies: policies.map((policy) => ({
+        id: policy.id,
+        policyName: policy.policyName,
+        description: policy.description,
+        active: !disabled.has(policy.id),
+      })),
+    };
+  }
+
+  //desactiva o reactiva una politica de un rol para un miembro
+  async setMemberRolePolicyActive(
+    ownerId: string,
+    propertyMemberId: string,
+    propertyId: string,
+    dto: SetMemberRolePolicyType,
+  ): Promise<{ message: string }> {
+    const { member, roleId } = await this.resolveMemberRole(
+      ownerId,
+      propertyMemberId,
+      propertyId,
+      dto.role,
+    );
+
+    //el propietario no puede quitarse permisos (perderia acceso al inmueble)
+    if (member.userId === ownerId) {
+      throw new OwnerPoliciesChangeNotAllowedException();
+    }
+
+    const policies =
+      await this.systemPropertyRepository.findPolicyStatementsByActorRoleId(
+        roleId,
+      );
+
+    if (!policies.some((policy) => policy.id === dto.policyId)) {
+      throw new PolicyNotInRoleException();
+    }
+
+    await this.systemPropertyRepository.upsertPolicyOverride(
+      member.id,
+      dto.policyId,
+      dto.active,
+    );
+
+    return {
+      message: dto.active
+        ? 'Politica activada correctamente para el miembro'
+        : 'Politica desactivada correctamente para el miembro',
     };
   }
 }

@@ -85,6 +85,9 @@ export class PropertyRepository {
 
           direction: true,
         },
+        orderBy: {
+          createAt: 'desc',
+        },
       }),
       db.property.count({
         where: { userId },
