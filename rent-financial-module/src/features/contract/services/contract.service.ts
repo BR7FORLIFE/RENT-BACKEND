@@ -36,6 +36,7 @@ import { getUserData } from '../../property-registration/api.js';
 import { PropertyActorRoleNotFoundException } from '../../system-property-role/exceptions/exceptions.js';
 import { NotificationService } from '../../notifications/notification.service.js';
 import { NotificationGateway } from '../../notifications/notification.gateway.js';
+import { NotificationDispatcher } from '../../notifications/notification-dispatcher.service.js';
 //import type { GenerateIAContractFields } from './helper.service.js';
 
 // estos dos actores importantes en los contratos son miembros activos
@@ -55,7 +56,22 @@ export class ContractService {
     private readonly systemRoleRepository: SystemPropertyRoleRepository,
     private readonly notificationService: NotificationService,
     private readonly notificationGateway: NotificationGateway,
+    private readonly notificationDispatcher: NotificationDispatcher,
   ) {}
+
+  //userId de los miembros indicados (las notificaciones se envian al userId)
+  private async userIdsOfMembers(propertyId: string, memberIds: string[]) {
+    const members = await Promise.all(
+      [...new Set(memberIds)].map((memberId) =>
+        this.systemRole.verifyPropertyMemberByIdAndPropertyIdWithoutStatus(
+          memberId,
+          propertyId,
+        ),
+      ),
+    );
+
+    return members.map((member) => member.userId);
+  }
 
   //contract drafts
   // async generateIAContractContent() {
@@ -335,6 +351,13 @@ export class ContractService {
         'TENANT',
       );
 
+      await this.notifyDraftAgreement(
+        userId,
+        propertyId,
+        tenantContractDraft,
+        'TENANT',
+      );
+
       return {
         contractDraftId,
         message: 'borrador de contrato aceptado exitosamente!',
@@ -356,6 +379,13 @@ export class ContractService {
         'LANDLORD',
       );
 
+      await this.notifyDraftAgreement(
+        userId,
+        propertyId,
+        landlordContractDraft,
+        'LANDLORD',
+      );
+
       return {
         contractDraftId,
         message: 'borrador de contrato aceptado exitosamente!',
@@ -363,6 +393,68 @@ export class ContractService {
     }
 
     throw new contractDraftNotFound();
+  }
+
+  //notifica a miembros del contrato (y a userIds extra) despues de un cambio de estado
+  private async notifyContractParties(
+    userId: string,
+    contract: { propertyId: string },
+    memberIds: string[],
+    name: string,
+    content: string,
+    type: 'INFO' | 'WARNING',
+    extraUserIds: string[] = [],
+  ) {
+    const memberUserIds = await this.userIdsOfMembers(
+      contract.propertyId,
+      memberIds,
+    );
+
+    await this.notificationDispatcher.notify(
+      'CONTRACT_SERVICE',
+      userId,
+      [...memberUserIds, ...extraUserIds],
+      name,
+      content,
+      type,
+    );
+  }
+
+  //avisa a la contraparte que una parte acepto el borrador; si con esto ambas
+  //partes ya lo aceptaron avisa a las dos que se puede crear el contrato
+  private async notifyDraftAgreement(
+    userId: string,
+    propertyId: string,
+    draft: {
+      landlordMemberId: string;
+      tenantMemberId: string;
+      landlordAgreed: boolean;
+      tenantAgreed: boolean;
+      version: number;
+    },
+    agreedBy: 'LANDLORD' | 'TENANT',
+  ) {
+    const otherAgreed =
+      agreedBy === 'TENANT' ? draft.landlordAgreed : draft.tenantAgreed;
+    const counterpart =
+      agreedBy === 'TENANT' ? draft.landlordMemberId : draft.tenantMemberId;
+
+    const receivers = await this.userIdsOfMembers(
+      propertyId,
+      otherAgreed
+        ? [draft.landlordMemberId, draft.tenantMemberId]
+        : [counterpart],
+    );
+
+    await this.notificationDispatcher.notify(
+      'CONTRACT_SERVICE',
+      userId,
+      receivers,
+      otherAgreed ? 'Borrador acordado por ambas partes' : 'Borrador aceptado',
+      otherAgreed
+        ? `Ambas partes aceptaron la version ${draft.version} del borrador, ya se puede crear el contrato`
+        : `${agreedBy === 'TENANT' ? 'El arrendatario' : 'El arrendador'} acepto la version ${draft.version} del borrador, falta tu aceptacion`,
+    );
   }
 
   //contracts
@@ -457,41 +549,40 @@ export class ContractService {
         newContract,
         tx,
       );
-      //enviamos la notificacion al posible arrendado para que se entere y decida
-      // si rechazar o aceptar que se continue el proceso de contratamiento
-
-      const landlordNotification =
-        await this.notificationService.sendNotification(
-          userId,
-          landlordPropertyMember.userId,
-          'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
-          'CREACIÓN DE CONTRATO EN VIGENCIA!',
-          'PROPERTY_REGISTRATION_SERVICE',
-          'INFO',
-        );
-
-      const tenantNotification =
-        await this.notificationService.sendNotification(
-          userId,
-          tenantPropertyMember.userId,
-          'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
-          'CREACIÓN DE CONTRATO EN VIGENCIA!',
-          'PROPERTY_REGISTRATION_SERVICE',
-          'INFO',
-        );
-
-      this.notificationGateway.sendNotification(
-        landlordPropertyMember.userId,
-        landlordNotification,
-      );
-
-      this.notificationGateway.sendNotification(
-        tenantPropertyMember.userId,
-        tenantNotification,
-      );
-
       return { contractId };
     });
+
+    //enviamos la notificacion al posible arrendado para que se entere y decida
+    // si rechazar o aceptar que se continue el proceso de contratamiento
+
+    const landlordNotification =
+      await this.notificationService.sendNotification(
+        userId,
+        landlordPropertyMember.userId,
+        'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
+        'CREACIÓN DE CONTRATO EN VIGENCIA!',
+        'CONTRACT_SERVICE',
+        'INFO',
+      );
+
+    const tenantNotification = await this.notificationService.sendNotification(
+      userId,
+      tenantPropertyMember.userId,
+      'Se ha creado un borrador de contrato y se encuentra a la espera de rechazo o aceptación',
+      'CREACIÓN DE CONTRATO EN VIGENCIA!',
+      'CONTRACT_SERVICE',
+      'INFO',
+    );
+
+    this.notificationGateway.sendNotification(
+      landlordPropertyMember.userId,
+      landlordNotification,
+    );
+
+    this.notificationGateway.sendNotification(
+      tenantPropertyMember.userId,
+      tenantNotification,
+    );
 
     return {
       id: result.contractId,
@@ -549,6 +640,16 @@ export class ContractService {
         );
       });
 
+      await this.notifyContractParties(
+        tenantId,
+        optContract,
+        [optContract.landlordMemberId],
+        'Contrato aceptado',
+        'El arrendatario acepto el contrato, falta cargar la documentacion para activarlo',
+        'INFO',
+        [optContract.createByUserId],
+      );
+
       return {
         contractId: optContract.id,
         message: 'Contrato aceptado exitosamente!',
@@ -563,6 +664,16 @@ export class ContractService {
         );
       });
     }
+
+    await this.notifyContractParties(
+      tenantId,
+      optContract,
+      [optContract.landlordMemberId],
+      'Contrato rechazado',
+      'El arrendatario rechazo el contrato',
+      'WARNING',
+      [optContract.createByUserId],
+    );
 
     return {
       contractId: optContract.id,
@@ -622,6 +733,15 @@ export class ContractService {
         tx,
       );
     });
+
+    await this.notifyContractParties(
+      userId,
+      optContract,
+      [optContract.landlordMemberId, optContract.tenantMemberId],
+      'Contrato activo',
+      'La documentacion fue cargada y el contrato ya se encuentra activo',
+      'INFO',
+    );
 
     return {
       contractId,
@@ -695,6 +815,19 @@ export class ContractService {
         );
         break;
     }
+
+    await this.notifyContractParties(
+      userId,
+      optContract,
+      [optContract.landlordMemberId, optContract.tenantMemberId],
+      contractStatus.status === 'FINISHED'
+        ? 'Contrato finalizado'
+        : 'Contrato suspendido',
+      contractStatus.status === 'FINISHED'
+        ? 'El contrato fue finalizado'
+        : 'El contrato fue suspendido',
+      'WARNING',
+    );
 
     return {
       contractId: optContract.id,

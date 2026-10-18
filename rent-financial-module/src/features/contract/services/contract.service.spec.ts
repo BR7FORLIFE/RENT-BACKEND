@@ -48,11 +48,13 @@ describe('ContractService', () => {
   const systemRole = {
     verifyPropertyMemberByUserIdInPropertyId: jest.fn(),
     verifyPropertyMemberByIdAndPropertyId: jest.fn(),
+    verifyPropertyMemberByIdAndPropertyIdWithoutStatus: jest.fn(),
     CheckPolicies: jest.fn(),
   };
   const systemRoleRepository = { updatePropertyActorRole: jest.fn() };
   const notificationService = { sendNotification: jest.fn() };
   const notificationGateway = { sendNotification: jest.fn() };
+  const notificationDispatcher = { notify: jest.fn() };
 
   let service: ContractService;
 
@@ -89,11 +91,22 @@ describe('ContractService', () => {
       systemRoleRepository as never,
       notificationService as never,
       notificationGateway as never,
+      notificationDispatcher as never,
     );
     systemRole.verifyPropertyMemberByUserIdInPropertyId.mockResolvedValue(
       requester,
     );
     systemRole.CheckPolicies.mockResolvedValue(undefined);
+    notificationDispatcher.notify.mockResolvedValue(undefined);
+    systemRole.verifyPropertyMemberByIdAndPropertyIdWithoutStatus.mockImplementation(
+      (id: string) =>
+        Promise.resolve(
+          [requester, landlord, tenant].find((m) => m.id === id) ?? {
+            id,
+            userId: `u-${id}`,
+          },
+        ),
+    );
   });
 
   describe('generateContractDraft', () => {
