@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import type { AuthRequest } from '../../types/global-types.js';
 import { ZodValidation } from '../../core/pipes/zod-validation.pipe.js';
 import {
@@ -17,7 +17,7 @@ export class GlobalController {
   @Get('notifications')
   async getNotifications(
     @Req() req: AuthRequest,
-    @Param(new ZodValidation(NotificationQueryParamsSchema))
+    @Query(new ZodValidation(NotificationQueryParamsSchema))
     filter: NotificationQueryParamsType,
   ) {}
 }
