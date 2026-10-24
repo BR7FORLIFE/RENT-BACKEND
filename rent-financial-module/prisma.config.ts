@@ -9,7 +9,7 @@ export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
-    seed: 'pnpm tsx prisma/seed.ts',
+    seed: 'pnpm tsx prisma/seeds/index.ts',
   },
   datasource: {
     url: process.env['POSTGRES_URI'],

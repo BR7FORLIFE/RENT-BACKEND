@@ -609,7 +609,7 @@ model FinancialTransaction {
   amount      Decimal  @db.Decimal(12, 2)
   currency    Currency
 
-  dueDate    DateTime? @map("due_date")
+  dueDate    DateTime? @map("due_date") //fecha de vencimiento
   occurredAt DateTime  @default(now()) @map("occurred_at")
   paidAt     DateTime? @map("paid_at")
 
