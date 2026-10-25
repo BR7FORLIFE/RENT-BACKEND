@@ -25,14 +25,27 @@ export class PropertyRepository {
   async findAll(
     userId: string,
     paginationDto: PaginationType,
+    filters: { occupation?: string; search?: string } = {},
     db: Prisma.TransactionClient = this.prisma,
   ): Promise<PaginationResponse<PropertyInfoPersistence>> {
     const { limit, page } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
+    const where: Prisma.PropertyWhereInput = {
+      userId,
+      ...(filters.occupation && {
+        propertyOccupationType: { name: filters.occupation },
+      }),
+      ...(filters.search && {
+        OR: [
+          { propertyName: { contains: filters.search, mode: 'insensitive' } },
+          { fmi: { contains: filters.search, mode: 'insensitive' } },
+        ],
+      }),
+    };
 
     const [data, total] = await Promise.all([
       db.property.findMany({
-        where: { userId },
+        where,
         skip,
         take: limit,
         select: {
@@ -89,9 +102,7 @@ export class PropertyRepository {
           createAt: 'desc',
         },
       }),
-      db.property.count({
-        where: { userId },
-      }),
+      db.property.count({ where }),
     ]);
 
     //transformamos con un dto la respuesta que enviaremos al servidor

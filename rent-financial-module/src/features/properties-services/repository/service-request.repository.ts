@@ -7,6 +7,7 @@ const requestInclude = {
   offering: {
     select: {
       id: true,
+      name: true,
       scope: true,
       priceTypeAgreement: true,
       service: { select: { id: true, name: true } },

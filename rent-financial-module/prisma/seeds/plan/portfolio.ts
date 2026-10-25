@@ -17,6 +17,7 @@ import {
 } from '../config.js';
 import {
   CITIES,
+  OCCUPIED_OCCUPATION_KEY,
   PROPERTY_TYPES,
   PUBLIC_SERVICE_TYPES,
   SERVICES,
@@ -246,7 +247,7 @@ function buildProperty(
     ownerId,
     tenantId,
     typeKey: profile.key,
-    occupationKey: 'OCUPADA',
+    occupationKey: OCCUPIED_OCCUPATION_KEY,
     name: `${profile.name} ${neighborhood} ${index + 1}`,
     description,
     fmi: `${city.fmiCircle}-${rng.int(10_000, 999_999)}`,

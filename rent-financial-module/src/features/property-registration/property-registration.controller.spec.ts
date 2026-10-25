@@ -164,6 +164,21 @@ describe('PropertyRegistrationController (HTTP)', () => {
         page: 2,
         limit: 5,
       },
+      { occupation: undefined, search: undefined },
+    );
+  });
+
+  it('GET /property aplica filtros de ocupacion y busqueda', async () => {
+    service.consultAllProperties.mockResolvedValue({ data: [], metadata: {} });
+
+    await request(app.getHttpServer())
+      .get('/property?occupation=OCUPADO&search=casa')
+      .expect(200);
+
+    expect(service.consultAllProperties).toHaveBeenCalledWith(
+      TEST_USER.userId,
+      { page: 1, limit: 100 },
+      { occupation: 'OCUPADO', search: 'casa' },
     );
   });
 

@@ -82,16 +82,43 @@ describe('ContractRepository', () => {
       );
     });
 
-    // BUG conocido: el count no aplica el filtro de aceptación => total/páginas incorrectos
-    it('findAllContractAccepted cuenta solo los aceptados', async () => {
-      prisma.contractDraft.findMany.mockResolvedValue([]);
-      prisma.contractDraft.count.mockResolvedValue(0);
+    const draft = {
+      id: 'd1',
+      createdAt: new Date('2026-01-01'),
+      landlordMemberId: 'l1',
+      tenantMemberId: 't1',
+    };
 
-      await repo.findAllContractAccepted('p1', { page: 1, limit: 10 });
+    it('findAllContractAccepted excluye borradores ya usados en un contrato', async () => {
+      prisma.contractDraft.findMany.mockResolvedValue([draft]);
+      prisma.contract.findMany.mockResolvedValue([
+        {
+          landlordMemberId: 'l1',
+          tenantMemberId: 't1',
+          createAt: new Date('2026-01-02'),
+        },
+      ]);
 
-      expect(prisma.contractDraft.count).toHaveBeenCalledWith({
-        where: { propertyId: 'p1', landlordAgreed: true, tenantAgreed: true },
+      const res = await repo.findAllContractAccepted('p1', {
+        page: 1,
+        limit: 10,
       });
+
+      expect(res.data).toEqual([]);
+      expect(res.metadata.total).toBe(0);
+    });
+
+    it('findAllContractAccepted cuenta solo los borradores disponibles', async () => {
+      prisma.contractDraft.findMany.mockResolvedValue([draft]);
+      prisma.contract.findMany.mockResolvedValue([]);
+
+      const res = await repo.findAllContractAccepted('p1', {
+        page: 1,
+        limit: 10,
+      });
+
+      expect(res.data).toEqual([draft]);
+      expect(res.metadata.total).toBe(1);
     });
   });
 
@@ -121,6 +148,24 @@ describe('ContractRepository', () => {
         where: { propertyId: 'p1', tenantAgreed: true, landlordAgreed: true },
         orderBy: { version: 'desc' },
       });
+    });
+
+    it('findContractDraftAvailability devuelve null si el borrador ya generó un contrato', async () => {
+      prisma.contractDraft.findFirst.mockResolvedValue({
+        id: 'd1',
+        createdAt: new Date('2026-01-01'),
+        landlordMemberId: 'l1',
+        tenantMemberId: 't1',
+      });
+      prisma.contract.findMany.mockResolvedValue([
+        {
+          landlordMemberId: 'l1',
+          tenantMemberId: 't1',
+          createAt: new Date('2026-01-02'),
+        },
+      ]);
+
+      expect(await repo.findContractDraftAvailability('p1')).toBeNull();
     });
 
     it('findContractDraftByMemberId LANDLORD filtra por landlordMemberId', async () => {

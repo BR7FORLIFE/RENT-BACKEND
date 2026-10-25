@@ -2,11 +2,17 @@ import type {
   PriceTypeAgreement as PriceType,
   TypeStreet as StreetType,
 } from '../prisma.js';
+import {
+  TYPE_LANDORD_ACTOR_ROLES_UUIDS,
+  TYPE_PROPERTY_UUIDS,
+  TYPE_TENANT_ACTOR_ROLES_UUIDS,
+} from '../../../src/types/global-types.js';
 
 export type Range = readonly [number, number];
 
 export interface PropertyTypeProfile {
   key: string;
+  category: keyof typeof TYPE_PROPERTY_UUIDS;
   name: string;
   description: string;
   weight: number;
@@ -24,6 +30,7 @@ export interface PropertyTypeProfile {
 export const PROPERTY_TYPES: readonly PropertyTypeProfile[] = [
   {
     key: 'APARTAMENTO',
+    category: 'RESIDENCIAL',
     name: 'Apartamento',
     description: 'Unidad residencial dentro de un edificio o conjunto',
     weight: 50,
@@ -39,6 +46,7 @@ export const PROPERTY_TYPES: readonly PropertyTypeProfile[] = [
   },
   {
     key: 'CASA',
+    category: 'RESIDENCIAL',
     name: 'Casa',
     description: 'Vivienda independiente con lote propio',
     weight: 22,
@@ -54,6 +62,7 @@ export const PROPERTY_TYPES: readonly PropertyTypeProfile[] = [
   },
   {
     key: 'APARTAESTUDIO',
+    category: 'RESIDENCIAL',
     name: 'Apartaestudio',
     description: 'Unidad residencial de un solo ambiente',
     weight: 10,
@@ -69,6 +78,7 @@ export const PROPERTY_TYPES: readonly PropertyTypeProfile[] = [
   },
   {
     key: 'LOCAL_COMERCIAL',
+    category: 'COMERCIAL',
     name: 'Local comercial',
     description: 'Espacio destinado a actividad comercial',
     weight: 12,
@@ -84,6 +94,7 @@ export const PROPERTY_TYPES: readonly PropertyTypeProfile[] = [
   },
   {
     key: 'OFICINA',
+    category: 'COMERCIAL',
     name: 'Oficina',
     description: 'Espacio destinado a uso administrativo o profesional',
     weight: 6,
@@ -99,46 +110,30 @@ export const PROPERTY_TYPES: readonly PropertyTypeProfile[] = [
   },
 ];
 
-export const OCCUPATION_TYPES = [
-  {
-    key: 'DISPONIBLE',
-    name: 'Disponible',
-    description: 'Inmueble sin contrato activo',
-  },
-  {
-    key: 'OCUPADA',
-    name: 'Ocupada',
-    description: 'Inmueble con contrato activo',
-  },
-  {
-    key: 'EN_MANTENIMIENTO',
-    name: 'En mantenimiento',
-    description: 'Inmueble temporalmente fuera de arriendo',
-  },
-] as const;
+export const OCCUPIED_OCCUPATION_KEY = 'OCUPADO';
 
 export const PUBLIC_SERVICE_TYPES = [
   {
     key: 'ENERGIA',
-    name: 'Energía eléctrica',
+    name: 'ENERGIA',
     description: 'Servicio de energía',
     presence: 1,
   },
   {
     key: 'AGUA',
-    name: 'Acueducto y alcantarillado',
+    name: 'AGUA',
     description: 'Servicio de agua',
     presence: 1,
   },
   {
     key: 'GAS',
-    name: 'Gas natural',
+    name: 'GAS',
     description: 'Servicio de gas domiciliario',
     presence: 0.8,
   },
   {
     key: 'INTERNET',
-    name: 'Internet y telefonía',
+    name: 'INTERNET',
     description: 'Servicio de internet',
     presence: 0.7,
   },
@@ -218,6 +213,7 @@ export const STREET_TYPE_WEIGHTS: readonly number[] = [40, 40, 12, 8];
 export interface ServiceProfile {
   key: string;
   name: string;
+  catalogName: string;
   description: string;
   weight: number;
   priceType: PriceType;
@@ -229,6 +225,7 @@ export const SERVICES: readonly ServiceProfile[] = [
   {
     key: 'PLOMERIA',
     name: 'Plomería',
+    catalogName: 'Plomería',
     description: 'Reparación e instalación de tuberías, grifos y sanitarios',
     weight: 24,
     priceType: 'NEGOTIABLE',
@@ -238,6 +235,7 @@ export const SERVICES: readonly ServiceProfile[] = [
   {
     key: 'ELECTRICIDAD',
     name: 'Electricidad',
+    catalogName: 'Electricidad',
     description: 'Revisión y reparación de instalaciones eléctricas',
     weight: 20,
     priceType: 'NEGOTIABLE',
@@ -247,6 +245,7 @@ export const SERVICES: readonly ServiceProfile[] = [
   {
     key: 'CERRAJERIA',
     name: 'Cerrajería',
+    catalogName: 'Cerrajería',
     description: 'Cambio y reparación de cerraduras',
     weight: 10,
     priceType: 'FIXED',
@@ -256,6 +255,7 @@ export const SERVICES: readonly ServiceProfile[] = [
   {
     key: 'PINTURA',
     name: 'Pintura',
+    catalogName: 'Pintura',
     description: 'Pintura y resane de paredes y techos',
     weight: 10,
     priceType: 'CUSTOM_QUOTE',
@@ -265,6 +265,7 @@ export const SERVICES: readonly ServiceProfile[] = [
   {
     key: 'ASEO_PROFUNDO',
     name: 'Aseo profundo',
+    catalogName: 'Aseo y limpieza',
     description: 'Limpieza profunda del inmueble',
     weight: 14,
     priceType: 'FIXED',
@@ -274,6 +275,7 @@ export const SERVICES: readonly ServiceProfile[] = [
   {
     key: 'FUMIGACION',
     name: 'Fumigación',
+    catalogName: 'Fumigación',
     description: 'Control de plagas',
     weight: 8,
     priceType: 'FIXED',
@@ -283,6 +285,7 @@ export const SERVICES: readonly ServiceProfile[] = [
   {
     key: 'AIRE_ACONDICIONADO',
     name: 'Mantenimiento de aire acondicionado',
+    catalogName: 'Mantenimiento de electrodomésticos',
     description: 'Limpieza y reparación de equipos de aire acondicionado',
     weight: 14,
     priceType: 'NEGOTIABLE',
@@ -291,107 +294,7 @@ export const SERVICES: readonly ServiceProfile[] = [
   },
 ];
 
-export const ACTOR_ROLES = [
-  {
-    key: 'LANDLORD',
-    name: 'ARRENDADOR',
-    description: 'Propietario que arrienda el inmueble',
-  },
-  {
-    key: 'TENANT',
-    name: 'ARRENDATARIO',
-    description: 'Persona que habita o usa el inmueble',
-  },
-  {
-    key: 'PROPERTY_MANAGER',
-    name: 'ADMINISTRADOR',
-    description: 'Persona que administra el inmueble',
-  },
-  {
-    key: 'SERVICE_PROVIDER',
-    name: 'PROVEEDOR_SERVICIO',
-    description: 'Persona que presta servicios al inmueble',
-  },
-] as const;
-
-export const POLICIES = [
-  {
-    key: 'property:read',
-    name: 'Consultar inmueble',
-    description: 'Permite ver la información del inmueble',
-  },
-  {
-    key: 'property:update',
-    name: 'Actualizar inmueble',
-    description: 'Permite editar la información del inmueble',
-  },
-  {
-    key: 'member:invite',
-    name: 'Invitar miembros',
-    description: 'Permite invitar miembros al inmueble',
-  },
-  {
-    key: 'member:remove',
-    name: 'Remover miembros',
-    description: 'Permite remover miembros del inmueble',
-  },
-  {
-    key: 'contract:create',
-    name: 'Crear contratos',
-    description: 'Permite crear contratos del inmueble',
-  },
-  {
-    key: 'contract:read',
-    name: 'Consultar contratos',
-    description: 'Permite ver los contratos del inmueble',
-  },
-  {
-    key: 'contract:update',
-    name: 'Actualizar contratos',
-    description: 'Permite editar los contratos del inmueble',
-  },
-  {
-    key: 'finance:read',
-    name: 'Consultar finanzas',
-    description: 'Permite ver los movimientos financieros',
-  },
-  {
-    key: 'finance:manage',
-    name: 'Gestionar finanzas',
-    description: 'Permite registrar y editar movimientos financieros',
-  },
-  {
-    key: 'service:request',
-    name: 'Solicitar servicios',
-    description: 'Permite solicitar servicios para el inmueble',
-  },
-  {
-    key: 'service:provide',
-    name: 'Prestar servicios',
-    description: 'Permite atender solicitudes de servicio',
-  },
-] as const;
-
-export const ROLE_POLICIES: Readonly<Record<string, readonly string[]>> = {
-  LANDLORD: [
-    'property:read',
-    'property:update',
-    'member:invite',
-    'member:remove',
-    'contract:create',
-    'contract:read',
-    'contract:update',
-    'finance:read',
-    'finance:manage',
-    'service:request',
-  ],
-  TENANT: ['property:read', 'contract:read', 'finance:read', 'service:request'],
-  PROPERTY_MANAGER: [
-    'property:read',
-    'property:update',
-    'contract:read',
-    'finance:read',
-    'service:request',
-  ],
-  SERVICE_PROVIDER: ['property:read', 'service:provide'],
-};
+export const PROPERTY_ROLE_IDS = {
+  LANDLORD: TYPE_LANDORD_ACTOR_ROLES_UUIDS.PROPIETARIO,
+  TENANT: TYPE_TENANT_ACTOR_ROLES_UUIDS.ARRENDADO,
+} as const;

@@ -1,5 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
@@ -62,7 +63,7 @@ export class NotificationGateway {
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('notifications:read')
   async handleMarkAsRead(
-    client: AuthenticatedSocket,
+    @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() body: unknown,
   ) {
     const user = this.authenticatedUser(client);

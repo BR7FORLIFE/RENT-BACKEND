@@ -2,6 +2,7 @@ import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { FinanceController } from './finance.controller.js';
 import { FinanceService } from './services/finance.service.js';
+import { FinanceAutomationService } from './services/finance-automation.service.js';
 import { FinancialTransactionImmutable } from './exceptions/exceptions.js';
 import { createControllerApp, TEST_USER } from '../../../test/helpers.js';
 
@@ -18,7 +19,9 @@ describe('FinanceController (HTTP)', () => {
     update: jest.fn(),
     changeStatus: jest.fn(),
     markAsPaid: jest.fn(),
+    assertCanRegister: jest.fn(),
   };
+  const automation = { generateDueRent: jest.fn() };
   const propertyId = uuid();
   const base = `/finance/property/${propertyId}`;
 
@@ -26,10 +29,23 @@ describe('FinanceController (HTTP)', () => {
     jest.spyOn(console, 'log').mockImplementation(() => undefined);
     app = await createControllerApp(FinanceController, [
       { provide: FinanceService, useValue: service },
+      { provide: FinanceAutomationService, useValue: automation },
     ]);
   });
   afterAll(() => app.close());
   beforeEach(() => Object.values(service).forEach((m) => m.mockReset()));
+
+  it('POST simulate-rent autoriza y genera los ingresos de canon vencidos', async () => {
+    automation.generateDueRent.mockResolvedValue(2);
+
+    const res = await request(app.getHttpServer())
+      .post(`${base}/simulate-rent`)
+      .expect(201);
+
+    expect(res.body).toEqual({ created: 2 });
+    expect(service.assertCanRegister).toHaveBeenCalledWith(TEST_USER, propertyId);
+    expect(automation.generateDueRent).toHaveBeenCalledWith(propertyId);
+  });
 
   it('rechaza propertyId que no es UUID (400) sin llamar al servicio', async () => {
     await request(app.getHttpServer())

@@ -138,6 +138,10 @@ export class FinanceService {
     });
   }
 
+  async assertCanRegister(user: AuthUser, propertyId: string) {
+    await this.authorize(user, propertyId, 'REGISTRAR_MOVIMIENTOS_FINANCIEROS');
+  }
+
   async findById(user: AuthUser, propertyId: string, id: string) {
     await this.authorize(user, propertyId, 'VER_FINANZAS');
 

@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../../core/auth/auth.guard.js';
 import { ZodValidation } from '../../core/pipes/zod-validation.pipe.js';
 import type { AuthRequest } from '../../types/global-types.js';
 import { FinanceService } from './services/finance.service.js';
+import { FinanceAutomationService } from './services/finance-automation.service.js';
 import {
   changeFinancialStatusDtoRequest,
   createFinancialTransactionDtoRequest,
@@ -34,7 +35,21 @@ const uuid = () => new ParseUUIDPipe();
 @UseGuards(JwtAuthGuard)
 @Controller({ path: 'finance/property/:propertyId' })
 export class FinanceController {
-  constructor(private readonly service: FinanceService) {}
+  constructor(
+    private readonly service: FinanceService,
+    private readonly automation: FinanceAutomationService,
+  ) {}
+
+  // simula el cobro de los canones vencidos de la propiedad (tambien corre solo cada hora)
+  @Post('simulate-rent')
+  async simulateRent(
+    @Req() req: AuthRequest,
+    @Param('propertyId', uuid()) propertyId: string,
+  ) {
+    await this.service.assertCanRegister(req.user, propertyId);
+    const created = await this.automation.generateDueRent(propertyId);
+    return { created };
+  }
 
   @Post('transactions')
   async create(

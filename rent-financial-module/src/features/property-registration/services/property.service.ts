@@ -146,10 +146,12 @@ export class PropertyService {
   async consultAllProperties(
     userId: string,
     paginationDto: PaginationType,
+    filters: { occupation?: string; search?: string } = {},
   ): Promise<PaginationResponse<Property>> {
     const { data, metadata } = await this.propertyRepository.findAll(
       userId,
       paginationDto,
+      filters,
     );
     const res = data.map((p) => this.propertyMapper.toDomain(p));
 

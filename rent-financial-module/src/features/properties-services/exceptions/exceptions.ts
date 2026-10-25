@@ -46,6 +46,16 @@ export class ServiceOfferingForbidden extends AppException {
   }
 }
 
+export class ServiceOfferingHasRequests extends AppException {
+  constructor() {
+    super(
+      'La oferta ya tiene solicitudes y no puede eliminarse; desactivala para dejar de prestarla!',
+      409,
+      'CONFLICT',
+    );
+  }
+}
+
 export class ServiceOfferingMemberInvalid extends AppException {
   constructor() {
     super(

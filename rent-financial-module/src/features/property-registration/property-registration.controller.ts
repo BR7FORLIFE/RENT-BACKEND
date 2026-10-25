@@ -33,6 +33,10 @@ import {
 } from './dtos/request-dto.js';
 import { CreateSuggestionByPropertyField } from './services/helpers.service.js';
 import type { PropertyField } from './types.js';
+import {
+  propertyListQuerySchema,
+  type PropertyListQuery,
+} from './schemas/property-list-query.schema.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller({
@@ -62,11 +66,14 @@ export class PropertyRegistrationController {
   @Get()
   async consultAllProperties(
     @Req() req: AuthRequest,
-    @Query(new ZodValidation(paginationSchema)) paginationDto: PaginationType,
+    @Query(new ZodValidation(propertyListQuerySchema))
+    query: PropertyListQuery,
   ) {
+    const { occupation, search, ...paginationDto } = query;
     const response = await this.propertyService.consultAllProperties(
       req.user.userId,
       paginationDto,
+      { occupation, search },
     );
 
     return response;

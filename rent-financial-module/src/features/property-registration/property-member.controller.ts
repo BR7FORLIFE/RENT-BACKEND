@@ -107,6 +107,21 @@ export class PropertyMemberController {
     );
   }
 
+  //politicas que incluye un rol (sin necesidad de que este asignado a un miembro)
+  @Get('property/:propertyId/role/:role/policies')
+  async getRolePolicies(
+    @Req() req: AuthRequest,
+    @Param('propertyId') propertyId: string,
+    @Param('role', new ZodValidation(PropertyActorRoleSchema))
+    role: PropertyActorRoleType,
+  ) {
+    return await this.propertyMemberService.getRolePolicies(
+      req.user.userId,
+      propertyId,
+      role,
+    );
+  }
+
   @Get(':propertyMemberId/property/:propertyId/get')
   async getPropertyMemberByIdAndPropertyId(
     @Req() req: AuthRequest,

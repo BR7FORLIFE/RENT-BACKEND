@@ -1,14 +1,20 @@
+import { getUserData } from '../../property-registration/api.js';
 import { ServiceOfferingService } from './service-offering.service.js';
 import {
   ServiceCatalogInactive,
   ServiceCatalogNotFound,
   ServiceOfferingForbidden,
+  ServiceOfferingHasRequests,
   ServiceOfferingInvalid,
   ServiceOfferingMemberInvalid,
   ServiceOfferingNotFound,
 } from '../exceptions/exceptions.js';
 import { PoliciesAuthorizationNotAllowed } from '../../system-property-role/exceptions/exceptions.js';
 import { POLICIES_STATEMENTS_NAMES } from '../../../types/global-types.js';
+
+jest.mock('../../property-registration/api.js', () => ({
+  getUserData: jest.fn(),
+}));
 
 const USER = { userId: 'u1', rols: ['USER'] };
 const ADMIN = { userId: 'u-admin', rols: ['ADMIN'] };
@@ -29,6 +35,8 @@ describe('ServiceOfferingService', () => {
     findById: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
+    countRequests: jest.fn(),
+    delete: jest.fn(),
     findPropertyMember: jest.fn(),
   };
   const catalogRepository = { findById: jest.fn() };
@@ -49,6 +57,86 @@ describe('ServiceOfferingService', () => {
       catalogRepository as never,
       systemRole as never,
     );
+  });
+
+  describe('name y delete', () => {
+    it('guarda el nombre opcional de la oferta', async () => {
+      await service.create(USER, { ...baseDto, name: 'Plomeria 24h' });
+      expect(offeringRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'Plomeria 24h' }),
+      );
+      await service.create(USER, baseDto);
+      expect(offeringRepository.create).toHaveBeenLastCalledWith(
+        expect.objectContaining({ name: null }),
+      );
+    });
+
+    it('elimina la oferta propia sin solicitudes', async () => {
+      offeringRepository.findById.mockResolvedValue({
+        id: 'o1',
+        providerUserId: 'u1',
+      });
+      offeringRepository.countRequests.mockResolvedValue(0);
+
+      await service.delete(USER, 'o1');
+
+      expect(offeringRepository.delete).toHaveBeenCalledWith('o1');
+    });
+
+    it('no elimina si tiene solicitudes ni si no es el proveedor', async () => {
+      offeringRepository.findById.mockResolvedValue({
+        id: 'o1',
+        providerUserId: 'u1',
+      });
+      offeringRepository.countRequests.mockResolvedValue(2);
+      await expect(service.delete(USER, 'o1')).rejects.toBeInstanceOf(
+        ServiceOfferingHasRequests,
+      );
+      await expect(
+        service.delete({ userId: 'x', rols: [] }, 'o1'),
+      ).rejects.toBeInstanceOf(ServiceOfferingForbidden);
+      expect(offeringRepository.delete).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('findById', () => {
+    const offering = {
+      id: 'o1',
+      providerUserId: 'u1',
+      status: 'ACTIVE',
+      scope: 'PUBLIC',
+      service: { isActive: true },
+      propertyMember: null,
+    };
+
+    it('incluye nombre, correo y telefono del proveedor', async () => {
+      offeringRepository.findById.mockResolvedValue(offering);
+      (getUserData as jest.Mock).mockResolvedValue({
+        userId: 'u1',
+        fullname: 'Ana Perez',
+        email: 'ana@mail.com',
+        cellphone: '3001234567',
+        identificationNumber: 123,
+      });
+
+      const res = await service.findById(USER, 'o1');
+
+      expect(res.provider).toEqual({
+        fullname: 'Ana Perez',
+        email: 'ana@mail.com',
+        cellphone: '3001234567',
+      });
+    });
+
+    it('entrega la oferta sin contacto si auth falla', async () => {
+      offeringRepository.findById.mockResolvedValue(offering);
+      (getUserData as jest.Mock).mockRejectedValue(new Error('down'));
+
+      const res = await service.findById(USER, 'o1');
+
+      expect(res.provider).toBeNull();
+      expect(res.id).toBe('o1');
+    });
   });
 
   describe('create', () => {

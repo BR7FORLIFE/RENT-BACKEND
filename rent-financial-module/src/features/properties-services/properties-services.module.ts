@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../core/database/prisma.module.js';
 import { SytemPropertyRoleModule } from '../system-property-role/system-property-role.module.js';
+import { FinanceModule } from '../finance/finance.module.js';
 import { NotificationModule } from '../notifications/notification.module.js';
 import { ServiceCatalogController } from './service-catalog.controller.js';
 import { ServiceOfferingController } from './service-offering.controller.js';
@@ -14,7 +15,12 @@ import { ServiceOfferingRepository } from './repository/service-offering.reposit
 import { ServiceRequestRepository } from './repository/service-request.repository.js';
 
 @Module({
-  imports: [PrismaModule, SytemPropertyRoleModule, NotificationModule],
+  imports: [
+    PrismaModule,
+    SytemPropertyRoleModule,
+    NotificationModule,
+    FinanceModule,
+  ],
   controllers: [
     ServiceCatalogController,
     ServiceOfferingController,

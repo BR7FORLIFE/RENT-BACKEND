@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -80,5 +81,13 @@ export class ServiceOfferingController {
     body: ChangeOfferingStatusType,
   ) {
     return await this.service.changeStatus(req.user, id, body);
+  }
+
+  @Delete(':id')
+  async delete(
+    @Req() req: AuthRequest,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return await this.service.delete(req.user, id);
   }
 }

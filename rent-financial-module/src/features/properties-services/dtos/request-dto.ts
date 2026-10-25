@@ -71,6 +71,8 @@ export type ChangeServiceStatusType = z.infer<
 export const createOfferingDtoRequest = z
   .object({
     serviceId: z.uuid(),
+    // nombre propio de la oferta (opcional)
+    name: z.string().trim().min(1).max(100).optional(),
     scope: scopeEnum,
     // PROPERTY: membresia del proveedor en el inmueble al que queda atada la oferta.
     // PUBLIC: no se envia.
@@ -98,6 +100,7 @@ export type CreateOfferingType = z.infer<typeof createOfferingDtoRequest>;
 
 export const updateOfferingDtoRequest = z
   .object({
+    name: z.string().trim().min(1).max(100).nullable().optional(),
     priceTypeAgreement: priceTypeEnum.optional(),
     basePrice: moneySchema.optional(),
     currency: currencyEnum.optional(),
@@ -125,6 +128,8 @@ export const listOfferingsQuery = paginationSchema
     minPrice: moneySchema.optional(),
     maxPrice: moneySchema.optional(),
     onlyValid: booleanQuery.optional(),
+    // marketplace: oculta las ofertas del propio usuario
+    excludeMine: booleanQuery.optional(),
     // lista blanca de columnas ordenables
     sortBy: z
       .enum(['createdAt', 'basePrice', 'validUntil'])

@@ -562,6 +562,37 @@ export class PropertyMemberService {
     return { member, roleId: TYPE_PROPERTY_ACTOR_ROLE_UUIDS[role] };
   }
 
+  //politicas que incluye un rol; solo el propietario del inmueble puede consultarlas
+  async getRolePolicies(
+    ownerId: string,
+    propertyId: string,
+    role: PropertyActorRoleType,
+  ) {
+    const property = await this.propertyRepository.findPropertyById(
+      ownerId,
+      propertyId,
+    );
+
+    if (!property) {
+      throw new PropertyNotFoundException();
+    }
+
+    const policies =
+      await this.systemPropertyRepository.findPolicyStatementsByActorRoleId(
+        TYPE_PROPERTY_ACTOR_ROLE_UUIDS[role],
+      );
+
+    return {
+      propertyId: property.id,
+      role,
+      policies: policies.map((policy) => ({
+        id: policy.id,
+        policyName: policy.policyName,
+        description: policy.description,
+      })),
+    };
+  }
+
   //politicas de un rol de un miembro indicando cuales estan activas
   //(activa = pertenece al rol y no tiene override active=false)
   async getMemberRolePolicies(

@@ -1,15 +1,12 @@
 import type { PrismaClient } from "../prisma.js";
 import { getPortfolio } from "../plan/portfolio.js";
-import { required } from "../utils/batch.js";
+import { PROPERTY_ROLE_IDS } from "../data/catalogs.js";
 import { stableId } from "../utils/hash.js";
 
-export async function seedMembers(
-  prisma: PrismaClient,
-  roleIds: ReadonlyMap<string, string>,
-): Promise<void> {
+export async function seedMembers(prisma: PrismaClient): Promise<void> {
   const { properties } = getPortfolio();
-  const landlordRoleId = required(roleIds, "LANDLORD", "rol");
-  const tenantRoleId = required(roleIds, "TENANT", "rol");
+  const landlordRoleId = PROPERTY_ROLE_IDS.LANDLORD;
+  const tenantRoleId = PROPERTY_ROLE_IDS.TENANT;
 
   await prisma.propertyMember.createMany({
     data: properties.flatMap((property) => {

@@ -16,10 +16,12 @@ import {
   ServiceCatalogInactive,
   ServiceCatalogNotFound,
   ServiceOfferingForbidden,
+  ServiceOfferingHasRequests,
   ServiceOfferingInvalid,
   ServiceOfferingMemberInvalid,
   ServiceOfferingNotFound,
 } from '../exceptions/exceptions.js';
+import { getUserData } from '../../property-registration/api.js';
 import { isServiceAdmin } from '../utils/catalog-admin.js';
 
 /**
@@ -52,6 +54,28 @@ export class ServiceOfferingService {
   }
 
   async findById(user: AuthUser, id: string) {
+    const offering = await this.findVisibleOffering(user, id);
+
+    //datos de contacto de quien presta el servicio; si auth no responde la oferta se entrega sin ellos
+    let provider: {
+      fullname: string;
+      email: string;
+      cellphone: string;
+    } | null = null;
+    try {
+      const { fullname, email, cellphone } = await getUserData(
+        null,
+        offering.providerUserId,
+      );
+      provider = { fullname, email, cellphone };
+    } catch {
+      provider = null;
+    }
+
+    return { ...offering, provider };
+  }
+
+  private async findVisibleOffering(user: AuthUser, id: string) {
     const offering = await this.offeringRepository.findById(id);
     if (!offering) throw new ServiceOfferingNotFound();
 
@@ -117,6 +141,7 @@ export class ServiceOfferingService {
 
     return await this.offeringRepository.create({
       serviceId: dto.serviceId,
+      name: dto.name ?? null,
       providerUserId: user.userId,
       propertyMemberId: dto.scope === 'PROPERTY' ? dto.propertyMemberId : null,
       scope: dto.scope,
@@ -157,6 +182,7 @@ export class ServiceOfferingService {
     }
 
     return await this.offeringRepository.update(id, {
+      ...(dto.name !== undefined && { name: dto.name }),
       ...(dto.priceTypeAgreement && {
         priceTypeAgreement: dto.priceTypeAgreement,
       }),
@@ -184,5 +210,18 @@ export class ServiceOfferingService {
       }
     }
     return await this.offeringRepository.update(id, { status: dto.status });
+  }
+
+  // Solo se elimina una oferta sin solicitudes (las solicitudes son historial); si ya tiene,
+  // el proveedor debe desactivarla.
+  async delete(user: AuthUser, id: string) {
+    await this.getOwnedOffering(user, id);
+
+    if ((await this.offeringRepository.countRequests(id)) > 0) {
+      throw new ServiceOfferingHasRequests();
+    }
+
+    await this.offeringRepository.delete(id);
+    return { id, message: 'Oferta eliminada exitosamente!' };
   }
 }

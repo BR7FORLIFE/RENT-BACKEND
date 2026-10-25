@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../core/database/prisma.service.js';
 import { SystemPropertyService } from '../../system-property-role/services/system-property.service.js';
 import {
@@ -6,6 +6,7 @@ import {
   type HistoryEntry,
 } from '../repository/service-request.repository.js';
 import { ServiceOfferingRepository } from '../repository/service-offering.repository.js';
+import { FinanceAutomationService } from '../../finance/services/finance-automation.service.js';
 import { ServiceNotifier } from './service-notifier.service.js';
 import {
   POLICIES_STATEMENTS_NAMES,
@@ -51,12 +52,15 @@ type FullRequest = NonNullable<
  */
 @Injectable()
 export class ServiceRequestService {
+  private readonly logger = new Logger(ServiceRequestService.name);
+
   constructor(
     private readonly prismaClient: PrismaService,
     private readonly requestRepository: ServiceRequestRepository,
     private readonly offeringRepository: ServiceOfferingRepository,
     private readonly systemRole: SystemPropertyService,
     private readonly notifier: ServiceNotifier,
+    private readonly finance: FinanceAutomationService,
   ) {}
 
   // ---------------- consultas ----------------
@@ -277,6 +281,7 @@ export class ServiceRequestService {
       reason: dto.reason,
       data: { acceptedAt: new Date() },
     });
+    await this.syncExpense(updated);
     await this.notifier.notify(
       user.userId,
       [updated.requestedByUserId],
@@ -340,6 +345,7 @@ export class ServiceRequestService {
       reason: dto.reason,
       data: { completedAt: new Date() },
     });
+    await this.safeFinance(() => this.finance.markServiceExpensePaid(id));
     await this.notifier.notify(
       user.userId,
       [updated.requestedByUserId],
@@ -402,6 +408,7 @@ export class ServiceRequestService {
       reason: dto.reason,
       data: { cancelledAt: new Date() },
     });
+    await this.safeFinance(() => this.finance.cancelServiceExpense(id));
 
     const counterparties = isProvider
       ? [updated.requestedByUserId]
@@ -505,6 +512,7 @@ export class ServiceRequestService {
       );
       return (await this.requestRepository.findById(id, tx))!;
     });
+    await this.syncExpense(updated);
 
     await this.notifier.notify(
       user.userId,
@@ -516,6 +524,30 @@ export class ServiceRequestService {
   }
 
   // ---------------- helpers ----------------
+
+  // El gasto se registra en finanzas cuando la solicitud esta aceptada y con precio acordado
+  // (al aceptar, o al acordar el precio si fue despues). Un fallo de finanzas no rompe el flujo.
+  private async syncExpense(request: FullRequest) {
+    if (request.status !== 'ACCEPTED' || !request.agreedPrice) return;
+    const agreedPrice = request.agreedPrice;
+    await this.safeFinance(() =>
+      this.finance.registerServiceExpense({
+        id: request.id,
+        propertyId: request.propertyId,
+        agreedPrice,
+        currency: request.currency,
+        serviceName: request.offering.service.name,
+      }),
+    );
+  }
+
+  private async safeFinance(action: () => Promise<unknown>) {
+    try {
+      await action();
+    } catch (error) {
+      this.logger.error('No se pudo sincronizar el gasto en finanzas', error);
+    }
+  }
 
   private isParty(userId: string, request: FullRequest) {
     return (

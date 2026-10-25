@@ -82,6 +82,37 @@ export class ContractRepository {
     };
   }
 
+  //un borrador aceptado se considera usado cuando ya existe un contrato (no rechazado) entre las
+  //mismas partes creado despues del borrador; asi no se generan contratos repetidos con el mismo borrador
+  private async excludeUsedDrafts<
+    T extends {
+      createdAt: Date;
+      landlordMemberId: string;
+      tenantMemberId: string;
+    },
+  >(propertyId: string, drafts: T[], db: Prisma.TransactionClient) {
+    if (drafts.length === 0) return drafts;
+
+    const contracts = await db.contract.findMany({
+      where: { propertyId, status: { not: 'RECHAZADO' } },
+      select: {
+        landlordMemberId: true,
+        tenantMemberId: true,
+        createAt: true,
+      },
+    });
+
+    return drafts.filter(
+      (draft) =>
+        !contracts.some(
+          (contract) =>
+            contract.landlordMemberId === draft.landlordMemberId &&
+            contract.tenantMemberId === draft.tenantMemberId &&
+            contract.createAt >= draft.createdAt,
+        ),
+    );
+  }
+
   async findAllContractAccepted(
     propertyId: string,
     paginationDto: PaginationType,
@@ -90,20 +121,16 @@ export class ContractRepository {
     const { limit, page } = paginationDto;
     const skip = (paginationDto.page - 1) * paginationDto.limit;
 
-    const [data, total] = await Promise.all([
-      db.contractDraft.findMany({
-        where: { propertyId, landlordAgreed: true, tenantAgreed: true },
-        skip,
-        take: limit,
-        orderBy: { version: 'desc' },
-      }),
-      db.contractDraft.count({
-        where: { propertyId, landlordAgreed: true, tenantAgreed: true },
-      }),
-    ]);
+    const accepted = await db.contractDraft.findMany({
+      where: { propertyId, landlordAgreed: true, tenantAgreed: true },
+      orderBy: { version: 'desc' },
+    });
+
+    const available = await this.excludeUsedDrafts(propertyId, accepted, db);
+    const total = available.length;
 
     return {
-      data,
+      data: available.slice(skip, skip + limit),
       metadata: {
         limit: limit,
         page,
@@ -144,7 +171,7 @@ export class ContractRepository {
     propertyId: string,
     db: Prisma.TransactionClient = this.prisma,
   ) {
-    return await db.contractDraft.findFirst({
+    const draft = await db.contractDraft.findFirst({
       where: {
         propertyId,
         tenantAgreed: true,
@@ -154,6 +181,12 @@ export class ContractRepository {
         version: 'desc',
       },
     });
+
+    if (!draft) return null;
+
+    //si el borrador ya se uso para crear un contrato no esta disponible
+    const [available] = await this.excludeUsedDrafts(propertyId, [draft], db);
+    return available ?? null;
   }
 
   //encontrar borrador de contrato por propietario

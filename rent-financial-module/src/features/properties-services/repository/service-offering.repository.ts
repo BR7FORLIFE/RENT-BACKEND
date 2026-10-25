@@ -57,6 +57,9 @@ export class ServiceOfferingRepository {
       });
     }
 
+    if (filters.excludeMine) {
+      and.push({ providerUserId: { not: scope.userId } });
+    }
     if (filters.serviceId) and.push({ serviceId: filters.serviceId });
     if (filters.providerUserId)
       and.push({ providerUserId: filters.providerUserId });
@@ -136,6 +139,14 @@ export class ServiceOfferingRepository {
       data,
       include: offeringInclude,
     });
+  }
+
+  async countRequests(id: string, db: Prisma.TransactionClient = this.prisma) {
+    return await db.serviceRequest.count({ where: { serviceOfferingId: id } });
+  }
+
+  async delete(id: string, db: Prisma.TransactionClient = this.prisma) {
+    await db.serviceOffering.delete({ where: { id } });
   }
 
   // membresia usada para validar que el proveedor es dueño del vinculo con el inmueble

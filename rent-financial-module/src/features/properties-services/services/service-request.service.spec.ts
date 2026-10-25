@@ -69,6 +69,11 @@ describe('ServiceRequestService', () => {
     hasPoliciesInProperty: jest.fn(),
   };
   const notifier = { notify: jest.fn() };
+  const finance = {
+    registerServiceExpense: jest.fn(),
+    markServiceExpensePaid: jest.fn(),
+    cancelServiceExpense: jest.fn(),
+  };
 
   let service: ServiceRequestService;
 
@@ -88,6 +93,7 @@ describe('ServiceRequestService', () => {
       offeringRepository as never,
       systemRole as never,
       notifier as never,
+      finance as never,
     );
   });
 

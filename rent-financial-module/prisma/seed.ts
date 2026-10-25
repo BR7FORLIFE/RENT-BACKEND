@@ -1,4 +1,5 @@
 import { PrismaService } from '../src/core/database/prisma.service.js';
+import type { PrismaClient } from '../generated/prisma/client.js';
 import {
   TYPE_PROPERTY_UUIDS,
   TYPE_PROPERTY_OCCUPATION_TYPE_UUIDS,
@@ -9,9 +10,7 @@ import {
 } from '../src/types/global-types.js';
 import { seedDemo } from './seed-demo.js';
 
-const prisma = new PrismaService();
-
-async function main() {
+export async function seedBaseCatalogs(prisma: PrismaClient): Promise<void> {
   await prisma.typeProperty.createMany({
     data: [
       {
@@ -577,7 +576,9 @@ async function main() {
     skipDuplicates: true,
   });
 
-  //definimos las politicas para cada rol
+  //definimos las politicas para cada rol; la tabla no tiene restriccion de unicidad,
+  //por eso se recrea completa para que el seed sea idempotente
+  await prisma.propertyActorRolePolicyStatements.deleteMany();
   await prisma.propertyActorRolePolicyStatements.createMany({
     data: [
       //politicas para el rol de propietario
@@ -1063,10 +1064,16 @@ async function main() {
     ],
     skipDuplicates: true,
   });
-
-  if (process.env.SEED_DEMO === 'true') {
-    await seedDemo(prisma);
-  }
 }
 
-await main().finally(() => prisma.$disconnect());
+if (process.argv[1]?.endsWith('seed.ts')) {
+  const prisma = new PrismaService();
+  try {
+    await seedBaseCatalogs(prisma);
+    if (process.env.SEED_DEMO === 'true') {
+      await seedDemo(prisma);
+    }
+  } finally {
+    await prisma.$disconnect();
+  }
+}
