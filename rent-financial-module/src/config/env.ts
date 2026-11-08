@@ -29,8 +29,10 @@ export const RENT_FINANCIAL_CLIENT_ID = process.env.RENT_FINANCIAL_CLIENT_ID;
 export const RENT_FINANCIAL_CLIENT_SECRET =
   process.env.RENT_FINANCIAL_CLIENT_SECRET;
 
-//Resend ENVIROMENT VARIABLES
-export const RESEND_API_KEY = process.env.RESEND_API_KEY;
+//Gmail API (OAuth2 refresh token, scope gmail.send)
+export const GMAIL_CLIENT_ID = process.env.OAUTH2_CLIENT_ID;
+export const GMAIL_CLIENT_SECRET = process.env.OAUTH2_CLIENT_SECRET;
+export const GMAIL_REFRESH_TOKEN = process.env.GMAIL_REFRESH_TOKEN;
 
 //URL publica de este servicio (se usa en los enlaces de los correos)
 export const PUBLIC_BASE_URL = (

@@ -6,7 +6,7 @@ Contexto técnico completo del proyecto: [`CLAUDE.md`](./CLAUDE.md) (sección 32
 
 ## Stack
 
-Node 22 · TypeScript · NestJS 11 · Prisma 7 (PostgreSQL) · Zod · JWT RS256 (Passport) · Socket.IO · Resend · Ollama · Jest · pnpm
+Node 22 · TypeScript · NestJS 11 · Prisma 7 (PostgreSQL) · Zod · JWT RS256 (Passport) · Socket.IO · Gmail API · Ollama · Jest · pnpm
 
 ## Puesta en marcha
 
@@ -143,7 +143,7 @@ El detalle original de cada bug se conserva abajo como referencia.
 ```text
 src/
 ├── core/        auth (JWT/WS), database (Prisma), filtros, pipes, IA
-├── config/      env y clientes externos (Resend, axios)
+├── config/      env y clientes externos (Gmail, axios)
 ├── features/    property-registration · contract · system-property-role ·
 │                notifications · global · microservice-auth
 ├── shared/      paginación

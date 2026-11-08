@@ -17,7 +17,7 @@ import com.files.rent_auth_module.application.emailVerification.exceptions.Email
 import com.files.rent_auth_module.application.emailVerification.exceptions.EmailVerificationIsExpiredException;
 import com.files.rent_auth_module.application.emailVerification.exceptions.NotEmailVerificationException;
 import com.files.rent_auth_module.application.emailVerification.ports.EmailVerificationPort;
-import com.files.rent_auth_module.application.emailVerification.ports.ResendPort;
+import com.files.rent_auth_module.application.emailVerification.ports.EmailSenderPort;
 import com.files.rent_auth_module.application.emailVerification.usecases.EmailVerificationUseCase;
 import com.files.rent_auth_module.config.GenerateCodeService;
 import com.files.rent_auth_module.domain.auth.UserModel;
@@ -29,22 +29,22 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class EmailVerificationUseCaseImp implements EmailVerificationUseCase {
-        private final ResendPort resendPort;
+        private final EmailSenderPort emailSenderPort;
         private final EmailVerificationPort emailVerificationPort;
         private final GenerateCodeService generateCodeService;
         private final AuthRepositoryPort authRepositoryPort;
 
-        @Value("${resend.expiration-time}")
+        @Value("${gmail.expiration-time}")
         private Long expirationTimeEmail;
 
-        @Value("${resend.expiration-forward-time}")
+        @Value("${gmail.expiration-forward-time}")
         private Long forwardTime;
 
-        public EmailVerificationUseCaseImp(ResendPort resendPort,
+        public EmailVerificationUseCaseImp(EmailSenderPort emailSenderPort,
                         EmailVerificationPort emailVerificationPort,
                         GenerateCodeService generateCodeService,
                         AuthRepositoryPort authRepositoryPort) {
-                this.resendPort = resendPort;
+                this.emailSenderPort = emailSenderPort;
                 this.emailVerificationPort = emailVerificationPort;
                 this.generateCodeService = generateCodeService;
                 this.authRepositoryPort = authRepositoryPort;
@@ -58,7 +58,7 @@ public class EmailVerificationUseCaseImp implements EmailVerificationUseCase {
 
                 EmailVerificationModel emailModel = EmailVerificationModel.createDraft(userId, code, expirationTime);
 
-                return Mono.when(emailVerificationPort.save(emailModel), resendPort.sendEmail(email, code)).then();
+                return Mono.when(emailVerificationPort.save(emailModel), emailSenderPort.sendEmail(email, code)).then();
         }
 
         @Override

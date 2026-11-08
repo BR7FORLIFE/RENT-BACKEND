@@ -9,9 +9,9 @@ export abstract class AppException extends Error {
   }
 }
 
-export class ResendException extends AppException {
+export class EmailSendException extends AppException {
   constructor(error: string) {
-    super('Servicio de email (RESEND) fallo al enviar el correo!', 503, error);
+    super('Servicio de email (Gmail) fallo al enviar el correo!', 503, error);
   }
 }
 

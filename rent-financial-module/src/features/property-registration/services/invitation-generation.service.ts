@@ -11,8 +11,8 @@
  * - Validar el enlace por parte del miembro que desea vincularse
  */
 import { webcrypto } from 'node:crypto';
-import { resendClient } from '../../../config/config.js';
-import { ResendException } from '../../../core/global-exception.js';
+import { gmailClient } from '../../../config/config.js';
+import { EmailSendException } from '../../../core/global-exception.js';
 import { ISSUER_EMAIL, PUBLIC_BASE_URL } from '../../../config/env.js';
 
 export function escapeHtml(value: string) {
@@ -222,14 +222,11 @@ export async function sendInvitedEmailTo(
     throw new Error('not provide a issuer for send the email');
   }
 
-  const { error } = await resendClient.emails.send({
-    to,
-    from: ISSUER_EMAIL,
-    html,
-    subject,
-  });
-
-  if (error) {
-    throw new ResendException(error.message);
+  try {
+    await gmailClient.send({ to, html, subject });
+  } catch (error) {
+    throw new EmailSendException(
+      error instanceof Error ? error.message : String(error),
+    );
   }
 }

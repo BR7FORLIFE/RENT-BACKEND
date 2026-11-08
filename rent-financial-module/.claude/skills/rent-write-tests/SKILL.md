@@ -17,7 +17,7 @@ npx tsc --noEmit && npx eslint "src/**/*.spec.ts" "test/**/*.ts"
 ## Cómo está montado (importante)
 - Proyecto ESM + Prisma generado con `import.meta` ⇒ Jest compila a **CJS** (`test/tsconfig.spec.json`) y `test/jest.shared.cjs` mapea: `generated/prisma/client`, `config/env`, `config/config`, `ollama` → stubs en `test/mocks/`; imports `.js` → `.ts`.
 - `config/env` stub: constantes de prueba (`RENT_AUTH_HOST='http://auth.test'`, `ISSUER_EMAIL`…) y llave RSA efímera (`TEST_PRIVATE_KEY`).
-- `config/config` stub: `resendClient.emails.send`, `axiosMicroserviceClient.get/post`, `axiosRentAuth.post` son `jest.fn()` (castea: `x as unknown as jest.Mock`).
+- `config/config` stub: `gmailClient.send`, `axiosMicroserviceClient.get/post`, `axiosRentAuth.post` son `jest.fn()` (castea: `x as unknown as jest.Mock`).
 
 ## Patrones
 **Service**: instanciar con `new Service(mock1 as never, ...)`, `jest.resetAllMocks()` en `beforeEach` y **volver a configurar** `prisma.$transaction.mockImplementation((cb) => cb(tx))` y cualquier `jest.fn(impl)` (el reset borra implementaciones). Verifica: (a) política requerida (`CheckPolicies` con el nombre exacto), (b) camino denegado ⇒ el repositorio NO se invoca, (c) argumentos de escritura incluyendo `tx`, (d) notificaciones.

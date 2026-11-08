@@ -1,10 +1,8 @@
-import { Resend } from 'resend';
 import axios from 'axios';
 import { MicroserviceAuthService } from '../features/microservice-auth/auth-microservice.service.js';
-import { RESEND_API_KEY } from './env.js';
 
-//resend config
-export const resendClient = new Resend(RESEND_API_KEY);
+//gmail config
+export { gmailClient } from './gmail.js';
 
 //axios config
 export const axiosMicroserviceClient = axios.create();

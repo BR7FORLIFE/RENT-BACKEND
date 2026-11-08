@@ -34,8 +34,10 @@ logging:
   level:
     org.springframework.security: DEBUG
 
-resend:
-  api-key: ${RESEND_API_KEY}
+gmail:
+  client-id: ${OAUTH2_CLIENT_ID}
+  client-secret: ${OAUTH2_CLIENT_SECRET}
+  refresh-token: ${GMAIL_REFRESH_TOKEN}
   issuer: ${ISSUER_EMAIL}
   path-verification: ${PATH_VERIFICATION_URL}
   expiration-time: 1800

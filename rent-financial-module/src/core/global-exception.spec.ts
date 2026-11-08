@@ -1,17 +1,17 @@
 import {
   AppException,
-  ResendException,
+  EmailSendException,
   UserNotFound,
 } from './global-exception.js';
 
 describe('global exceptions', () => {
-  it('ResendException expone 503 y el error original', () => {
-    const e = new ResendException('boom');
+  it('EmailSendException expone 503 y el error original', () => {
+    const e = new EmailSendException('boom');
     expect(e).toBeInstanceOf(AppException);
     expect(e).toBeInstanceOf(Error);
     expect(e.status).toBe(503);
     expect(e.error).toBe('boom');
-    expect(e.name).toBe('ResendException');
+    expect(e.name).toBe('EmailSendException');
   });
 
   it('UserNotFound expone 406 NOT_ACCEPTABLE', () => {

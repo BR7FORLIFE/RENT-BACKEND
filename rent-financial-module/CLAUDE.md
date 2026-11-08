@@ -61,7 +61,7 @@ El backend actual utiliza principalmente:
 * Passport JWT
 * Socket.IO / WebSockets
 * Axios
-* Resend
+* Gmail API
 * Jest
 * Supertest
 * pnpm
@@ -937,7 +937,7 @@ Aunque el repositorio se llama `rent-financial-module`, hoy es el **microservici
 | `core/filters` + `global-exception.ts` | `GlobalExceptionFilter`; jerarquía `AppException(message,status,error)` — **toda excepción de dominio debe extenderla** |
 | `core/pipes` | `ZodValidation(schema)` → `schema.parse`; Zod falla → filtro responde **406** (no 400) |
 | `core/IA` | Cliente Ollama (`CallModelStream`, solo `chat` no-stream pese al nombre). Modelo/host por env |
-| `config/` | `env.ts` (lee `public.pem` al importar), `config.ts` (Resend + axios + interceptor Bearer) |
+| `config/` | `env.ts` (lee `public.pem` al importar), `config.ts` (Gmail API + axios + interceptor Bearer) |
 | `shared/pagination` | `paginationSchema` (page≥1, limit 1–100, default 100) y tipos. `paginate()` está vacío; cada repo repite la lógica de metadata |
 | `features/property-registration` | Propiedades, miembros, invitaciones, IA de sugerencias |
 | `features/contract` | Contratos y borradores (`ContractDraft`) |
