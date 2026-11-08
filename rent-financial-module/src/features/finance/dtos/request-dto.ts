@@ -133,3 +133,10 @@ export const financialSummaryQuery = z
     path: ['from'],
   });
 export type FinancialSummaryQueryType = z.infer<typeof financialSummaryQuery>;
+
+export const forecastQuery = z
+  .object({
+    horizon: z.coerce.number().int().min(1).max(12).default(6),
+  })
+  .strict();
+export type ForecastQueryType = z.infer<typeof forecastQuery>;

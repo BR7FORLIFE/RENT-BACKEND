@@ -19,12 +19,14 @@ import {
   changeFinancialStatusDtoRequest,
   createFinancialTransactionDtoRequest,
   financialSummaryQuery,
+  forecastQuery,
   listFinancialTransactionsQuery,
   markAsPaidDtoRequest,
   updateFinancialTransactionDtoRequest,
   type ChangeFinancialStatusType,
   type CreateFinancialTransactionType,
   type FinancialSummaryQueryType,
+  type ForecastQueryType,
   type ListFinancialTransactionsQueryType,
   type MarkAsPaidType,
   type UpdateFinancialTransactionType,
@@ -89,6 +91,16 @@ export class FinanceController {
     query: FinancialSummaryQueryType,
   ) {
     return await this.service.getSummary(req.user, propertyId, query);
+  }
+
+  //pronostico del saldo mensual (modelo de regresion) + series historicas para graficas
+  @Get('forecast')
+  async getForecast(
+    @Req() req: AuthRequest,
+    @Param('propertyId', uuid()) propertyId: string,
+    @Query(new ZodValidation(forecastQuery)) query: ForecastQueryType,
+  ) {
+    return await this.service.getForecast(req.user, propertyId, query);
   }
 
   @Get('transactions/:id')

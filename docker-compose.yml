@@ -53,9 +53,21 @@ services:
       - "3002:3002"
     depends_on:
       - financial-database
+      - model
     env_file:
       - ./enviroments/financial-rent.env
   
+  ## API del modelo de prediccion financiera - FRAMEWORK: FASTAPI (interno, no se expone por nginx ni al host)
+  model:
+    build:
+      context: ./modelo
+      dockerfile: Dockerfile
+    container_name: rent-model
+    expose:
+      - "8000"
+    env_file:
+      - ./enviroments/model-rent.env
+
   ##gateway para reversed proxy
   nginx: 
     image: nginx:trixie

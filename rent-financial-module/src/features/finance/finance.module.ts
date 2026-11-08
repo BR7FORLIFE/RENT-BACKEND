@@ -4,11 +4,17 @@ import { SytemPropertyRoleModule } from '../system-property-role/system-property
 import { FinanceController } from './finance.controller.js';
 import { FinanceService } from './services/finance.service.js';
 import { FinanceAutomationService } from './services/finance-automation.service.js';
+import { ModelClient } from './services/model-client.service.js';
 import { FinanceRepository } from './repository/finance.repository.js';
 
 @Module({
   controllers: [FinanceController],
-  providers: [FinanceService, FinanceRepository, FinanceAutomationService],
+  providers: [
+    FinanceService,
+    FinanceRepository,
+    FinanceAutomationService,
+    ModelClient,
+  ],
   exports: [FinanceAutomationService],
   imports: [PrismaModule, SytemPropertyRoleModule],
 })

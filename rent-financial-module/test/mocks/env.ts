@@ -24,3 +24,5 @@ export const GMAIL_CLIENT_SECRET = 'gmail-client-secret';
 export const GMAIL_REFRESH_TOKEN = 'gmail-refresh-token';
 export const ISSUER_EMAIL = 'noreply@test.dev';
 export const PUBLIC_BASE_URL = 'http://public.test';
+export const MODEL_API_URL = 'http://model.test';
+export const MODEL_API_KEY = undefined;

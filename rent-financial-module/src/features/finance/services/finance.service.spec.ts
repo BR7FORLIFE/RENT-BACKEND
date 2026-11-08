@@ -27,7 +27,9 @@ describe('FinanceService', () => {
     updateIfStatus: jest.fn(),
     findAllByPropertyId: jest.fn(),
     aggregateSummary: jest.fn(),
+    findForForecast: jest.fn(),
   };
+  const model = { forecast: jest.fn() };
   let service: FinanceService;
 
   beforeEach(() => {
@@ -37,7 +39,11 @@ describe('FinanceService', () => {
     });
     systemRole.CheckPolicies.mockResolvedValue(undefined);
     repository.findPropertyById.mockResolvedValue({ id: PROPERTY });
-    service = new FinanceService(systemRole as never, repository as never);
+    service = new FinanceService(
+      systemRole as never,
+      repository as never,
+      model as never,
+    );
   });
 
   const base: Record<string, unknown> = {
@@ -355,6 +361,52 @@ describe('FinanceService', () => {
         PROPERTY,
         query,
         false,
+      );
+    });
+  });
+
+  describe('pronostico', () => {
+    it('exige VER_FINANZAS y no llama al modelo sin permiso', async () => {
+      systemRole.CheckPolicies.mockRejectedValue(
+        new PoliciesAuthorizationNotAllowed(),
+      );
+      await expect(
+        service.getForecast(USER, PROPERTY, { horizon: 6 }),
+      ).rejects.toBeInstanceOf(PoliciesAuthorizationNotAllowed);
+      expect(repository.findForForecast).not.toHaveBeenCalled();
+      expect(model.forecast).not.toHaveBeenCalled();
+    });
+
+    it('serializa los movimientos y devuelve la respuesta del modelo', async () => {
+      repository.findForForecast.mockResolvedValue([
+        {
+          propertyId: PROPERTY,
+          type: 'INCOME',
+          category: 'RENT',
+          status: 'PAID',
+          amount: { toString: () => '1500000.00' },
+          currency: 'COP',
+          occurredAt: new Date('2026-10-01T10:00:00Z'),
+        },
+      ]);
+      model.forecast.mockResolvedValue({ ready: true });
+
+      const result = await service.getForecast(USER, PROPERTY, { horizon: 3 });
+
+      expect(result).toEqual({ ready: true });
+      expect(model.forecast).toHaveBeenCalledWith(
+        [
+          {
+            property_id: PROPERTY,
+            type: 'INCOME',
+            category: 'RENT',
+            status: 'PAID',
+            amount: '1500000.00',
+            currency: 'COP',
+            occurred_at: '2026-10-01T10:00:00.000Z',
+          },
+        ],
+        3,
       );
     });
   });

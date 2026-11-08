@@ -137,6 +137,26 @@ export class FinanceRepository {
     };
   }
 
+  //movimientos que alimentan el modelo de prediccion (los cancelados nunca cuentan)
+  async findForForecast(
+    propertyId: string,
+    db: Prisma.TransactionClient = this.prisma,
+  ) {
+    return await db.financialTransaction.findMany({
+      where: { propertyId, status: { not: 'CANCELLED' } },
+      select: {
+        propertyId: true,
+        type: true,
+        category: true,
+        status: true,
+        amount: true,
+        currency: true,
+        occurredAt: true,
+      },
+      orderBy: { occurredAt: 'asc' },
+    });
+  }
+
   async aggregateSummary(
     propertyId: string,
     from: Date,

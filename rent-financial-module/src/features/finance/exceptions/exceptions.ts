@@ -63,3 +63,13 @@ export class FinancialInvalidData extends AppException {
     super(message, 406, 'NOT_ACCEPTABLE');
   }
 }
+
+export class FinanceForecastUnavailable extends AppException {
+  constructor() {
+    super(
+      'El servicio de predicciones no está disponible en este momento!',
+      503,
+      'SERVICE_UNAVAILABLE',
+    );
+  }
+}

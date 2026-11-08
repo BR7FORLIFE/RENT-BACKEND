@@ -40,3 +40,9 @@ export const PUBLIC_BASE_URL = (
 ).replace(/\/$/, '');
 
 export const ISSUER_EMAIL = process.env.ISSUER_EMAIL;
+
+//API Python del modelo de prediccion (RENT-BACKEND/modelo). Servicio interno, no se expone por nginx
+export const MODEL_API_URL = (
+  process.env.MODEL_API_URL ?? 'http://model:8000'
+).replace(/\/$/, '');
+export const MODEL_API_KEY = process.env.MODEL_API_KEY;

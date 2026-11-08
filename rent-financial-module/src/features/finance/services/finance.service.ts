@@ -6,6 +6,7 @@ import type {
 } from '../../../../generated/prisma/enums.js';
 import { SystemPropertyService } from '../../system-property-role/services/system-property.service.js';
 import { FinanceRepository } from '../repository/finance.repository.js';
+import { ModelClient } from './model-client.service.js';
 import {
   POLICIES_STATEMENTS_NAMES,
   type AuthUser,
@@ -14,6 +15,7 @@ import type {
   ChangeFinancialStatusType,
   CreateFinancialTransactionType,
   FinancialSummaryQueryType,
+  ForecastQueryType,
   ListFinancialTransactionsQueryType,
   MarkAsPaidType,
   UpdateFinancialTransactionType,
@@ -67,6 +69,7 @@ export class FinanceService {
   constructor(
     private readonly systemRole: SystemPropertyService,
     private readonly repository: FinanceRepository,
+    private readonly model: ModelClient,
   ) {}
 
   private async authorize(
@@ -322,5 +325,29 @@ export class FinanceService {
       period: { from: query.from, to: query.to },
       byCurrency,
     };
+  }
+
+  //envia el historial de la propiedad al modelo y devuelve su pronostico + datos para graficas
+  async getForecast(
+    user: AuthUser,
+    propertyId: string,
+    query: ForecastQueryType,
+  ) {
+    await this.authorize(user, propertyId, 'VER_FINANZAS');
+
+    const rows = await this.repository.findForForecast(propertyId);
+
+    return await this.model.forecast(
+      rows.map((row) => ({
+        property_id: row.propertyId,
+        type: row.type,
+        category: row.category,
+        status: row.status,
+        amount: row.amount.toString(),
+        currency: row.currency,
+        occurred_at: row.occurredAt.toISOString(),
+      })),
+      query.horizon,
+    );
   }
 }
