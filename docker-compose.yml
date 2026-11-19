@@ -1,47 +1,88 @@
-services: 
+## Stack completo de RENT para el VPS.
+## Solo el gateway (nginx) publica un puerto en el host; el resto de servicios
+## se comunica unicamente por la red interna `rent-network` usando el nombre del servicio
+## (auth-database, financial-database, cache, auth, financial, model).
+##
+## Levantar:   docker compose up -d --build
+## Logs:       docker compose logs -f financial auth
+## Puerto publico configurable con GATEWAY_PORT (por defecto 3000).
+
+services:
   ## base de datos del microservicio de authentication usuarios
   auth-database:
     image: mongo:noble
     container_name: auth-database
-    ports:
-      - 27017:27017    
-    volumes: 
+    restart: unless-stopped
+    volumes:
       - mongo_data:/data/db
     env_file:
       - ./enviroments/auth-rent.env
+    networks:
+      - rent-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   ## base de datos de registro e informacion de las propiedades
-  financial-database: 
+  financial-database:
     image: postgres:17
     container_name: financial-database-module
-    ports: 
-      - 5432:5432
-    volumes: 
+    restart: unless-stopped
+    volumes:
       - pg_data:/var/lib/postgresql/data
     env_file:
-      - ./enviroments/financial-rent.env 
+      - ./enviroments/financial-rent.env
+    networks:
+      - rent-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
-  cache: 
+  cache:
     image: redis:8
     container_name: auth-cache
-    ports: 
-      - 6379:6379
-    volumes: 
+    restart: unless-stopped
+    volumes:
       - redis-data:/data
-  
+    networks:
+      - rent-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   ## servicio de authentication - FRAMEWORK: SPRING
-  auth:   
+  auth:
     build:
       context: ./rent-auth-module
       dockerfile: Dockerfile
     container_name: rent-auth
-    ports: 
-      - "3001:3001"
+    restart: unless-stopped
+    expose:
+      - "3001"
     depends_on:
-      - auth-database
-      - cache
+      auth-database:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
     env_file:
       - ./enviroments/auth-rent.env
+    networks:
+      - rent-network
+    healthcheck:
+      # cualquier respuesta HTTP (aunque sea 401) indica que el servicio esta arriba
+      test: ["CMD-SHELL", "curl -s -o /dev/null http://localhost:3001/rent-auth/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
 
   ## servicio de registro e informacion de propiedades - FRAMEWORK: NESTJS
   financial:
@@ -49,38 +90,74 @@ services:
       context: ./rent-financial-module
       dockerfile: Dockerfile
     container_name: rent-financial
-    ports: 
-      - "3002:3002"
+    restart: unless-stopped
+    expose:
+      - "3002"
     depends_on:
-      - financial-database
-      - model
+      financial-database:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
+      model:
+        condition: service_healthy
     env_file:
       - ./enviroments/financial-rent.env
-  
+    # permite alcanzar Ollama si corre en el host del VPS (OLLAMA_HOST=http://host.docker.internal:11434)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - rent-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3002/api').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      # migraciones + seed se ejecutan antes de arrancar
+      start_period: 90s
+
   ## API del modelo de prediccion financiera - FRAMEWORK: FASTAPI (interno, no se expone por nginx ni al host)
   model:
     build:
       context: ./modelo
       dockerfile: Dockerfile
     container_name: rent-model
+    restart: unless-stopped
     expose:
       - "8000"
     env_file:
       - ./enviroments/model-rent.env
+    networks:
+      - rent-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
 
-  ##gateway para reversed proxy
-  nginx: 
+  ## gateway para reversed proxy (unico punto de entrada publico)
+  nginx:
     image: nginx:trixie
     container_name: gateway
+    restart: unless-stopped
     ports:
-      - "3000:3000"
-    volumes: 
+      - "${GATEWAY_PORT:-3000}:3000"
+    volumes:
       - ./nginx/nginx.local.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - auth
-      - financial
+      auth:
+        condition: service_healthy
+      financial:
+        condition: service_healthy
+    networks:
+      - rent-network
 
-volumes: 
-  mongo_data: 
+networks:
+  rent-network:
+    name: rent-network
+    driver: bridge
+
+volumes:
+  mongo_data:
   pg_data:
   redis-data:

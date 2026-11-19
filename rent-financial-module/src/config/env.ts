@@ -8,7 +8,12 @@ export const MICROSERVICE_CLIENT_ID = process.env.CLIENT_ID;
 export const MICROSERVICE_CLIENT_SECRET = process.env.CLIENT_SECRET;
 
 //public Key del microservicio de autentication
+//prioridad: PUBLIC_KEY_RSA (PEM en base64, igual que en rent-auth) -> archivo public.pem
 function obtainPublicKey() {
+  const fromEnv = process.env.PUBLIC_KEY_RSA?.trim();
+  if (fromEnv) {
+    return Buffer.from(fromEnv, 'base64').toString('utf-8');
+  }
   const file = readFileSync('public.pem', 'utf-8');
   return file;
 }

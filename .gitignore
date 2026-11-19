@@ -3,3 +3,4 @@ enviroments/auth-rent.env
 enviroments/auth-rent.prod.env
 enviroments/financial-rent.env
 enviroments/financial-rent.prod.env
+.env
