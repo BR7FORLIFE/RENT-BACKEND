@@ -58,16 +58,22 @@ function buildRawMessage(to: string, subject: string, html: string) {
 /** Envia correos con la API de Gmail (users.messages.send) via OAuth2 refresh token. */
 export const gmailClient = {
   async send(params: { to: string; subject: string; html: string }) {
-    const token = await getAccessToken();
     try {
+      const token = await getAccessToken();
       await axios.post(
         SEND_URL,
-        { raw: buildRawMessage(params.to, params.subject, params.html) },
+        { raw: buildRawMessage(params.to.trim(), params.subject, params.html) },
         { headers: { Authorization: `Bearer ${token}` } },
       );
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.status === 401) {
-        cachedToken = null;
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 401) {
+          cachedToken = null;
+        }
+        // detalle real de Google (ej: invalid_grant -> refresh token expirado/revocado)
+        const detail = JSON.stringify(err.response?.data ?? err.message);
+        console.error(`Gmail API fallo (${err.response?.status}): ${detail}`);
+        throw new Error(`Gmail ${err.response?.status ?? ''}: ${detail}`);
       }
       throw err;
     }
